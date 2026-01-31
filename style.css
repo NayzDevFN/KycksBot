@@ -1,0 +1,146 @@
+/* ===================== BASE ===================== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0a0a0a;
+  color: white;
+  text-align: center;
+}
+
+/* ===================== HEADER ===================== */
+header {
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #1a0022, #000);
+}
+
+/* LOGO ÉCLAIRS VIOLETS */
+.logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 56px;
+  letter-spacing: 3px;
+  color: #c300ff;
+  text-shadow:
+    0 0 5px #c300ff,
+    0 0 10px #c300ff,
+    0 0 20px #9b00ff,
+    0 0 40px #6f00ff,
+    0 0 80px #4b00ff;
+  animation: lightning 1.2s infinite alternate;
+}
+
+@keyframes lightning {
+  0% {
+    text-shadow:
+      0 0 5px #c300ff,
+      0 0 10px #c300ff,
+      0 0 20px #9b00ff;
+  }
+  100% {
+    text-shadow:
+      0 0 20px #ff00ff,
+      0 0 40px #b000ff,
+      0 0 80px #6f00ff;
+  }
+}
+
+.subtitle {
+  color: #ccc;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+/* ===================== SECTIONS ===================== */
+section {
+  padding: 40px 20px;
+}
+
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  color: #c300ff;
+  margin-bottom: 20px;
+  text-shadow: 0 0 5px #c300ff;
+}
+
+/* ===================== JOUEURS ===================== */
+.players-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px; /* espace entre les cartes */
+}
+
+.player {
+  background: #141414;
+  border-radius: 16px;
+  padding: 25px;
+  max-width: 300px; /* largeur fixe pour 3 par ligne */
+  flex: 1 1 300px;
+  box-shadow: 0 0 20px rgba(195, 0, 255, 0.4);
+  transition: 0.3s;
+}
+
+.player:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 40px #c300ff, 0 0 60px #9b00ff;
+}
+
+.player h3 {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+/* ===================== RÉSEAUX ===================== */
+.socials a {
+  display: inline-block;
+  margin: 8px;
+  padding: 8px 16px;
+  border: 1px solid #c300ff;
+  border-radius: 20px;
+  color: #c300ff;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.socials a:hover {
+  background: #c300ff;
+  color: black;
+  box-shadow: 0 0 10px #c300ff, 0 0 20px #9b00ff;
+}
+
+/* ===================== BOUTIQUE ===================== */
+.coming-soon {
+  color: #aaa;
+  font-style: italic;
+}
+
+/* ===================== ANNONCES ===================== */
+#announcements ul {
+  list-style: none;
+  padding: 0;
+}
+
+#announcements li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #8e00ff33;
+}
+
+/* ===================== FOOTER ===================== */
+footer {
+  padding: 20px;
+  background: #000;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 1000px) {
+  .player {
+    flex: 1 1 45%;
+  }
+}
+
+@media (max-width: 600px) {
+  .player {
+    flex: 1 1 90%;
+  }
+}

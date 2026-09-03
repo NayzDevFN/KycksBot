@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NoVaX Esport</title>
 
   <!-- Police Esport -->
@@ -11,6 +12,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Stars background -->
+<div class="stars" id="stars"></div>
+<div class="shooting-stars"></div>
 
 <!-- ===================== HEADER ===================== -->
 <header>
@@ -29,7 +34,7 @@
 <!-- ===================== LA TEAM ===================== -->
 <section id="team">
   <h2>La Team</h2>
-  <p>
+  <p class="team-desc">
     NoVaX Esport est une team Fortnite compétitive,
     axée sur la performance, le grind et la victoire.
   </p>
@@ -43,8 +48,9 @@
 
     <!-- XoTi Fragger -->
     <div class="player">
+      <div class="player-glow"></div>
       <h3>XoTi Fragger</h3>
-      <p>Joueur Fortnite</p>
+      <p class="player-role">Joueur Fortnite</p>
       <div class="socials">
         <a href="https://www.twitch.tv/nxt_nxoti" target="_blank">Twitch</a>
         <a href="https://x.com/WDX_XoTi" target="_blank">X</a>
@@ -55,8 +61,9 @@
 
     <!-- Ezox IGL -->
     <div class="player">
+      <div class="player-glow"></div>
       <h3>Ezox IGL</h3>
-      <p>Stratège / In-Game Leader</p>
+      <p class="player-role">Stratège / In-Game Leader</p>
       <div class="socials">
         <a href="https://www.twitch.tv/ezoxfn" target="_blank">Twitch</a>
         <a href="https://youtube.com/@ezox-v7m?si=KgZmLp3QpCwgljin" target="_blank">YouTube</a>
@@ -66,8 +73,9 @@
 
     <!-- Max Fragger -->
     <div class="player">
+      <div class="player-glow"></div>
       <h3>Max Fragger</h3>
-      <p>Support / DPS</p>
+      <p class="player-role">Support / DPS</p>
       <div class="socials">
         <a href="https://www.twitch.tv/wdx2hs_max62" target="_blank">Twitch</a>
         <a href="https://x.com/wdx2hs_max" target="_blank">X</a>
@@ -78,8 +86,9 @@
 
     <!-- Teostra -->
     <div class="player">
+      <div class="player-glow"></div>
       <h3>Teostra</h3>
-      <p>Leader / Coach</p>
+      <p class="player-role">Leader / Coach</p>
       <div class="socials">
         <a href="https://www.twitch.tv/teostra246" target="_blank">Twitch</a>
         <a href="#" target="_blank">YouTube</a>
@@ -88,8 +97,9 @@
 
     <!-- Brixzz -->
     <div class="player">
+      <div class="player-glow"></div>
       <h3>Brixzz</h3>
-      <p>DPS / Attaquant</p>
+      <p class="player-role">DPS / Attaquant</p>
       <div class="socials">
         <a href="#" target="_blank">Twitch</a>
         <a href="#" target="_blank">X</a>
@@ -132,6 +142,20 @@
 <footer>
   <p>© 2026 NoVaX Esport. Tous droits réservés.</p>
 </footer>
+
+<script>
+  // Generate random stars
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 200; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 3 + 's';
+    star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+    starsContainer.appendChild(star);
+  }
+</script>
 
 </body>
 </html>

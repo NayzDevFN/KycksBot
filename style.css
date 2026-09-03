@@ -1,16 +1,100 @@
 /* ===================== BASE ===================== */
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: Arial, sans-serif;
-  background: #0a0a0a;
+  background: #050510;
   color: white;
   text-align: center;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===================== STARS ===================== */
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* Shooting stars */
+.shooting-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.shooting-stars::before,
+.shooting-stars::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(147, 130, 255, 0), #9382ff, rgba(147, 130, 255, 0));
+  border-radius: 50%;
+  animation: shoot 4s linear infinite;
+}
+
+.shooting-stars::before {
+  top: 20%;
+  left: -150px;
+  animation-delay: 0s;
+}
+
+.shooting-stars::after {
+  top: 60%;
+  left: -150px;
+  animation-delay: 2s;
+}
+
+@keyframes shoot {
+  0% { transform: translateX(0) translateY(0); opacity: 1; }
+  100% { transform: translateX(150vw) translateY(30vh); opacity: 0; }
 }
 
 /* ===================== HEADER ===================== */
 header {
-  padding: 60px 20px;
-  background: linear-gradient(135deg, #1a0022, #000);
+  padding: 80px 20px 60px;
+  background: radial-gradient(ellipse at center, rgba(88, 28, 135, 0.4) 0%, rgba(5, 5, 16, 0.95) 70%);
+  position: relative;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 /* LOGO ÉCLAIRS VIOLETS */
@@ -18,47 +102,76 @@ header {
   font-family: 'Orbitron', sans-serif;
   font-size: 56px;
   letter-spacing: 3px;
-  color: #c300ff;
+  color: #c084fc;
   text-shadow:
-    0 0 5px #c300ff,
-    0 0 10px #c300ff,
-    0 0 20px #9b00ff,
-    0 0 40px #6f00ff,
-    0 0 80px #4b00ff;
-  animation: lightning 1.2s infinite alternate;
+    0 0 5px #c084fc,
+    0 0 10px #c084fc,
+    0 0 20px #a855f7,
+    0 0 40px #7c3aed,
+    0 0 80px #6d28d9;
+  animation: cosmicGlow 2s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 1;
 }
 
-@keyframes lightning {
+@keyframes cosmicGlow {
   0% {
     text-shadow:
-      0 0 5px #c300ff,
-      0 0 10px #c300ff,
-      0 0 20px #9b00ff;
+      0 0 5px #c084fc,
+      0 0 10px #c084fc,
+      0 0 20px #a855f7;
   }
   100% {
     text-shadow:
-      0 0 20px #ff00ff,
-      0 0 40px #b000ff,
-      0 0 80px #6f00ff;
+      0 0 10px #e879f9,
+      0 0 20px #d946ef,
+      0 0 40px #a855f7,
+      0 0 80px #7c3aed;
   }
 }
 
 .subtitle {
-  color: #ccc;
+  color: #a5b4fc;
   font-size: 18px;
-  margin-top: 10px;
+  margin-top: 15px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
 }
 
 /* ===================== SECTIONS ===================== */
 section {
-  padding: 40px 20px;
+  padding: 60px 20px;
+  position: relative;
+}
+
+section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.5), transparent);
 }
 
 h2 {
   font-family: 'Orbitron', sans-serif;
-  color: #c300ff;
-  margin-bottom: 20px;
-  text-shadow: 0 0 5px #c300ff;
+  font-size: 32px;
+  color: #c084fc;
+  margin-bottom: 25px;
+  text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+  letter-spacing: 2px;
+}
+
+.team-desc {
+  max-width: 600px;
+  margin: 0 auto;
+  color: #a5b4fc;
+  line-height: 1.8;
+  font-size: 16px;
 }
 
 /* ===================== JOUEURS ===================== */
@@ -66,70 +179,141 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 30px; /* espace entre les cartes */
+  gap: 30px;
 }
 
 .player {
-  background: #141414;
-  border-radius: 16px;
-  padding: 25px;
-  max-width: 300px; /* largeur fixe pour 3 par ligne */
+  background: linear-gradient(145deg, rgba(30, 20, 60, 0.8), rgba(15, 10, 30, 0.9));
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 20px;
+  padding: 30px 25px;
+  max-width: 300px;
   flex: 1 1 300px;
-  box-shadow: 0 0 20px rgba(195, 0, 255, 0.4);
-  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.player-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.player:hover .player-glow {
+  opacity: 1;
 }
 
 .player:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 40px #c300ff, 0 0 60px #9b00ff;
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 
+    0 0 30px rgba(168, 85, 247, 0.3),
+    0 0 60px rgba(168, 85, 247, 0.1),
+    inset 0 0 30px rgba(168, 85, 247, 0.05);
 }
 
 .player h3 {
-  font-size: 26px;
-  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  color: #e879f9;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(232, 121, 249, 0.5);
+}
+
+.player-role {
+  color: #a5b4fc;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* ===================== RÉSEAUX ===================== */
+.socials {
+  position: relative;
+  z-index: 1;
+}
+
 .socials a {
   display: inline-block;
   margin: 8px;
-  padding: 8px 16px;
-  border: 1px solid #c300ff;
-  border-radius: 20px;
-  color: #c300ff;
+  padding: 10px 20px;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  border-radius: 25px;
+  color: #c084fc;
   text-decoration: none;
+  font-size: 14px;
   transition: 0.3s;
+  background: rgba(168, 85, 247, 0.05);
 }
 
 .socials a:hover {
-  background: #c300ff;
-  color: black;
-  box-shadow: 0 0 10px #c300ff, 0 0 20px #9b00ff;
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: white;
+  border-color: transparent;
+  box-shadow: 
+    0 0 15px rgba(168, 85, 247, 0.5),
+    0 0 30px rgba(168, 85, 247, 0.3);
+  transform: translateY(-2px);
 }
 
 /* ===================== BOUTIQUE ===================== */
+#shop {
+  background: radial-gradient(ellipse at center, rgba(88, 28, 135, 0.15) 0%, transparent 60%);
+}
+
 .coming-soon {
-  color: #aaa;
+  color: #c084fc;
   font-style: italic;
+  font-size: 18px;
 }
 
 /* ===================== ANNONCES ===================== */
+#announcements {
+  background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+}
+
 #announcements ul {
   list-style: none;
   padding: 0;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 #announcements li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #8e00ff33;
+  padding: 15px 20px;
+  margin: 10px 0;
+  background: rgba(168, 85, 247, 0.08);
+  border-left: 3px solid #a855f7;
+  border-radius: 0 10px 10px 0;
+  color: #e0e7ff;
+  transition: 0.3s;
+}
+
+#announcements li:hover {
+  background: rgba(168, 85, 247, 0.15);
+  transform: translateX(5px);
+}
+
+/* ===================== RESEAUX ===================== */
+#social {
+  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
 }
 
 /* ===================== FOOTER ===================== */
 footer {
-  padding: 20px;
-  background: #000;
-  color: #666;
+  padding: 30px 20px;
+  background: linear-gradient(180deg, transparent, rgba(5, 5, 16, 0.95));
+  color: #6b7280;
   font-size: 14px;
+  border-top: 1px solid rgba(168, 85, 247, 0.2);
 }
 
 /* ===================== RESPONSIVE ===================== */
@@ -137,10 +321,28 @@ footer {
   .player {
     flex: 1 1 45%;
   }
+  
+  .logo {
+    font-size: 40px;
+  }
 }
 
 @media (max-width: 600px) {
   .player {
     flex: 1 1 90%;
+  }
+  
+  .logo {
+    font-size: 28px;
+    letter-spacing: 1px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+  
+  h2 {
+    font-size: 24px;
   }
 }

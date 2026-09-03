@@ -13,6 +13,12 @@
 <!-- Paper texture overlay -->
 <div class="paper-texture"></div>
 
+<!-- 
+  ===================== MODIFIER ICI =====================
+  Remplace 1544851212187340881 par le Client ID de ton bot Kycks
+  Le Client ID se trouve dans le Discord Developer Portal > ton bot > General Information
+  Lien : https://discord.com/developers/applications
+-->
 <!-- ===================== HEADER ===================== -->
 <header>
   <div class="doodle star-doodle">★</div>
@@ -23,7 +29,7 @@
   <p class="tagline">~ ton bot discord préféré ~</p>
   
   <div class="invite-btn-container">
-    <a href="#" class="invite-btn">+ Inviter le Bot</a>
+    <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="invite-btn" target="_blank">+ Inviter le Bot</a>
   </div>
   
   <div class="header-stats">
@@ -188,7 +194,7 @@
       <li>Choisis ton serveur</li>
       <li>Et c'est bon, Kycks est là ! 🎉</li>
     </ol>
-    <a href="#" class="invite-btn big-invite">+ Inviter Kycks maintenant</a>
+    <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="invite-btn big-invite" target="_blank">+ Inviter Kycks maintenant</a>
   </div>
   
   <div class="doodle floating-star">★</div>
@@ -249,11 +255,11 @@ document.addEventListener('mousemove', (e) => {
     x: e.clientX,
     y: e.clientY,
     age: 0,
-    size: Math.random() * 2 + 1
+    size: Math.random() * 3 + 2
   });
   
   // Limit points for performance
-  if (points.length > 100) {
+  if (points.length > 150) {
     points.shift();
   }
 });
@@ -269,9 +275,16 @@ function drawPencilTrail() {
     const opacity = Math.max(0, 1 - (point.age / 60));
     
     if (opacity > 0) {
+      // Main pencil dots - dark grey/black
       ctx.beginPath();
       ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(45, 45, 45, ${opacity * 0.6})`;
+      ctx.fillStyle = `rgba(30, 30, 30, ${opacity * 0.9})`;
+      ctx.fill();
+      
+      // Extra smudge effect
+      ctx.beginPath();
+      ctx.arc(point.x + 1, point.y + 1, point.size * 0.7, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(50, 50, 50, ${opacity * 0.4})`;
       ctx.fill();
       
       // Draw connecting lines for pencil effect
@@ -280,8 +293,9 @@ function drawPencilTrail() {
         ctx.beginPath();
         ctx.moveTo(prev.x, prev.y);
         ctx.lineTo(point.x, point.y);
-        ctx.strokeStyle = `rgba(45, 45, 45, ${opacity * 0.3})`;
-        ctx.lineWidth = point.size * 0.5;
+        ctx.strokeStyle = `rgba(30, 30, 30, ${opacity * 0.7})`;
+        ctx.lineWidth = point.size * 0.8;
+        ctx.lineCap = 'round';
         ctx.stroke();
       }
     }

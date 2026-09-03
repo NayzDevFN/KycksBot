@@ -228,5 +228,73 @@
   <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
 </footer>
 
+<!-- Pencil trail canvas -->
+<canvas id="pencil-canvas"></canvas>
+
+<script>
+// ===================== PENCIL TRAIL EFFECT =====================
+const canvas = document.getElementById('pencil-canvas');
+const ctx = canvas.getContext('2d');
+let points = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+document.addEventListener('mousemove', (e) => {
+  points.push({
+    x: e.clientX,
+    y: e.clientY,
+    age: 0,
+    size: Math.random() * 2 + 1
+  });
+  
+  // Limit points for performance
+  if (points.length > 100) {
+    points.shift();
+  }
+});
+
+function drawPencilTrail() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  for (let i = 0; i < points.length; i++) {
+    const point = points[i];
+    point.age++;
+    
+    // Fade out after 60 frames (~1 second)
+    const opacity = Math.max(0, 1 - (point.age / 60));
+    
+    if (opacity > 0) {
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(45, 45, 45, ${opacity * 0.6})`;
+      ctx.fill();
+      
+      // Draw connecting lines for pencil effect
+      if (i > 0 && points[i-1].age < 60) {
+        const prev = points[i-1];
+        ctx.beginPath();
+        ctx.moveTo(prev.x, prev.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.strokeStyle = `rgba(45, 45, 45, ${opacity * 0.3})`;
+        ctx.lineWidth = point.size * 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  
+  // Remove old points
+  points = points.filter(p => p.age < 60);
+  
+  requestAnimationFrame(drawPencilTrail);
+}
+
+drawPencilTrail();
+</script>
+
 </body>
 </html>

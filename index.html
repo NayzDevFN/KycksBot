@@ -3,159 +3,230 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NoVaX Esport</title>
-
-  <!-- Police Esport -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-
-  <!-- Style -->
+  <title>Kycks - Bot Discord</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Stars background -->
-<div class="stars" id="stars"></div>
-<div class="shooting-stars"></div>
+<!-- Paper texture overlay -->
+<div class="paper-texture"></div>
 
 <!-- ===================== HEADER ===================== -->
 <header>
-  <h1 class="logo">⚡ NoVaX Esport ⚡</h1>
-  <p class="subtitle">Team Esport Fortnite</p>
-
-  <!-- Réseaux de la team -->
-  <div class="socials">
-    <a href="https://discord.gg/r4GeDDHkKs" target="_blank">Discord</a>
-    <a href="https://x.com/nvxnovaxesport?s=21" target="_blank">X</a>
-    <a href="#" target="_blank">Twitch</a>
-    <a href="https://youtube.com/@novaxesport-v7s?si=CC8nD2gfmCNyN01R" target="_blank">YouTube</a>
+  <div class="doodle star-doodle">★</div>
+  <div class="doodle heart-doodle">♥</div>
+  <div class="doodle spiral-doodle">✿</div>
+  
+  <h1 class="logo">Kycks</h1>
+  <p class="tagline">~ ton bot discord préféré ~</p>
+  
+  <div class="invite-btn-container">
+    <a href="#" class="invite-btn">+ Inviter le Bot</a>
+  </div>
+  
+  <div class="header-stats">
+    <div class="stat-box">
+      <span class="stat-number" id="servers">250+</span>
+      <span class="stat-label">Serviteurs</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number" id="users">15k+</span>
+      <span class="stat-label">Utilisateurs</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number" id="commands">50+</span>
+      <span class="stat-label">Commandes</span>
+    </div>
   </div>
 </header>
 
-<!-- ===================== LA TEAM ===================== -->
-<section id="team">
-  <h2>La Team</h2>
-  <p class="team-desc">
-    NoVaX Esport est une team Fortnite compétitive,
-    axée sur la performance, le grind et la victoire.
-  </p>
-</section>
-
-<!-- ===================== JOUEURS ===================== -->
-<section id="players">
-  <h2>Nos Joueurs</h2>
-
-  <div class="players-container">
-
-    <!-- XoTi Fragger -->
-    <div class="player">
-      <div class="player-glow"></div>
-      <h3>XoTi Fragger</h3>
-      <p class="player-role">Joueur Fortnite</p>
-      <div class="socials">
-        <a href="https://www.twitch.tv/nxt_nxoti" target="_blank">Twitch</a>
-        <a href="https://x.com/WDX_XoTi" target="_blank">X</a>
-        <a href="https://www.youtube.com/@NXT_NXoTi" target="_blank">YouTube</a>
-        <a href="https://www.tiktok.com/@nxoti_nxt?_r=1&_t=ZN-93XIdQ6gAYF" target="_blank">TikTok</a>
-      </div>
-    </div>
-
-    <!-- Ezox IGL -->
-    <div class="player">
-      <div class="player-glow"></div>
-      <h3>Ezox IGL</h3>
-      <p class="player-role">Stratège / In-Game Leader</p>
-      <div class="socials">
-        <a href="https://www.twitch.tv/ezoxfn" target="_blank">Twitch</a>
-        <a href="https://youtube.com/@ezox-v7m?si=KgZmLp3QpCwgljin" target="_blank">YouTube</a>
-        <a href="https://www.tiktok.com/@ezox.fn5?_r=1&_t=ZN-93XKNeFk2ic" target="_blank">TikTok</a>
-      </div>
-    </div>
-
-    <!-- Max Fragger -->
-    <div class="player">
-      <div class="player-glow"></div>
-      <h3>Max Fragger</h3>
-      <p class="player-role">Support / DPS</p>
-      <div class="socials">
-        <a href="https://www.twitch.tv/wdx2hs_max62" target="_blank">Twitch</a>
-        <a href="https://x.com/wdx2hs_max" target="_blank">X</a>
-        <a href="https://youtube.com/@mxm-maxence?si=wVGHz3q_NKKOSWIe" target="_blank">YouTube</a>
-        <a href="https://www.tiktok.com/@hs_max62?_r=1&_t=ZN-93XLTPMB05u" target="_blank">TikTok</a>
-      </div>
-    </div>
-
-    <!-- Teostra -->
-    <div class="player">
-      <div class="player-glow"></div>
-      <h3>Teostra</h3>
-      <p class="player-role">Leader / Coach</p>
-      <div class="socials">
-        <a href="https://www.twitch.tv/teostra246" target="_blank">Twitch</a>
-        <a href="#" target="_blank">YouTube</a>
-      </div>
-    </div>
-
-    <!-- Brixzz -->
-    <div class="player">
-      <div class="player-glow"></div>
-      <h3>Brixzz</h3>
-      <p class="player-role">DPS / Attaquant</p>
-      <div class="socials">
-        <a href="#" target="_blank">Twitch</a>
-        <a href="#" target="_blank">X</a>
-        <a href="#" target="_blank">YouTube</a>
-        <a href="#" target="_blank">TikTok</a>
-      </div>
-    </div>
-
+<!-- ===================== A PROPOS ===================== -->
+<section id="about">
+  <h2 class="section-title">C'est quoi Kycks ?</h2>
+  <div class="paper-card">
+    <p>
+      <span class="underline">Kycks</span> est un bot Discord multifonctionnel 
+      crée avec amour (et beaucoup de café ☕). 
+      Il fait tout : modération, musique, fun, utilités... 
+      Bref, c'est le <span class="circle">meilleur</span> bot de ton serv !
+    </p>
+    <div class="doodle corner-doodle top-left">星巴</div>
+    <div class="doodle corner-doodle top-right">~</div>
+    <div class="doodle corner-doodle bottom-left">彡</div>
+    <div class="doodle corner-doodle bottom-right">★</div>
   </div>
 </section>
 
-<!-- ===================== BOUTIQUE ===================== -->
-<section id="shop">
-  <h2>Boutique</h2>
-  <p class="coming-soon">🛒 Boutique bientôt disponible</p>
+<!-- ===================== FONCTIONNALITÉS ===================== -->
+<section id="features">
+  <h2 class="section-title">Ce qu'il fait</h2>
+  
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <h3>Modération</h3>
+      <p>Ban, kick, mute, warn...<br>Tout pour garder ton serv propre !</p>
+      <div class="squiggle"></div>
+    </div>
+    
+    <div class="feature-card">
+      <div class="feature-icon">🎵</div>
+      <h3>Musique</h3>
+      <p>Joue de la musique dans tes salons vocaux<br>avec /play</p>
+      <div class="squiggle"></div>
+    </div>
+    
+    <div class="feature-card">
+      <div class="feature-icon">🎮</div>
+      <h3>Fun & Jeux</h3>
+      <p>Memes, mini-jeux, blagues...<br>Pour pimenter ton serv !</p>
+      <div class="squiggle"></div>
+    </div>
+    
+    <div class="feature-card">
+      <div class="feature-icon">⚙️</div>
+      <h3>Utilités</h3>
+      <p>Embeds, information, outils<br>pour les admins</p>
+      <div class="squiggle"></div>
+    </div>
+  </div>
 </section>
 
-<!-- ===================== ANNONCES ===================== -->
-<section id="announcements">
-  <h2>Annonces</h2>
-  <ul>
-    <li>Tournoi ce week-end – Rejoignez-nous !</li>
-    <li>Nouveaux sponsors annoncés !</li>
-    <li>Stream spécial vendredi à 20h sur Twitch.</li>
-  </ul>
+<!-- ===================== COMMANDES ===================== -->
+<section id="commands">
+  <h2 class="section-title">Commandes</h2>
+  
+  <div class="commands-list">
+    <div class="command-item">
+      <span class="cmd-name">/help</span>
+      <span class="cmd-desc">Affiche la liste des commandes</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/play</span>
+      <span class="cmd-desc">Joue de la musique</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/ban</span>
+      <span class="cmd-desc">Bannir un membre</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/kick</span>
+      <span class="cmd-desc">Expulser un membre</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/mute</span>
+      <span class="cmd-desc">Mute un membre</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/meme</span>
+      <span class="cmd-desc">Envoie un mème aléatoire</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/rank</span>
+      <span class="cmd-desc">Voir ton niveau XP</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/embed</span>
+      <span class="cmd-desc">Créer un embed custom</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+  </div>
+  
+  <p class="more-cmds">... et bien d'autres !</p>
 </section>
 
-<!-- ===================== RESEAUX ===================== -->
-<section id="social">
-  <h2>Suivez-nous</h2>
-  <div class="socials">
-    <a href="https://discord.gg/r4GeDDHkKs" target="_blank">Discord</a>
-    <a href="https://x.com/nvxnovaxesport?s=21" target="_blank">X</a>
-    <a href="#" target="_blank">Twitch</a>
-    <a href="https://youtube.com/@novaxesport-v7s?si=CC8nD2gfmCNyN01R" target="_blank">YouTube</a>
+<!-- ===================== PREVIEW DISCORD ===================== -->
+<section id="preview">
+  <h2 class="section-title">Comment ça marche</h2>
+  
+  <div class="discord-preview">
+    <div class="discord-msg">
+      <div class="msg-avatar">K</div>
+      <div class="msg-content">
+        <span class="msg-name">Kycks</span>
+        <span class="msg-badge">BOT</span>
+        <p class="msg-text">Salut ! Je suis Kycks, ton nouveau bot Discord 🎉</p>
+      </div>
+    </div>
+    
+    <div class="discord-msg user-msg">
+      <div class="msg-avatar user-avatar">U</div>
+      <div class="msg-content">
+        <span class="msg-name">Toi</span>
+        <p class="msg-text">/play despacito</p>
+      </div>
+    </div>
+    
+    <div class="discord-msg">
+      <div class="msg-avatar">K</div>
+      <div class="msg-content">
+        <span class="msg-name">Kycks</span>
+        <span class="msg-badge">BOT</span>
+        <p class="msg-text">🎵 En lecture : Despacito - Luis Fonsi<br>Volume : 80% | File : 3 chansons</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INVITER ===================== -->
+<section id="invite">
+  <h2 class="section-title">Rejoins l'aventure</h2>
+  
+  <div class="invite-box">
+    <p>C'est simple comme bonjour :</p>
+    <ol class="steps-list">
+      <li>Clique sur le bouton</li>
+      <li>Choisis ton serveur</li>
+      <li>Et c'est bon, Kycks est là ! 🎉</li>
+    </ol>
+    <a href="#" class="invite-btn big-invite">+ Inviter Kycks maintenant</a>
+  </div>
+  
+  <div class="doodle floating-star">★</div>
+  <div class="doodle floating-heart">♥</div>
+</section>
+
+<!-- ===================== SUPPORT ===================== -->
+<section id="support">
+  <h2 class="section-title">Besoin d'aide ?</h2>
+  
+  <div class="support-links">
+    <a href="#" class="support-btn">
+      <span class="support-icon">💬</span>
+      <span>Discord Support</span>
+    </a>
+    <a href="#" class="support-btn">
+      <span class="support-icon">🐦</span>
+      <span>Twitter</span>
+    </a>
+    <a href="#" class="support-btn">
+      <span class="support-icon">📖</span>
+      <span>Documentation</span>
+    </a>
   </div>
 </section>
 
 <!-- ===================== FOOTER ===================== -->
 <footer>
-  <p>© 2026 NoVaX Esport. Tous droits réservés.</p>
+  <div class="footer-doodles">
+    <span>★</span>
+    <span>~</span>
+    <span>✿</span>
+    <span>彡</span>
+    <span>★</span>
+  </div>
+  <p>Fait avec ♥ et beaucoup de papier</p>
+  <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
 </footer>
-
-<script>
-  // Generate random stars
-  const starsContainer = document.getElementById('stars');
-  for (let i = 0; i < 200; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * 100 + '%';
-    star.style.top = Math.random() * 100 + '%';
-    star.style.animationDelay = Math.random() * 3 + 's';
-    star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
-    starsContainer.appendChild(star);
-  }
-</script>
 
 </body>
 </html>

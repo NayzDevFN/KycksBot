@@ -13,6 +13,7 @@ const io = new Server(server, { cors: { origin: '*' } });
 app.use(cors());
 app.use(express.json());
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use(express.static(__dirname, { index: false }));
 
 // ===================== JSON DATABASE =====================
 const DB_PATH = path.join(__dirname, 'settings.json');

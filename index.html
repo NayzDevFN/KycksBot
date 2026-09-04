@@ -42,8 +42,8 @@
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="invite-btn" target="_blank">+ Inviter le Bot</a>
   </div>
   <div class="header-stats">
-    <div class="stat-box"><span class="stat-number">250+</span><span class="stat-label">Serviteurs</span></div>
-    <div class="stat-box"><span class="stat-number">15k+</span><span class="stat-label">Utilisateurs</span></div>
+    <div class="stat-box"><span class="stat-number" id="statServers">-</span><span class="stat-label">Serviteurs</span></div>
+    <div class="stat-box"><span class="stat-number" id="statUsers">-</span><span class="stat-label">Utilisateurs</span></div>
     <div class="stat-box"><span class="stat-number">70+</span><span class="stat-label">Commandes</span></div>
   </div>
 </header>
@@ -144,6 +144,31 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
   });
 });
+
+// Load real stats from API
+async function loadRealStats() {
+  try {
+    const res = await fetch('http://localhost:3000/api/stats');
+    const data = await res.json();
+    if (data.servers) document.getElementById('statServers').textContent = data.servers + '+';
+    if (data.users) document.getElementById('statUsers').textContent = (data.users >= 1000 ? Math.floor(data.users/1000) + 'k+' : data.users + '+');
+  } catch (e) {}
+}
+
+// Load bot avatar from Discord
+function loadBotAvatar() {
+  const BOT_CLIENT_ID = '1544851212187340881';
+  const avatarUrl = `https://cdn.discordapp.com/avatars/${BOT_CLIENT_ID}/avatar.png?size=128`;
+  const fallbackUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
+  const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .header-avatar');
+  const img = new Image();
+  img.onload = function() { imgs.forEach(el => el.src = avatarUrl); };
+  img.onerror = function() { imgs.forEach(el => el.src = fallbackUrl); };
+  img.src = avatarUrl;
+}
+
+loadRealStats();
+loadBotAvatar();
 </script>
 
 </body>

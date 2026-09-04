@@ -1,0 +1,17 @@
+{
+  "name": "kycks-bot",
+  "version": "1.0.0",
+  "description": "Kycks Discord Bot",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node api.js",
+    "bot": "node bot.js",
+    "api": "node api.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "cors": "^2.8.5"
+  }
+}

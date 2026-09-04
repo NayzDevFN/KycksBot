@@ -1,0 +1,44 @@
+{
+  "name": "pre_nuke_1788485023280",
+  "createdAt": "2026-09-04T01:23:43.280Z",
+  "guildId": "1544851522280628244",
+  "guildName": "Serveur de N0xt1",
+  "channels": [
+    {
+      "id": "1544851522960236556",
+      "name": "général",
+      "type": 0,
+      "topic": null,
+      "position": 0,
+      "nsfw": false,
+      "parent": "1544851522960236554",
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1544851522960236557",
+      "name": "Général",
+      "type": 2,
+      "position": 0,
+      "nsfw": false,
+      "bitrate": 64000,
+      "userLimit": 0,
+      "parent": "1544851522960236555",
+      "permissionOverwrites": []
+    }
+  ],
+  "roles": [],
+  "categories": [
+    {
+      "id": "1544851522960236554",
+      "name": "Salons textuels",
+      "position": 0,
+      "permissionOverwrites": []
+    },
+    {
+      "id": "1544851522960236555",
+      "name": "Salons vocaux",
+      "position": 1,
+      "permissionOverwrites": []
+    }
+  ]
+}

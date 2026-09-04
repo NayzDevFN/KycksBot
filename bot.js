@@ -137,7 +137,8 @@ async function createBackup(guild, name) {
     guildName: guild.name,
     channels: [],
     roles: [],
-    categories: []
+    categories: [],
+    messages: {}
   };
 
   // Sauvegarder les catégories
@@ -155,15 +156,73 @@ async function createBackup(guild, name) {
     });
   });
 
-  // Sauvegarder les salons
-  guild.channels.cache.filter(c => c.type !== ChannelType.GuildCategory).forEach(ch => {
-    backup.channels.push({
+  // Sauvegarder les salons texte + messages (jusqu'à 500 par salon)
+  const textChannels = guild.channels.cache.filter(c => c.type === ChannelType.GuildText);
+  
+  for (const ch of textChannels) {
+    const channelData = {
       id: ch.id,
       name: ch.name,
       type: ch.type,
       topic: ch.topic,
       position: ch.position,
       nsfw: ch.nsfw,
+      parent: ch.parent?.id || null,
+      permissionOverwrites: ch.permissionOverwrites.cache.map(p => ({
+        id: p.id,
+        type: p.type,
+        allow: p.allow.toString(),
+        deny: p.deny.toString()
+      }))
+    };
+    backup.channels.push(channelData);
+    
+    // Sauvegarder les messages (1000 derniers par salon)
+    try {
+      let allMessages = [];
+      let lastId = null;
+      const maxMessages = 1000;
+      
+      while (allMessages.length < maxMessages) {
+        const fetchOptions = { limit: Math.min(maxMessages - allMessages.length, 100) };
+        if (lastId) fetchOptions.before = lastId;
+        
+        const messages = await ch.messages.fetch(fetchOptions);
+        if (messages.size === 0) break;
+        
+        for (const [id, msg] of messages) {
+          if (!msg.author.bot) {
+            allMessages.push({
+              id: msg.id,
+              author: msg.author.username,
+              authorId: msg.author.id,
+              avatar: msg.author.displayAvatarURL({ extension: 'png', size: 128 }),
+              content: msg.content || '',
+              timestamp: msg.createdTimestamp,
+              editedTimestamp: msg.editedTimestamp,
+              attachments: msg.attachments.map(a => ({ url: a.url, name: a.name, size: a.size })),
+              embeds: msg.embeds.length > 0 ? msg.embeds.map(e => ({ title: e.title, description: e.description, url: e.url })) : [],
+              replyTo: msg.reference?.messageId || null
+            });
+          }
+        }
+        
+        lastId = messages.last()?.id;
+      }
+      
+      if (allMessages.length > 0) {
+        backup.messages[ch.id] = allMessages.reverse();
+      }
+    } catch (e) {}
+  }
+
+  // Sauvegarder les autres types de salons (vocaux, etc)
+  guild.channels.cache.filter(c => c.type !== ChannelType.GuildCategory && c.type !== ChannelType.GuildText).forEach(ch => {
+    backup.channels.push({
+      id: ch.id,
+      name: ch.name,
+      type: ch.type,
+      position: ch.position,
       bitrate: ch.bitrate,
       userLimit: ch.userLimit,
       parent: ch.parent?.id || null,
@@ -176,7 +235,7 @@ async function createBackup(guild, name) {
     });
   });
 
-  // Sauvegarder les rôles (sauf @everyone et rôles du bot)
+  // Sauvegarder les rôles
   guild.roles.cache.forEach(role => {
     if (role.name === '@everyone') return;
     if (role.managed) return;
@@ -202,7 +261,7 @@ async function restoreBackup(guild, backupName) {
   
   const backup = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   
-  // Supprimer tous les salons sauf le salon général
+  // Supprimer tous les salons sauf le général
   for (const [id, channel] of guild.channels.cache) {
     try {
       if (channel.name === 'général' || channel.name === 'general') continue;
@@ -227,7 +286,8 @@ async function restoreBackup(guild, backupName) {
   
   await new Promise(r => setTimeout(r, 500));
   
-  // Créer les salons
+  // Créer les salons + restaurer les messages
+  const channelMap = {};
   for (const ch of backup.channels) {
     try {
       const options = {
@@ -241,7 +301,69 @@ async function restoreBackup(guild, backupName) {
       if (ch.userLimit) options.userLimit = ch.userLimit;
       if (ch.parent && categoryMap[ch.parent]) options.parent = categoryMap[ch.parent];
       
-      await guild.channels.create(options);
+      const newChannel = await guild.channels.create(options);
+      channelMap[ch.id] = newChannel.id;
+      
+      // Restaurer les messages si c'est un salon texte
+      if (ch.type === ChannelType.GuildText && backup.messages && backup.messages[ch.id]) {
+        const messages = backup.messages[ch.id];
+        
+        if (messages.length > 0) {
+          // Créer un webhook pour restaurer les messages avec le vrai nom
+          let webhook;
+          try {
+            webhook = await newChannel.createWebhook({ name: 'Historique restauré' });
+          } catch (e) {}
+          
+          // Envoyer un embed d'en-tête
+          const headerEmbed = new EmbedBuilder()
+            .setColor('#2ecc71')
+            .setTitle('📋 Historique restauré')
+            .setDescription(`${messages.length} message(s) restauré(s) depuis **${backupName}**`)
+            .setTimestamp();
+          await newChannel.send({ embeds: [headerEmbed] }).catch(() => {});
+          await new Promise(r => setTimeout(r, 500));
+          
+          // Restaurer les messages via webhook (avec le vrai nom et avatar)
+          for (const msg of messages) {
+            try {
+              // Construire le contenu
+              let content = msg.content || '';
+              
+              // Ajouter les pièces jointes
+              if (msg.attachments && msg.attachments.length > 0) {
+                const attStr = msg.attachments.map(a => a.url).join('\n');
+                content += (content ? '\n' : '') + attStr;
+              }
+              
+              if (webhook) {
+                // Utiliser le webhook pour envoyer avec le vrai nom/avatar
+                await webhook.send({
+                  content: content || '*message vide*',
+                  username: msg.author,
+                  avatarURL: msg.avatar || `https://cdn.discordapp.com/embed/avatars/${(parseInt(msg.authorId) >> 22) % 6}.png`
+                }).catch(() => {});
+              } else {
+                // Fallback : envoyer en embed
+                const embed = new EmbedBuilder()
+                  .setColor('#7289da')
+                  .setAuthor({ name: msg.author })
+                  .setDescription(content || '*message vide*')
+                  .setTimestamp(msg.timestamp);
+                await newChannel.send({ embeds: [embed] }).catch(() => {});
+              }
+              
+              // Petit délai pour ne pas spammer
+              await new Promise(r => setTimeout(r, 500));
+            } catch (e) {}
+          }
+          
+          // Supprimer le webhook après restauration
+          if (webhook) {
+            try { await webhook.delete(); } catch (e) {}
+          }
+        }
+      }
     } catch (e) {}
   }
   
@@ -250,7 +372,7 @@ async function restoreBackup(guild, backupName) {
 
 async function nukeGuild(guild, confirm = true) {
   if (confirm) {
-    // Sauvegarder d'abord
+    // Sauvegarder avec les messages
     const backup = await createBackup(guild, `pre_nuke_${Date.now()}`);
     
     // Supprimer tous les salons

@@ -137,7 +137,8 @@ app.get('/api/backups', (req, res) => {
     const backups = files.map(f => {
       try {
         const data = JSON.parse(fs.readFileSync(path.join(BACKUPS_PATH, f), 'utf8'));
-        return { name: data.name, createdAt: data.createdAt, guildName: data.guildName };
+        const msgCount = data.messages ? Object.values(data.messages).reduce((acc, msgs) => acc + msgs.length, 0) : 0;
+        return { name: data.name, createdAt: data.createdAt, guildName: data.guildName, channels: data.channels?.length || 0, messages: msgCount };
       } catch (e) {
         return { name: f.replace('.json', '') };
       }
@@ -165,6 +166,11 @@ app.get('/api/server', async (req, res) => {
   try {
     const client = bot.client;
     const guild = await client.guilds.fetch(GUILD_ID);
+    
+    // Fetch explicitement
+    await guild.channels.fetch();
+    await guild.roles.fetch();
+    await guild.members.fetch();
     
     const channels = guild.channels.cache.map(c => ({
       id: c.id,
@@ -218,8 +224,9 @@ app.get('/api/channels', async (req, res) => {
     const client = bot.client;
     const guild = await client.guilds.fetch(GUILD_ID);
     const channels = guild.channels.cache
-      .filter(c => c.type === 0 || c.type === 2 || c.type === 4)
-      .map(c => ({ id: c.id, name: c.name, type: c.type }));
+      .filter(c => c.type === 0 || c.type === 2 || c.type === 4 || c.type === 5)
+      .sort((a, b) => a.position - b.position)
+      .map(c => ({ id: c.id, name: c.name, type: c.type, category: c.parent?.name || null }));
     res.json({ channels });
   } catch (error) {
     res.json({ channels: [] });
@@ -232,10 +239,53 @@ app.get('/api/roles', async (req, res) => {
     const guild = await client.guilds.fetch(GUILD_ID);
     const roles = guild.roles.cache
       .filter(r => r.name !== '@everyone' && !r.managed)
+      .sort((a, b) => b.position - a.position)
       .map(r => ({ id: r.id, name: r.name, color: r.hexColor }));
     res.json({ roles });
   } catch (error) {
     res.json({ roles: [] });
+  }
+});
+
+app.get('/api/selectors', async (req, res) => {
+  try {
+    const client = bot.client;
+    const guild = await client.guilds.fetch(GUILD_ID);
+    
+    // Fetch explicitement les salons, rôles et membres (pas juste le cache)
+    await guild.channels.fetch();
+    await guild.members.fetch();
+    await guild.roles.fetch();
+    
+    const textChannels = guild.channels.cache
+      .filter(c => c.type === 0)
+      .sort((a, b) => a.position - b.position)
+      .map(c => ({ id: c.id, name: c.name, category: c.parent?.name || null }));
+    
+    const voiceChannels = guild.channels.cache
+      .filter(c => c.type === 2)
+      .sort((a, b) => a.position - b.position)
+      .map(c => ({ id: c.id, name: c.name, category: c.parent?.name || null }));
+    
+    const categories = guild.channels.cache
+      .filter(c => c.type === 4)
+      .sort((a, b) => a.position - b.position)
+      .map(c => ({ id: c.id, name: c.name }));
+    
+    const roles = guild.roles.cache
+      .filter(r => r.name !== '@everyone' && !r.managed)
+      .sort((a, b) => b.position - a.position)
+      .map(r => ({ id: r.id, name: r.name, color: r.hexColor }));
+    
+    const members = guild.members.cache
+      .filter(m => !m.user.bot)
+      .sort((a, b) => a.user.username.localeCompare(b.user.username))
+      .map(m => ({ id: m.id, username: m.user.username, displayName: m.displayName }));
+    
+    res.json({ textChannels, voiceChannels, categories, roles, members });
+  } catch (error) {
+    console.error('Erreur selectors:', error.message);
+    res.json({ textChannels: [], voiceChannels: [], categories: [], roles: [], members: [] });
   }
 });
 

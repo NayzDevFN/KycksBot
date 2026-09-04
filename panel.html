@@ -892,13 +892,18 @@ function renderCustomCmds() {
 async function loadStats() {
   try {
     const res = await fetch(`${API}/api/stats`);
+    if (!res.ok) throw new Error('API offline');
     const data = await res.json();
     document.getElementById('dashServers').textContent = data.servers || 0;
     document.getElementById('dashUsers').textContent = data.users || 0;
-  } catch (e) {}
+  } catch (e) {
+    document.getElementById('dashServers').textContent = '0';
+    document.getElementById('dashUsers').textContent = '0';
+  }
   
   try {
     const res = await fetch(`${API}/api/server`);
+    if (!res.ok) throw new Error('API offline');
     const data = await res.json();
     if (data.name) {
       document.getElementById('serverName').textContent = data.name;
@@ -906,7 +911,12 @@ async function loadStats() {
     }
     document.getElementById('dashChannels').textContent = data.channels?.length || 0;
     document.getElementById('dashRoles').textContent = data.roles?.length || 0;
-  } catch (e) {}
+  } catch (e) {
+    document.getElementById('serverName').textContent = 'Kycks Bot';
+    document.getElementById('serverGreeting').textContent = 'Connecte le bot pour gérer ton serveur.';
+    document.getElementById('dashChannels').textContent = '0';
+    document.getElementById('dashRoles').textContent = '0';
+  }
 }
 
 // ===================== TABS =====================

@@ -145,14 +145,34 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// Load real stats from API
+// Load real stats from Discord widget API
 async function loadRealStats() {
+  const BOT_CLIENT_ID = '1544851212187340881';
+  
+  // Try local API first (when bot server is running)
   try {
     const res = await fetch('http://localhost:3000/api/stats');
-    const data = await res.json();
-    if (data.servers) document.getElementById('statServers').textContent = data.servers + '+';
-    if (data.users) document.getElementById('statUsers').textContent = (data.users >= 1000 ? Math.floor(data.users/1000) + 'k+' : data.users + '+');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.servers) document.getElementById('statServers').textContent = data.servers + '+';
+      if (data.users) document.getElementById('statUsers').textContent = (data.users >= 1000 ? Math.floor(data.users/1000) + 'k+' : data.users + '+');
+      return;
+    }
   } catch (e) {}
+  
+  // Fallback: use Discord widget to get server count
+  try {
+    const res = await fetch(`https://discord.com/api/v10/guilds/widget.json?id=1544851212187340881`);
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('statServers').textContent = (data.member_count || 1) + '+';
+    } else {
+      document.getElementById('statServers').textContent = '1+';
+    }
+  } catch (e) {
+    document.getElementById('statServers').textContent = '1+';
+  }
+  document.getElementById('statUsers').textContent = '1+';
 }
 
 loadRealStats();

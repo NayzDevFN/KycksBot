@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kycks - Panel de Contrôle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="paper-texture"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-left">
+    <img src="assets/avatar.svg" alt="Kycks" class="nav-logo-img">
+    <div class="nav-logo">KycksBot</div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Accueil</a>
+    <a href="index.html#features" class="nav-link">Fonctionnalités</a>
+    <a href="index.html#commands" class="nav-link">Commandes</a>
+    <a href="panel.html" class="nav-link active">Panel</a>
+    <a href="index.html#support" class="nav-link">Support</a>
+    <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
+  </div>
+  <div class="nav-right">
+    <img src="assets/avatar.svg" alt="Kycks Bot" class="nav-avatar">
+  </div>
+</nav>
+
+<!-- PANEL -->
+<section id="panel" style="padding-top: 80px;">
+  <h2 class="section-title" id="panelTitle">Panel de Contrôle</h2>
+  
+  <div class="dashboard">
+    <!-- SIDEBAR -->
+    <div class="dash-sidebar">
+      <div class="dash-server">
+        <img src="assets/avatar.svg" alt="Kycks" class="dash-server-icon">
+        <span>Kycks Bot</span>
+      </div>
+      <div class="dash-menu">
+        <a class="dash-item active" onclick="showTab('accueil')"><span class="dash-icon">🏠</span> Accueil</a>
+        <a class="dash-item" onclick="showTab('general')"><span class="dash-icon">⚙️</span> Général</a>
+        <a class="dash-item" onclick="showTab('moderation')"><span class="dash-icon">🛡️</span> Modération</a>
+        <a class="dash-item" onclick="showTab('automod')"><span class="dash-icon">🤖</span> Automod</a>
+        <a class="dash-item" onclick="showTab('welcome')"><span class="dash-icon">👋</span> Bienvenue</a>
+        <a class="dash-item" onclick="showTab('tickets')"><span class="dash-icon">🎫</span> Tickets</a>
+        <a class="dash-item" onclick="showTab('levels')"><span class="dash-icon">📈</span> Niveaux</a>
+        <a class="dash-item" onclick="showTab('music')"><span class="dash-icon">🎵</span> Musique</a>
+        <a class="dash-item" onclick="showTab('autorole')"><span class="dash-icon">🎭</span> Autorole</a>
+        <a class="dash-item" onclick="showTab('logs')"><span class="dash-icon">📋</span> Logs</a>
+        <a class="dash-item" onclick="showTab('custom')"><span class="dash-icon">✨</span> Commandes Custom</a>
+      </div>
+      <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="dash-invite-btn" target="_blank">+ Inviter le Bot</a>
+    </div>
+    
+    <!-- CONTENT -->
+    <div class="dash-content">
+      
+      <!-- ACCUEIL -->
+      <div class="dash-tab active" id="tab-accueil">
+        <h3>🏠 Accueil</h3>
+        <div class="welcome-card">
+          <img src="assets/avatar.svg" alt="Kycks" class="welcome-avatar">
+          <h4>Bienvenue sur Kycks Bot !</h4>
+          <p>Gère ton serveur directement depuis ici.</p>
+          <div class="welcome-stats">
+            <div class="ws-item"><span class="ws-num" id="dashServers">0</span><span>Serveurs</span></div>
+            <div class="ws-item"><span class="ws-num" id="dashUsers">0</span><span>Utilisateurs</span></div>
+            <div class="ws-item"><span class="ws-num">18</span><span>Commandes</span></div>
+          </div>
+        </div>
+        <div class="quick-actions">
+          <h4>⚡ Actions Rapides</h4>
+          <div class="qa-grid">
+            <button onclick="showTab('general')" class="qa-btn">⚙️ Paramètres</button>
+            <button onclick="showTab('moderation')" class="qa-btn">🛡️ Modération</button>
+            <button onclick="showTab('welcome')" class="qa-btn">👋 Bienvenue</button>
+            <button onclick="showTab('logs')" class="qa-btn">📋 Logs</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- GÉNÉRAL -->
+      <div class="dash-tab" id="tab-general">
+        <h3>⚙️ Paramètres Généraux</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">💬</span><div><span class="setting-name">Préfixe</span><span class="setting-desc">Préfixe pour les commandes texte</span></div></div>
+          <div class="setting-input"><input type="text" id="sPrefix" placeholder="!" class="dash-input small" value="!"><button onclick="save('prefix')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🟢</span><div><span class="setting-name">Status du Bot</span><span class="setting-desc">Activité affichée</span></div></div>
+          <div class="setting-input"><input type="text" id="sStatus" placeholder="En ligne 🟢" class="dash-input"><button onclick="save('status')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🌍</span><div><span class="setting-name">Langue</span><span class="setting-desc">Langue du bot</span></div></div>
+          <div class="setting-input">
+            <select id="sLang" class="dash-input"><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option></select>
+            <button onclick="save('lang')" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Admin Only</span><span class="setting-desc">Restreindre les commandes admin</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+      </div>
+      
+      <!-- MODÉRATION -->
+      <div class="dash-tab" id="tab-moderation">
+        <h3>🛡️ Modération</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔨</span><div><span class="setting-name">Bannir</span><span class="setting-desc">Bannir un membre du serveur</span></div></div>
+          <div class="setting-input multi"><input type="text" id="mBanId" placeholder="ID utilisateur" class="dash-input"><input type="text" id="mBanReason" placeholder="Raison" class="dash-input"><button onclick="mod('ban')" class="dash-btn red">Bannir</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">👢</span><div><span class="setting-name">Expulser</span><span class="setting-desc">Expulser un membre</span></div></div>
+          <div class="setting-input multi"><input type="text" id="mKickId" placeholder="ID utilisateur" class="dash-input"><input type="text" id="mKickReason" placeholder="Raison" class="dash-input"><button onclick="mod('kick')" class="dash-btn orange">Expulser</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔇</span><div><span class="setting-name">Mute</span><span class="setting-desc">Mute temporaire</span></div></div>
+          <div class="setting-input multi"><input type="text" id="mMuteId" placeholder="ID" class="dash-input"><input type="number" id="mMuteDur" placeholder="Min" class="dash-input small"><button onclick="mod('mute')" class="dash-btn blue">Mute</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🗑️</span><div><span class="setting-name">Clear</span><span class="setting-desc">Supprimer des messages</span></div></div>
+          <div class="setting-input multi"><input type="number" id="mClearN" placeholder="1-100" class="dash-input small"><button onclick="mod('clear')" class="dash-btn purple">Supprimer</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⚡</span><div><span class="setting-name">Mod Role</span><span class="setting-desc">Rôle avec permissions modération</span></div></div>
+          <div class="setting-input"><input type="text" id="sModRole" placeholder="ID du rôle" class="dash-input"><button onclick="save('modRole')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🚫</span><div><span class="setting-name">Anti-Spam</span><span class="setting-desc">Protéger contre le spam</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔗</span><div><span class="setting-name">Anti-Liens</span><span class="setting-desc">Bloquer les liens Discord</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+      </div>
+      
+      <!-- AUTOMOD -->
+      <div class="dash-tab" id="tab-automod">
+        <h3>🤖 Automodération</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🤖</span><div><span class="setting-name">Automod Activé</span><span class="setting-desc">Active l'automodération automatique</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🤐</span><div><span class="setting-name">Mots Interdits</span><span class="setting-desc">Mots automatiquement supprimés</span></div></div>
+          <div class="setting-input"><input type="text" id="sBadwords" placeholder="mot1, mot2, mot3" class="dash-input"><button onclick="save('badwords')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📏</span><div><span class="setting-name">Limite Caractères</span><span class="setting-desc">Longueur max d'un message</span></div></div>
+          <div class="setting-input"><input type="number" id="sMaxLen" placeholder="2000" class="dash-input small" value="2000"><button onclick="save('maxlen')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Anti-Raid</span><span class="setting-desc">Protection contre les raids</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⚠️</span><div><span class="setting-name">Système Warns</span><span class="setting-desc">3 warns = ban automatique</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+      </div>
+      
+      <!-- BIENVENUE -->
+      <div class="dash-tab" id="tab-welcome">
+        <h3>👋 Messages de Bienvenue</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">👋</span><div><span class="setting-name">Message de bienvenue</span><span class="setting-desc">Envoyé quand un membre rejoint</span></div></div>
+          <div class="setting-input"><input type="text" id="sWelcomeMsg" placeholder="Bienvenue {user} sur {server} !" class="dash-input"><button onclick="save('welcomeMsg')" class="dash-btn">Sauvegarder</button></div>
+          <span class="setting-hint">{user} = membre, {server} = serveur, {count} = nombre de membres</span>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">😢</span><div><span class="setting-name">Message d'au revoir</span><span class="setting-desc">Envoyé quand un membre quitte</span></div></div>
+          <div class="setting-input"><input type="text" id="sGoodbyeMsg" placeholder="{user} a quitté le serveur." class="dash-input"><button onclick="save('goodbyeMsg')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Salon de bienvenue</span><span class="setting-desc">ID du salon d'accueil</span></div></div>
+          <div class="setting-input"><input type="text" id="sWelcomeChan" placeholder="ID du salon" class="dash-input"><button onclick="save('welcomeChan')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🖼️</span><div><span class="setting-name">Image de bienvenue</span><span class="setting-desc">URL de l'image d'accueil</span></div></div>
+          <div class="setting-input"><input type="text" id="sWelcomeImg" placeholder="https://..." class="dash-input"><button onclick="save('welcomeImg')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">👋</span><div><span class="setting-name">DM de bienvenue</span><span class="setting-desc">Envoyer un MP aux nouveaux membres</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+      </div>
+      
+      <!-- TICKETS -->
+      <div class="dash-tab" id="tab-tickets">
+        <h3>🎫 Système de Tickets</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎫</span><div><span class="setting-name">Tickets Activés</span><span class="setting-desc">Permet aux membres de créer des tickets</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📂</span><div><span class="setting-name">Catégorie Tickets</span><span class="setting-desc">ID de la catégorie pour les tickets</span></div></div>
+          <div class="setting-input"><input type="text" id="sTicketCat" placeholder="ID catégorie" class="dash-input"><button onclick="save('ticketCat')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">💬</span><div><span class="setting-name">Salon Support</span><span class="setting-desc">ID du salon de notification</span></div></div>
+          <div class="setting-input"><input type="text" id="sTicketSup" placeholder="ID salon support" class="dash-input"><button onclick="save('ticketSup')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📝</span><div><span class="setting-name">Message d'ouverture</span><span class="setting-desc">Message quand un ticket est ouvert</span></div></div>
+          <div class="setting-input"><input type="text" id="sTicketMsg" placeholder="Un staff va vous répondre." class="dash-input"><button onclick="save('ticketMsg')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎫</span><div><span class="setting-name">Max Tickets</span><span class="setting-desc">Nombre max de tickets par utilisateur</span></div></div>
+          <div class="setting-input"><input type="number" id="sTicketMax" placeholder="3" class="dash-input small" value="3"><button onclick="save('ticketMax')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📋</span><div><span class="setting-name">Transcript</span><span class="setting-desc">Sauvegarder les conversations</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+      </div>
+      
+      <!-- NIVEAUX -->
+      <div class="dash-tab" id="tab-levels">
+        <h3>📈 Système de Niveaux</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📈</span><div><span class="setting-name">XP Activé</span><span class="setting-desc">Les membres gagnent de l'XP en parlant</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎯</span><div><span class="setting-name">XP par message</span><span class="setting-desc">Quantité d'XP gagnée par message</span></div></div>
+          <div class="setting-input"><input type="number" id="sXpAmount" placeholder="15" class="dash-input small" value="15"><button onclick="save('xpAmount')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⏱️</span><div><span class="setting-name">Cooldown XP</span><span class="setting-desc">Temps entre chaque gain d'XP (secondes)</span></div></div>
+          <div class="setting-input"><input type="number" id="sXpCooldown" placeholder="60" class="dash-input small" value="60"><button onclick="save('xpCooldown')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Annonce de level up</span><span class="setting-desc">ID du salon pour les level ups</span></div></div>
+          <div class="setting-input"><input type="text" id="sLevelChan" placeholder="ID salon" class="dash-input"><button onclick="save('levelChan')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎁</span><div><span class="setting-name">Récompenses de rôles</span><span class="setting-desc">Rôles donnés à certains niveaux</span></div></div>
+          <div class="setting-input"><input type="text" id="sRoleRewards" placeholder="niveau:roleID, niveau:roleID" class="dash-input"><button onclick="save('roleRewards')" class="dash-btn">Sauvegarder</button></div>
+          <span class="setting-hint">Format: 5:123456789, 10:987654321</span>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🚫</span><div><span class="setting-name">Salons ignorés</span><span class="setting-desc">Salons où l'XP n'est pas gagné</span></div></div>
+          <div class="setting-input"><input type="text" id="sIgnoredChannels" placeholder="ID1, ID2" class="dash-input"><button onclick="save('ignoredChannels')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+      </div>
+      
+      <!-- MUSIQUE -->
+      <div class="dash-tab" id="tab-music">
+        <h3>🎵 Musique</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎵</span><div><span class="setting-name">Musique Activée</span><span class="setting-desc">Active le système de musique</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔊</span><div><span class="setting-name">Volume par défaut</span><span class="setting-desc">Volume de départ (1-100)</span></div></div>
+          <div class="setting-input"><input type="number" id="sMusicVol" placeholder="80" class="dash-input small" value="80"><button onclick="save('musicVol')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⏭️</span><div><span class="setting-name">Auto-Play</span><span class="setting-desc">Lancer automatiquement la musique</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔁</span><div><span class="setting-name">Loop</span><span class="setting-desc">Répéter la musique en boucle</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔗</span><div><span class="setting-name">Sources</span><span class="setting-desc">Sites supportés</span></div></div>
+          <div class="setting-tags"><span class="tag">YouTube</span><span class="tag">Spotify</span><span class="tag">SoundCloud</span><span class="tag">Twitch</span></div>
+        </div>
+      </div>
+      
+      <!-- AUTOROLE -->
+      <div class="dash-tab" id="tab-autorole">
+        <h3>🎭 Autorole</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎭</span><div><span class="setting-name">Autorole Activé</span><span class="setting-desc">Donne un rôle automatiquement aux nouveaux membres</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🏷️</span><div><span class="setting-name">Rôle à donner</span><span class="setting-desc">ID du rôle automatique</span></div></div>
+          <div class="setting-input"><input type="text" id="sAutoRole" placeholder="ID du rôle" class="dash-input"><button onclick="save('autoRole')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⏰</span><div><span class="setting-name">Délai</span><span class="setting-desc">Temps d'attente avant de donner le rôle (secondes)</span></div></div>
+          <div class="setting-input"><input type="number" id="sAutoRoleDelay" placeholder="0" class="dash-input small" value="0"><button onclick="save('autoRoleDelay')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">✅</span><div><span class="setting-name">Vérification requise</span><span class="setting-desc">Attendre la vérification du compte</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+      </div>
+      
+      <!-- LOGS -->
+      <div class="dash-tab" id="tab-logs">
+        <h3>📋 Système de Logs</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📋</span><div><span class="setting-name">Salon de logs</span><span class="setting-desc">ID du salon pour tous les logs</span></div></div>
+          <div class="setting-input"><input type="text" id="sLogChan" placeholder="ID salon logs" class="dash-input"><button onclick="save('logChan')" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📝</span><div><span class="setting-name">Logs de messages</span><span class="setting-desc">Messages modifiés/supprimés</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">👤</span><div><span class="setting-name">Logs de membres</span><span class="setting-desc">Joins/Leaves</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🛡️</span><div><span class="setting-name">Logs de modération</span><span class="setting-desc">Ban/Kick/Mute</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔊</span><div><span class="setting-name">Logs vocaux</span><span class="setting-desc">Join/Leave salons vocaux</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⚙️</span><div><span class="setting-name">Logs de serveur</span><span class="setting-desc">Changements de serveur</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+      </div>
+      
+      <!-- COMMANDES CUSTOM -->
+      <div class="dash-tab" id="tab-custom">
+        <h3>✨ Commandes Custom</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">✨</span><div><span class="setting-name">Commandes Custom</span><span class="setting-desc">Crée tes propres commandes</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">➕</span><div><span class="setting-name">Ajouter une commande</span><span class="setting-desc">Crée une nouvelle commande custom</span></div></div>
+          <div class="setting-input multi">
+            <input type="text" id="customCmdName" placeholder="Nom (!hello)" class="dash-input small">
+            <input type="text" id="customCmdResponse" placeholder="Réponse du bot" class="dash-input">
+            <button onclick="addCustomCmd()" class="dash-btn">Ajouter</button>
+          </div>
+        </div>
+        <div class="custom-list" id="customCmdList">
+          <h4>📋 Commandes existantes</h4>
+          <div class="empty-state">Aucune commande custom. Crée-en une !</div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <div class="notification" id="notif"><span id="notifText">Sauvegardé !</span></div>
+</section>
+
+<footer>
+  <p>Fait avec ♥ et beaucoup de papier</p>
+  <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
+</footer>
+
+<script>
+let customCommands = JSON.parse(localStorage.getItem('kycksCustomCmds') || '[]');
+
+function showTab(tab) {
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.dash-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+  
+  const titles = {
+    accueil: 'Panel de Contrôle',
+    general: '⚙️ Général',
+    moderation: '🛡️ Modération',
+    automod: '🤖 Automod',
+    welcome: '👋 Bienvenue',
+    tickets: '🎫 Tickets',
+    levels: '📈 Niveaux',
+    music: '🎵 Musique',
+    autorole: '🎭 Autorole',
+    logs: '📋 Logs',
+    custom: '✨ Commandes Custom'
+  };
+  document.getElementById('panelTitle').textContent = titles[tab] || 'Panel de Contrôle';
+}
+
+function notif(msg, type='success') {
+  const n = document.getElementById('notif');
+  document.getElementById('notifText').textContent = msg;
+  n.className = 'notification ' + type;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+function save(key) {
+  const val = document.getElementById('s' + key.charAt(0).toUpperCase() + key.slice(1))?.value;
+  if (val !== undefined) {
+    localStorage.setItem('kycks_' + key, val);
+    notif('Paramètre sauvegardé !');
+  }
+}
+
+function mod(action) {
+  const ids = { ban: 'mBanId', kick: 'mKickId', mute: 'mMuteId', clear: 'mClearN' };
+  const el = document.getElementById(ids[action]);
+  if (!el || !el.value) return notif('Remplis le champ', 'error');
+  notif(action.charAt(0).toUpperCase() + action.slice(1) + ' effectué !');
+  el.value = '';
+}
+
+function addCustomCmd() {
+  const name = document.getElementById('customCmdName').value.trim();
+  const response = document.getElementById('customCmdResponse').value.trim();
+  if (!name || !response) return notif('Remplis les deux champs', 'error');
+  
+  customCommands.push({ name, response });
+  localStorage.setItem('kycksCustomCmds', JSON.stringify(customCommands));
+  document.getElementById('customCmdName').value = '';
+  document.getElementById('customCmdResponse').value = '';
+  renderCustomCmds();
+  notif('Commande !' + name + ' créée !');
+}
+
+function deleteCustomCmd(index) {
+  customCommands.splice(index, 1);
+  localStorage.setItem('kycksCustomCmds', JSON.stringify(customCommands));
+  renderCustomCmds();
+  notif('Commande supprimée');
+}
+
+function renderCustomCmds() {
+  const list = document.getElementById('customCmdList');
+  if (customCommands.length === 0) {
+    list.innerHTML = '<h4>📋 Commandes existantes</h4><div class="empty-state">Aucune commande custom. Crée-en une !</div>';
+  } else {
+    list.innerHTML = '<h4>📋 Commandes existantes</h4>' + customCommands.map((cmd, i) => 
+      `<div class="custom-cmd-item"><span class="cmd-name">!${cmd.name}</span><span class="cmd-desc">${cmd.response}</span><button onclick="deleteCustomCmd(${i})" class="cmd-delete">✕</button></div>`
+    ).join('');
+  }
+}
+
+window.onload = function() {
+  const keys = ['prefix','status','lang','welcomeMsg','goodbyeMsg','welcomeChan','welcomeImg','ticketCat','ticketSup','ticketMsg','ticketMax','logChan','autoRole','autoRoleDelay','badwords','maxlen','modRole','sXpAmount','sXpCooldown','levelChan','roleRewards','ignoredChannels','musicVol'];
+  keys.forEach(k => {
+    const saved = localStorage.getItem('kycks_' + k);
+    const el = document.getElementById('s' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (saved && el) el.value = saved;
+  });
+  renderCustomCmds();
+};
+</script>
+
+</body>
+</html>

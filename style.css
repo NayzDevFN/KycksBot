@@ -545,6 +545,163 @@ section {
 .dash-btn.blue { background: #7289da; }
 .dash-btn.purple { background: #9b59b6; }
 
+/* Welcome card */
+.welcome-card {
+  background: linear-gradient(135deg, #7289da 0%, #5b6eae 100%);
+  color: white;
+  padding: 40px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.welcome-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid white;
+  margin-bottom: 15px;
+}
+
+.welcome-card h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.welcome-card p {
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.welcome-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.ws-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.ws-num {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 28px;
+}
+
+.ws-item span:last-child {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* Quick actions */
+.quick-actions h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #2d2d2d;
+}
+
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.qa-btn {
+  padding: 15px;
+  background: #f9f6f0;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.qa-btn:hover {
+  background: #7289da;
+  color: white;
+  border-color: #7289da;
+  transform: translateY(-2px);
+}
+
+/* Tags */
+.setting-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 6px 12px;
+  background: #7289da;
+  color: white;
+  border-radius: 15px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* Custom commands */
+.custom-list h4 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 18px;
+  margin: 20px 0 10px;
+  color: #2d2d2d;
+}
+
+.custom-cmd-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  background: #f9f6f0;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.custom-cmd-item .cmd-name {
+  min-width: 100px;
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  font-weight: 700;
+  color: #7289da;
+}
+
+.custom-cmd-item .cmd-desc {
+  flex: 1;
+  font-size: 14px;
+  color: #666;
+}
+
+.cmd-delete {
+  width: 30px;
+  height: 30px;
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.cmd-delete:hover {
+  background: #e55555;
+  transform: scale(1.1);
+}
+
+.empty-state {
+  padding: 30px;
+  color: #999;
+  font-style: italic;
+  background: #f9f6f0;
+  border-radius: 10px;
+  border: 2px dashed #ddd;
+}
+
 /* Toggle */
 .setting-toggle {
   display: flex;
@@ -756,6 +913,10 @@ footer p {
   
   .dash-invite-btn {
     margin-top: 0;
+  }
+  
+  .qa-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

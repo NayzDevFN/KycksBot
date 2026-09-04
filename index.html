@@ -10,10 +10,9 @@
 </head>
 <body>
 
-<!-- Paper texture overlay -->
 <div class="paper-texture"></div>
 
-<!-- ===================== NAVBAR ===================== -->
+<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
     <img src="assets/avatar.svg" alt="Kycks" class="nav-logo-img">
@@ -22,7 +21,7 @@
   <div class="nav-links">
     <a href="#features" class="nav-link">Fonctionnalités</a>
     <a href="#commands" class="nav-link">Commandes</a>
-    <a href="#panel" class="nav-link">Panel</a>
+    <a href="panel.html" class="nav-link">Panel</a>
     <a href="#support" class="nav-link">Support</a>
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
@@ -31,452 +30,64 @@
   </div>
 </nav>
 
-<!-- ===================== HEADER ===================== -->
-<header>
+<!-- HEADER -->
+<header id="home">
   <div class="doodle star-doodle">★</div>
   <div class="doodle heart-doodle">♥</div>
   <div class="doodle spiral-doodle">✿</div>
-  
   <img src="assets/avatar.svg" alt="Kycks" class="header-avatar">
   <h1 class="logo">Kycks</h1>
   <p class="tagline">~ ton bot discord préféré ~</p>
-  
   <div class="invite-btn-container">
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="invite-btn" target="_blank">+ Inviter le Bot</a>
   </div>
-  
   <div class="header-stats">
-    <div class="stat-box">
-      <span class="stat-number">250+</span>
-      <span class="stat-label">Serviteurs</span>
-    </div>
-    <div class="stat-box">
-      <span class="stat-number">15k+</span>
-      <span class="stat-label">Utilisateurs</span>
-    </div>
-    <div class="stat-box">
-      <span class="stat-number">18</span>
-      <span class="stat-label">Commandes</span>
-    </div>
+    <div class="stat-box"><span class="stat-number">250+</span><span class="stat-label">Serviteurs</span></div>
+    <div class="stat-box"><span class="stat-number">15k+</span><span class="stat-label">Utilisateurs</span></div>
+    <div class="stat-box"><span class="stat-number">18</span><span class="stat-label">Commandes</span></div>
   </div>
 </header>
 
-<!-- ===================== FONCTIONNALITÉS ===================== -->
+<!-- FONCTIONNALITÉS -->
 <section id="features">
   <h2 class="section-title">Ce qu'il fait</h2>
-  
   <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🛡️</div>
-      <h3>Modération</h3>
-      <p>Ban, kick, mute, warn...<br>Tout pour garder ton serv propre !</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">🎫</div>
-      <h3>Tickets</h3>
-      <p>Système de tickets pour le<br>support et les réclamations</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">🎮</div>
-      <h3>Fun & Jeux</h3>
-      <p>Memes, sondages, blagues...<br>Pour pimenter ton serv !</p>
-    </div>
-    
-    <div class="feature-card">
-      <div class="feature-icon">⚙️</div>
-      <h3>Utilités</h3>
-      <p>Embeds, info, outils<br>pour les admins</p>
-    </div>
+    <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Modération</h3><p>Ban, kick, mute, automod...</p></div>
+    <div class="feature-card"><div class="feature-icon">🎫</div><h3>Tickets</h3><p>Système de tickets support</p></div>
+    <div class="feature-card"><div class="feature-icon">🎵</div><h3>Musique</h3><p>YouTube, Spotify, etc.</p></div>
+    <div class="feature-card"><div class="feature-icon">📈</div><h3>Niveaux</h3><p>Système XP et niveaux</p></div>
   </div>
 </section>
 
-<!-- ===================== COMMANDES ===================== -->
+<!-- COMMANDES -->
 <section id="commands">
   <h2 class="section-title">Commandes</h2>
-  
   <div class="commands-grid">
-    <div class="cmd-card">
-      <span class="cmd-name">/help</span>
-      <span class="cmd-desc">Liste des commandes</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/ban</span>
-      <span class="cmd-desc">Bannir un membre</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/kick</span>
-      <span class="cmd-desc">Expulser un membre</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/mute</span>
-      <span class="cmd-desc">Mute un membre</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/ticket</span>
-      <span class="cmd-desc">Créer un ticket</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/close</span>
-      <span class="cmd-desc">Fermer un ticket</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/embed</span>
-      <span class="cmd-desc">Créer un embed</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/poll</span>
-      <span class="cmd-desc">Créer un sondage</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/say</span>
-      <span class="cmd-desc">Le bot dit un message</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/clear</span>
-      <span class="cmd-desc">Supprimer des messages</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/userinfo</span>
-      <span class="cmd-desc">Infos d'un membre</span>
-    </div>
-    <div class="cmd-card">
-      <span class="cmd-name">/serverinfo</span>
-      <span class="cmd-desc">Infos du serveur</span>
-    </div>
+    <div class="cmd-card"><span class="cmd-name">/help</span><span class="cmd-desc">Liste des commandes</span></div>
+    <div class="cmd-card"><span class="cmd-name">/ban</span><span class="cmd-desc">Bannir un membre</span></div>
+    <div class="cmd-card"><span class="cmd-name">/kick</span><span class="cmd-desc">Expulser un membre</span></div>
+    <div class="cmd-card"><span class="cmd-name">/mute</span><span class="cmd-desc">Mute un membre</span></div>
+    <div class="cmd-card"><span class="cmd-name">/ticket</span><span class="cmd-desc">Créer un ticket</span></div>
+    <div class="cmd-card"><span class="cmd-name">/rank</span><span class="cmd-desc">Voir ton niveau</span></div>
+    <div class="cmd-card"><span class="cmd-name">/leaderboard</span><span class="cmd-desc">Classement XP</span></div>
+    <div class="cmd-card"><span class="cmd-name">/play</span><span class="cmd-desc">Jouer de la musique</span></div>
+    <div class="cmd-card"><span class="cmd-name">/embed</span><span class="cmd-desc">Créer un embed</span></div>
+    <div class="cmd-card"><span class="cmd-name">/poll</span><span class="cmd-desc">Créer un sondage</span></div>
+    <div class="cmd-card"><span class="cmd-name">/userinfo</span><span class="cmd-desc">Infos membre</span></div>
+    <div class="cmd-card"><span class="cmd-name">/serverinfo</span><span class="cmd-desc">Infos serveur</span></div>
   </div>
 </section>
 
-<!-- ===================== PANEL DE CONTROLE ===================== -->
-<section id="panel">
+<!-- PANEL LINK -->
+<section id="panel" style="text-align:center; padding: 60px 20px;">
   <h2 class="section-title">Panel de Contrôle</h2>
-  
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <div class="dash-sidebar">
-      <div class="dash-server">
-        <img src="assets/avatar.svg" alt="Kycks" class="dash-server-icon">
-        <span>Kycks Bot</span>
-      </div>
-      <div class="dash-menu">
-        <a href="#" class="dash-item active" onclick="showTab('general')">
-          <span class="dash-icon">⚙️</span> Général
-        </a>
-        <a href="#" class="dash-item" onclick="showTab('moderation')">
-          <span class="dash-icon">🛡️</span> Modération
-        </a>
-        <a href="#" class="dash-item" onclick="showTab('tickets')">
-          <span class="dash-icon">🎫</span> Tickets
-        </a>
-        <a href="#" class="dash-item" onclick="showTab('welcome')">
-          <span class="dash-icon">👋</span> Accueil
-        </a>
-        <a href="#" class="dash-item" onclick="showTab('logs')">
-          <span class="dash-icon">📋</span> Logs
-        </a>
-      </div>
-      <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" 
-         class="dash-invite-btn" target="_blank">
-        + Inviter le Bot
-      </a>
-    </div>
-    
-    <!-- Content -->
-    <div class="dash-content">
-      
-      <!-- Général -->
-      <div class="dash-tab active" id="tab-general">
-        <h3>⚙️ Paramètres Généraux</h3>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">🟢</span>
-            <div>
-              <span class="setting-name">Status du Bot</span>
-              <span class="setting-desc">Change l'activité affichée</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="botStatus" placeholder="En ligne 🟢" class="dash-input">
-            <button onclick="saveSetting('status')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">💬</span>
-            <div>
-              <span class="setting-name">Préfixe</span>
-              <span class="setting-desc">Préfixe pour les commandes texte</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="botPrefix" placeholder="!" class="dash-input small">
-            <button onclick="saveSetting('prefix')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">🎵</span>
-            <div>
-              <span class="setting-name">Musique</span>
-              <span class="setting-desc">Activer/désactiver la musique</span>
-            </div>
-          </div>
-          <div class="setting-toggle">
-            <label class="toggle">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-label">Activé</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Modération -->
-      <div class="dash-tab" id="tab-moderation">
-        <h3>🛡️ Modération</h3>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">🔨</span>
-            <div>
-              <span class="setting-name">Bannir</span>
-              <span class="setting-desc">Bannir un membre du serveur</span>
-            </div>
-          </div>
-          <div class="setting-input multi">
-            <input type="text" id="modBanId" placeholder="ID utilisateur" class="dash-input">
-            <input type="text" id="modBanReason" placeholder="Raison" class="dash-input">
-            <button onclick="modAction('ban')" class="dash-btn red">Bannir</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">👢</span>
-            <div>
-              <span class="setting-name">Expulser</span>
-              <span class="setting-desc">Expulser un membre</span>
-            </div>
-          </div>
-          <div class="setting-input multi">
-            <input type="text" id="modKickId" placeholder="ID utilisateur" class="dash-input">
-            <input type="text" id="modKickReason" placeholder="Raison" class="dash-input">
-            <button onclick="modAction('kick')" class="dash-btn orange">Expulser</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">🔇</span>
-            <div>
-              <span class="setting-name">Mute</span>
-              <span class="setting-desc">Mute un membre temporairement</span>
-            </div>
-          </div>
-          <div class="setting-input multi">
-            <input type="text" id="modMuteId" placeholder="ID utilisateur" class="dash-input">
-            <input type="number" id="modMuteDuration" placeholder="Minutes" class="dash-input small">
-            <button onclick="modAction('mute')" class="dash-btn blue">Mute</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">🗑️</span>
-            <div>
-              <span class="setting-name">Clear</span>
-              <span class="setting-desc">Supprimer des messages</span>
-            </div>
-          </div>
-          <div class="setting-input multi">
-            <input type="number" id="clearAmount" placeholder="Nombre (1-100)" class="dash-input small">
-            <button onclick="modAction('clear')" class="dash-btn purple">Supprimer</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Tickets -->
-      <div class="dash-tab" id="tab-tickets">
-        <h3>🎫 Système de Tickets</h3>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">🎫</span>
-            <div>
-              <span class="setting-name">Activer les tickets</span>
-              <span class="setting-desc">Permet aux membres de créer des tickets</span>
-            </div>
-          </div>
-          <div class="setting-toggle">
-            <label class="toggle">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-label">Activé</span>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">📂</span>
-            <div>
-              <span class="setting-name">Catégorie Tickets</span>
-              <span class="setting-desc">ID de la catégorie pour les tickets</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="ticketCategory" placeholder="ID de la catégorie" class="dash-input">
-            <button onclick="saveSetting('ticketCategory')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">💬</span>
-            <div>
-              <span class="setting-name">Salon Support</span>
-              <span class="setting-desc">ID du salon où les tickets sont notifiés</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="ticketSupport" placeholder="ID du salon support" class="dash-input">
-            <button onclick="saveSetting('ticketSupport')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">📝</span>
-            <div>
-              <span class="setting-name">Message d'ouverture</span>
-              <span class="setting-desc">Message envoyé quand un ticket est ouvert</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="ticketMessage" placeholder="Un membre du staff va vous répondre." class="dash-input">
-            <button onclick="saveSetting('ticketMessage')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Accueil -->
-      <div class="dash-tab" id="tab-welcome">
-        <h3>👋 Messages d'Accueil</h3>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">👋</span>
-            <div>
-              <span class="setting-name">Message de bienvenue</span>
-              <span class="setting-desc">Envoyé quand un membre rejoint</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="welcomeMsg" placeholder="Bienvenue {user} sur {server} !" class="dash-input">
-            <button onclick="saveSetting('welcome')" class="dash-btn">Sauvegarder</button>
-          </div>
-          <span class="setting-hint">{user} = membre, {server} = nom du serveur</span>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">👋</span>
-            <div>
-              <span class="setting-name">Message d'au revoir</span>
-              <span class="setting-desc">Envoyé quand un membre quitte</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="goodbyeMsg" placeholder="{user} a quitté le serveur." class="dash-input">
-            <button onclick="saveSetting('goodbye')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">📢</span>
-            <div>
-              <span class="setting-name">Salon de bienvenue</span>
-              <span class="setting-desc">ID du salon d'accueil</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="welcomeChannel" placeholder="ID du salon" class="dash-input">
-            <button onclick="saveSetting('welcomeChannel')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Logs -->
-      <div class="dash-tab" id="tab-logs">
-        <h3>📋 Logs</h3>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">📋</span>
-            <div>
-              <span class="setting-name">Salon de logs</span>
-              <span class="setting-desc">ID du salon où sont envoyés les logs</span>
-            </div>
-          </div>
-          <div class="setting-input">
-            <input type="text" id="logChannel" placeholder="ID du salon de logs" class="dash-input">
-            <button onclick="saveSetting('logChannel')" class="dash-btn">Sauvegarder</button>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">📝</span>
-            <div>
-              <span class="setting-name">Logs de messages</span>
-              <span class="setting-desc">Enregistrer les messages modifiés/supprimés</span>
-            </div>
-          </div>
-          <div class="setting-toggle">
-            <label class="toggle">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-label">Activé</span>
-          </div>
-        </div>
-        
-        <div class="setting-card">
-          <div class="setting-header">
-            <span class="setting-icon">👤</span>
-            <div>
-              <span class="setting-name">Logs de membres</span>
-              <span class="setting-desc">Enregistrer les joins/leaves</span>
-            </div>
-          </div>
-          <div class="setting-toggle">
-            <label class="toggle">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-            <span class="toggle-label">Activé</span>
-          </div>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-  
-  <!-- Notification -->
-  <div class="notification" id="notification">
-    <span id="notifText">Paramètre sauvegardé !</span>
-  </div>
+  <p style="font-family:'Patrick Hand',cursive; font-size:1.3rem; margin-bottom:20px;">Gère ton bot directement depuis le dashboard</p>
+  <a href="panel.html" class="invite-btn" style="display:inline-block;">Ouvrir le Panel</a>
 </section>
 
-<!-- ===================== INVITER ===================== -->
+<!-- INVITER -->
 <section id="invite">
   <h2 class="section-title">Rejoins l'aventure</h2>
-  
   <div class="invite-box">
     <p>C'est simple comme bonjour :</p>
     <ol class="steps-list">
@@ -488,144 +99,32 @@
   </div>
 </section>
 
-<!-- ===================== SUPPORT ===================== -->
+<!-- SUPPORT -->
 <section id="support">
   <h2 class="section-title">Besoin d'aide ?</h2>
-  
   <div class="support-links">
-    <a href="#" class="support-btn">
-      <span class="support-icon">💬</span>
-      <span>Discord Support</span>
-    </a>
-    <a href="#" class="support-btn">
-      <span class="support-icon">🐦</span>
-      <span>Twitter</span>
-    </a>
-    <a href="#" class="support-btn">
-      <span class="support-icon">📖</span>
-      <span>Documentation</span>
-    </a>
+    <a href="#" class="support-btn"><span class="support-icon">💬</span><span>Discord Support</span></a>
+    <a href="#" class="support-btn"><span class="support-icon">🐦</span><span>Twitter</span></a>
+    <a href="#" class="support-btn"><span class="support-icon">📖</span><span>Documentation</span></a>
   </div>
 </section>
 
-<!-- ===================== FOOTER ===================== -->
 <footer>
   <p>Fait avec ♥ et beaucoup de papier</p>
   <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
 </footer>
 
 <script>
-// ===================== DASHBOARD PANEL =====================
-
-// Show/hide tabs
-function showTab(tabName) {
-  // Hide all tabs
-  document.querySelectorAll('.dash-tab').forEach(tab => {
-    tab.classList.remove('active');
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
   });
-  
-  // Remove active from menu
-  document.querySelectorAll('.dash-item').forEach(item => {
-    item.classList.remove('active');
-  });
-  
-  // Show selected tab
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  
-  // Add active to clicked menu item
-  event.currentTarget.classList.add('active');
-}
-
-// Show notification
-function showNotification(message, type = 'success') {
-  const notif = document.getElementById('notification');
-  const notifText = document.getElementById('notifText');
-  
-  notifText.textContent = message;
-  notif.className = `notification ${type}`;
-  notif.classList.add('show');
-  
-  setTimeout(() => {
-    notif.classList.remove('show');
-  }, 3000);
-}
-
-// Save setting (simulated)
-function saveSetting(setting) {
-  const settings = {
-    status: document.getElementById('botStatus')?.value,
-    prefix: document.getElementById('botPrefix')?.value,
-    welcome: document.getElementById('welcomeMsg')?.value,
-    goodbye: document.getElementById('goodbyeMsg')?.value,
-    welcomeChannel: document.getElementById('welcomeChannel')?.value,
-    logChannel: document.getElementById('logChannel')?.value,
-    ticketCategory: document.getElementById('ticketCategory')?.value,
-    ticketSupport: document.getElementById('ticketSupport')?.value,
-    ticketMessage: document.getElementById('ticketMessage')?.value
-  };
-  
-  // Save to localStorage
-  localStorage.setItem('kycksSettings', JSON.stringify(settings));
-  
-  showNotification('Paramètre sauvegardé !');
-}
-
-// Mod actions (simulated)
-function modAction(action) {
-  let id, reason;
-  
-  switch(action) {
-    case 'ban':
-      id = document.getElementById('modBanId').value;
-      reason = document.getElementById('modBanReason').value || 'Aucune raison';
-      if (!id) return showNotification('Entrez un ID utilisateur', 'error');
-      showNotification(`${id} a été banni !`);
-      document.getElementById('modBanId').value = '';
-      document.getElementById('modBanReason').value = '';
-      break;
-      
-    case 'kick':
-      id = document.getElementById('modKickId').value;
-      reason = document.getElementById('modKickReason').value || 'Aucune raison';
-      if (!id) return showNotification('Entrez un ID utilisateur', 'error');
-      showNotification(`${id} a été expulsé !`);
-      document.getElementById('modKickId').value = '';
-      document.getElementById('modKickReason').value = '';
-      break;
-      
-    case 'mute':
-      id = document.getElementById('modMuteId').value;
-      if (!id) return showNotification('Entrez un ID utilisateur', 'error');
-      showNotification(`${id} a été mute !`);
-      document.getElementById('modMuteId').value = '';
-      document.getElementById('modMuteDuration').value = '';
-      break;
-      
-    case 'clear':
-      const amount = document.getElementById('clearAmount').value;
-      if (!amount) return showNotification('Entrez un nombre', 'error');
-      showNotification(`${amount} messages supprimés !`);
-      document.getElementById('clearAmount').value = '';
-      break;
-  }
-}
-
-// Load saved settings
-window.onload = function() {
-  const saved = localStorage.getItem('kycksSettings');
-  if (saved) {
-    const settings = JSON.parse(saved);
-    if (settings.status) document.getElementById('botStatus').value = settings.status;
-    if (settings.prefix) document.getElementById('botPrefix').value = settings.prefix;
-    if (settings.welcome) document.getElementById('welcomeMsg').value = settings.welcome;
-    if (settings.goodbye) document.getElementById('goodbyeMsg').value = settings.goodbye;
-    if (settings.welcomeChannel) document.getElementById('welcomeChannel').value = settings.welcomeChannel;
-    if (settings.logChannel) document.getElementById('logChannel').value = settings.logChannel;
-    if (settings.ticketCategory) document.getElementById('ticketCategory').value = settings.ticketCategory;
-    if (settings.ticketSupport) document.getElementById('ticketSupport').value = settings.ticketSupport;
-    if (settings.ticketMessage) document.getElementById('ticketMessage').value = settings.ticketMessage;
-  }
-};
+});
 </script>
 
 </body>

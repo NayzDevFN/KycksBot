@@ -743,6 +743,19 @@ async function registerCommands() {
 client.on('ready', async () => {
   console.log(`🤖 ${client.user.tag} est en ligne !`);
   client.user.setActivity(config.status);
+  
+  // Set bot avatar
+  const avatarPath = path.join(__dirname, 'assets', 'avatar', 'KycksBot-pdp.png');
+  if (fs.existsSync(avatarPath)) {
+    try {
+      const avatarBuffer = fs.readFileSync(avatarPath);
+      await client.user.setAvatar(avatarBuffer);
+      console.log('✅ Avatar du bot mis à jour.');
+    } catch (e) {
+      console.error('❌ Erreur avatar:', e.message);
+    }
+  }
+  
   await registerCommands();
 });
 

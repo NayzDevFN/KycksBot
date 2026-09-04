@@ -1309,18 +1309,121 @@ footer p {
   font-style: italic;
 }
 
-/* Responsive panel */
-@media (max-width: 600px) {
-  .action-form {
-    flex-direction: column;
+/* Avatar fallback */
+.nav-avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #2d2d2d;
+  background: #7289da;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 18px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+
+/* Clear button */
+.clear-btn {
+  background: #9b59b6;
+  color: white;
+}
+
+/* ===================== TICKETS SECTION ===================== */
+#tickets {
+  background: 
+    radial-gradient(circle at 30% 70%, rgba(255, 193, 7, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 70% 30%, rgba(114, 137, 218, 0.1) 0%, transparent 40%);
+}
+
+.ticket-container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.ticket-info {
+  text-align: left;
+}
+
+.ticket-info > p {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.ticket-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ticket-step {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #fffef9;
+  border: 2px solid #2d2d2d;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.ticket-step:hover {
+  transform: translateX(5px);
+}
+
+.ticket-step-num {
+  width: 35px;
+  height: 35px;
+  background: #ffc107;
+  border: 2px solid #2d2d2d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 18px;
+  color: #2d2d2d;
+  flex-shrink: 0;
+}
+
+.ticket-step p {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.ticket-step code {
+  background: #e9ecef;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #7289da;
+}
+
+.ticket-preview {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .ticket-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
   }
   
-  .action-form .panel-input {
-    width: 100%;
+  .ticket-info {
+    text-align: center;
   }
   
-  .panel-stats {
-    flex-direction: column;
+  .ticket-steps {
     align-items: center;
   }
 }

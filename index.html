@@ -20,21 +20,19 @@
   </div>
   <div class="nav-links">
     <a href="#panel" class="nav-link">Panel</a>
+    <a href="#tickets" class="nav-link">Tickets</a>
     <a href="#support" class="nav-link">Support</a>
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
-  <img src="https://cdn.discordapp.com/avatars/1544851212187340881/a_1234567890abcdef1234567890abcdef.png?size=128" 
-       alt="Kycks Bot" 
-       class="nav-avatar"
-       onerror="this.src='https://ui-avatars.com/api/?name=K&background=7289da&color=fff&size=128'">
+  <div class="nav-right">
+    <img src="https://cdn.discordapp.com/avatars/1544851212187340881.png?size=128" 
+         alt="Kycks Bot" 
+         class="nav-avatar"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <div class="nav-avatar-fallback" style="display: none;">K</div>
+  </div>
 </nav>
 
-<!-- 
-  ===================== MODIFIER ICI =====================
-  Remplace 1544851212187340881 par le Client ID de ton bot Kycks
-  Le Client ID se trouve dans le Discord Developer Portal > ton bot > General Information
-  Lien : https://discord.com/developers/applications
--->
 <!-- ===================== HEADER ===================== -->
 <header>
   <div class="doodle star-doodle">★</div>
@@ -58,7 +56,7 @@
       <span class="stat-label">Utilisateurs</span>
     </div>
     <div class="stat-box">
-      <span class="stat-number" id="commands">50+</span>
+      <span class="stat-number" id="commands">18</span>
       <span class="stat-label">Commandes</span>
     </div>
   </div>
@@ -71,7 +69,7 @@
     <p>
       <span class="underline">Kycks</span> est un bot Discord multifonctionnel 
       crée avec amour (et beaucoup de café ☕). 
-      Il fait tout : modération, musique, fun, utilités... 
+      Il fait tout : modération, musique, fun, utilités, tickets... 
       Bref, c'est le <span class="circle">meilleur</span> bot de ton serv !
     </p>
     <div class="doodle corner-doodle top-left">星巴</div>
@@ -94,9 +92,9 @@
     </div>
     
     <div class="feature-card">
-      <div class="feature-icon">🎵</div>
-      <h3>Musique</h3>
-      <p>Joue de la musique dans tes salons vocaux<br>avec /play</p>
+      <div class="feature-icon">🎫</div>
+      <h3>Tickets</h3>
+      <p>Système de tickets pour le<br>support et les réclamations</p>
       <div class="squiggle"></div>
     </div>
     
@@ -127,11 +125,6 @@
       <div class="arrow-doodle">→</div>
     </div>
     <div class="command-item">
-      <span class="cmd-name">/play</span>
-      <span class="cmd-desc">Joue de la musique</span>
-      <div class="arrow-doodle">→</div>
-    </div>
-    <div class="command-item">
       <span class="cmd-name">/ban</span>
       <span class="cmd-desc">Bannir un membre</span>
       <div class="arrow-doodle">→</div>
@@ -147,18 +140,23 @@
       <div class="arrow-doodle">→</div>
     </div>
     <div class="command-item">
-      <span class="cmd-name">/meme</span>
-      <span class="cmd-desc">Envoie un mème aléatoire</span>
+      <span class="cmd-name">/ticket</span>
+      <span class="cmd-desc">Créer un ticket support</span>
       <div class="arrow-doodle">→</div>
     </div>
     <div class="command-item">
-      <span class="cmd-name">/rank</span>
-      <span class="cmd-desc">Voir ton niveau XP</span>
+      <span class="cmd-name">/close</span>
+      <span class="cmd-desc">Fermer un ticket</span>
       <div class="arrow-doodle">→</div>
     </div>
     <div class="command-item">
       <span class="cmd-name">/embed</span>
       <span class="cmd-desc">Créer un embed custom</span>
+      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="command-item">
+      <span class="cmd-name">/poll</span>
+      <span class="cmd-desc">Créer un sondage</span>
       <div class="arrow-doodle">→</div>
     </div>
   </div>
@@ -169,7 +167,7 @@
 <!-- ===================== PANEL DE CONTROLE ===================== -->
 <section id="panel">
   <h2 class="section-title">Panel de Contrôle</h2>
-  <p class="panel-info">Connecte-toi pour gérer ton serveur depuis le site</p>
+  <p class="panel-info">Gère ton serveur directement depuis le site</p>
   
   <div class="panel-container">
     <!-- Login -->
@@ -204,7 +202,7 @@
       
       <!-- Actions rapides -->
       <div class="panel-actions">
-        <h3>⚡ Actions Rapides</h3>
+        <h3>⚡ Modération</h3>
         
         <!-- Ban -->
         <div class="action-card">
@@ -245,11 +243,23 @@
           </div>
         </div>
         
+        <!-- Clear -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">🗑️</span>
+            <span class="action-name">Clear Messages</span>
+          </div>
+          <div class="action-form">
+            <input type="number" id="clearAmount" placeholder="Nombre (1-100)" class="panel-input">
+            <button onclick="clearMessages()" class="action-btn clear-btn">Supprimer</button>
+          </div>
+        </div>
+        
       </div>
       
       <!-- Configuration du bot -->
       <div class="panel-config">
-        <h3>⚙️ Configuration du Bot</h3>
+        <h3>⚙️ Configuration</h3>
         
         <!-- Status -->
         <div class="action-card">
@@ -258,7 +268,7 @@
             <span class="action-name">Status du Bot</span>
           </div>
           <div class="action-form">
-            <input type="text" id="newStatus" placeholder="Nouveau status (ex: En ligne 🟢)" class="panel-input">
+            <input type="text" id="newStatus" placeholder="Nouveau status" class="panel-input">
             <button onclick="changeStatus()" class="action-btn config-btn">Changer</button>
           </div>
         </div>
@@ -276,18 +286,6 @@
           <p class="config-hint">Variables: {user} = membre, {server} = nom du serveur</p>
         </div>
         
-        <!-- Message d'au revoir -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">👋</span>
-            <span class="action-name">Message d'au revoir</span>
-          </div>
-          <div class="action-form">
-            <input type="text" id="goodbyeMsg" placeholder="{user} a quitté le serveur." class="panel-input">
-            <button onclick="changeGoodbye()" class="action-btn config-btn">Changer</button>
-          </div>
-        </div>
-        
         <!-- Salon de logs -->
         <div class="action-card">
           <div class="action-header">
@@ -297,19 +295,6 @@
           <div class="action-form">
             <input type="text" id="logChannelId" placeholder="ID du salon de logs" class="panel-input">
             <button onclick="changeLogChannel()" class="action-btn config-btn">Changer</button>
-          </div>
-        </div>
-        
-        <!-- Envoyer un message -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">✉️</span>
-            <span class="action-name">Envoyer un message</span>
-          </div>
-          <div class="action-form">
-            <input type="text" id="sendChannelId" placeholder="ID du salon" class="panel-input">
-            <input type="text" id="sendMessage" placeholder="Message à envoyer" class="panel-input">
-            <button onclick="sendMessage()" class="action-btn config-btn">Envoyer</button>
           </div>
         </div>
         
@@ -324,6 +309,49 @@
       </div>
       
       <button onclick="disconnectApi()" class="panel-btn disconnect-btn">Déconnexion</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TICKETS ===================== -->
+<section id="tickets">
+  <h2 class="section-title">Système de Tickets</h2>
+  
+  <div class="ticket-container">
+    <div class="ticket-info">
+      <p>Le système de tickets permet à tes membres de créer des demandes d'aide privées.</p>
+      
+      <div class="ticket-steps">
+        <div class="ticket-step">
+          <span class="ticket-step-num">1</span>
+          <p>L'utilisateur fait <code>/ticket</code></p>
+        </div>
+        <div class="ticket-step">
+          <span class="ticket-step-num">2</span>
+          <p>Un salon privé est créé</p>
+        </div>
+        <div class="ticket-step">
+          <span class="ticket-step-num">3</span>
+          <p>Le staff répond et aide</p>
+        </div>
+        <div class="ticket-step">
+          <span class="ticket-step-num">4</span>
+          <p>Le ticket est fermé avec <code>/close</code></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="ticket-preview">
+      <div class="discord-preview">
+        <div class="discord-msg">
+          <div class="msg-avatar">K</div>
+          <div class="msg-content">
+            <span class="msg-name">Kycks</span>
+            <span class="msg-badge">BOT</span>
+            <p class="msg-text">🎫 Ticket #142 créé par <@Utilisateur><br>Un membre du staff va vous répondre.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -346,7 +374,7 @@
       <div class="msg-avatar user-avatar">U</div>
       <div class="msg-content">
         <span class="msg-name">Toi</span>
-        <p class="msg-text">/play despacito</p>
+        <p class="msg-text">/ticket J'ai besoin d'aide</p>
       </div>
     </div>
     
@@ -355,7 +383,7 @@
       <div class="msg-content">
         <span class="msg-name">Kycks</span>
         <span class="msg-badge">BOT</span>
-        <p class="msg-text">🎵 En lecture : Despacito - Luis Fonsi<br>Volume : 80% | File : 3 chansons</p>
+        <p class="msg-text">🎫 Ticket #142 créé !<br>Un salon privé a été créé pour vous.</p>
       </div>
     </div>
   </div>
@@ -412,81 +440,7 @@
   <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
 </footer>
 
-<!-- Pencil trail canvas -->
-<canvas id="pencil-canvas"></canvas>
-
 <script>
-// ===================== PENCIL TRAIL EFFECT =====================
-const canvas = document.getElementById('pencil-canvas');
-const ctx = canvas.getContext('2d');
-let points = [];
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
-document.addEventListener('mousemove', (e) => {
-  points.push({
-    x: e.clientX,
-    y: e.clientY,
-    age: 0,
-    size: Math.random() * 3 + 2
-  });
-  
-  // Limit points for performance
-  if (points.length > 150) {
-    points.shift();
-  }
-});
-
-function drawPencilTrail() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  for (let i = 0; i < points.length; i++) {
-    const point = points[i];
-    point.age++;
-    
-    // Fade out after 60 frames (~1 second)
-    const opacity = Math.max(0, 1 - (point.age / 60));
-    
-    if (opacity > 0) {
-      // Main pencil dots - dark grey/black
-      ctx.beginPath();
-      ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(30, 30, 30, ${opacity * 0.9})`;
-      ctx.fill();
-      
-      // Extra smudge effect
-      ctx.beginPath();
-      ctx.arc(point.x + 1, point.y + 1, point.size * 0.7, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(50, 50, 50, ${opacity * 0.4})`;
-      ctx.fill();
-      
-      // Draw connecting lines for pencil effect
-      if (i > 0 && points[i-1].age < 60) {
-        const prev = points[i-1];
-        ctx.beginPath();
-        ctx.moveTo(prev.x, prev.y);
-        ctx.lineTo(point.x, point.y);
-        ctx.strokeStyle = `rgba(30, 30, 30, ${opacity * 0.7})`;
-        ctx.lineWidth = point.size * 0.8;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-      }
-    }
-  }
-  
-  // Remove old points
-  points = points.filter(p => p.age < 60);
-  
-  requestAnimationFrame(drawPencilTrail);
-}
-
-drawPencilTrail();
-
 // ===================== PANEL DE CONTROLE =====================
 let API_URL = '';
 
@@ -497,7 +451,6 @@ function addLog(message, type = 'info') {
   entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
   log.insertBefore(entry, log.firstChild);
   
-  // Limiter à 20 messages
   while (log.children.length > 20) {
     log.removeChild(log.lastChild);
   }
@@ -637,7 +590,35 @@ async function muteUser() {
   }
 }
 
-// ===================== CONFIGURATION DU BOT =====================
+async function clearMessages() {
+  const amount = document.getElementById('clearAmount').value;
+  
+  if (!amount || amount < 1 || amount > 100) {
+    addLog('Erreur: Entrez un nombre entre 1 et 100', 'error');
+    return;
+  }
+  
+  addLog(`Suppression de ${amount} messages...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/clear`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: parseInt(amount) })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('clearAmount').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
 async function changeStatus() {
   const status = document.getElementById('newStatus').value.trim();
   if (!status) {
@@ -694,34 +675,6 @@ async function changeWelcome() {
   }
 }
 
-async function changeGoodbye() {
-  const message = document.getElementById('goodbyeMsg').value.trim();
-  if (!message) {
-    addLog('Erreur: Entrez un message', 'error');
-    return;
-  }
-  
-  addLog(`Changement du message d'au revoir...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/config/goodbye`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('goodbyeMsg').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
 async function changeLogChannel() {
   const channelId = document.getElementById('logChannelId').value.trim();
   if (!channelId) {
@@ -750,37 +703,6 @@ async function changeLogChannel() {
   }
 }
 
-async function sendMessage() {
-  const channelId = document.getElementById('sendChannelId').value.trim();
-  const message = document.getElementById('sendMessage').value.trim();
-  
-  if (!channelId || !message) {
-    addLog('Erreur: Entrez un ID de salon et un message', 'error');
-    return;
-  }
-  
-  addLog(`Envoi du message...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ channelId, message })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('sendChannelId').value = '';
-      document.getElementById('sendMessage').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
 function disconnectApi() {
   API_URL = '';
   document.getElementById('panelLogin').style.display = 'block';
@@ -790,7 +712,6 @@ function disconnectApi() {
   addLog('Déconnecté', 'info');
 }
 
-// Actualiser les stats toutes les 30 secondes
 setInterval(() => {
   if (API_URL) loadStats();
 }, 30000);

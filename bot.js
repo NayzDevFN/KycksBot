@@ -108,7 +108,9 @@ function saveConfig(config) {
 
 let config = loadConfig();
 
-// ===================== CLIENT =====================
+// ===================== CLIENT (OPTIMISE 315MB) =====================
+const { Options, Collection } = require('discord.js');
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -116,9 +118,31 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildVoiceStates,
-    GatewayIntentBits.GuildPresences,
     GatewayIntentBits.GuildMessageReactions
-  ]
+  ],
+  makeCache: Options.cacheWithLimits({
+    ...Options.DefaultMakeCacheSettings,
+    MessageManager: 50,
+    GuildMemberManager: {
+      maxSize: 100,
+      keepOverLimit: (member) => member.id === client.user?.id,
+    },
+    GuildBanManager: 50,
+    PresenceManager: 0,
+    GuildEmojiManager: 25,
+    ReactionManager: 0,
+    ReactionUserManager: 0,
+    VoiceStateManager: 25,
+    StageInstanceManager: 0,
+    GuildScheduledEventManager: 0,
+    PollManager: 0,
+  }),
+  sweepers: {
+    ...Options.DefaultSweeperSettings,
+    clients: { interval: 300, lifetime: 600 },
+    guildMembers: { interval: 300, lifetime: 600 },
+    messages: { interval: 300, lifetime: 180 },
+  },
 });
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -400,8 +424,28 @@ async function nukeGuild(guild, confirm = true) {
   return { success: false };
 }
 
+// ===================== PERSISTENCE (DATA FILES) =====================
+const XP_DATA_PATH = path.join(__dirname, 'xp-data.json');
+const WARNS_DATA_PATH = path.join(__dirname, 'warns-data.json');
+const TICKETS_DATA_PATH = path.join(__dirname, 'tickets-data.json');
+
+function loadJsonFile(filePath, fallback) {
+  try {
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    }
+  } catch (e) {}
+  return fallback;
+}
+
+function saveJsonFile(filePath, data) {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  } catch (e) {}
+}
+
 // ===================== XP SYSTEM =====================
-const xpData = {};
+let xpData = loadJsonFile(XP_DATA_PATH, {});
 
 function getXp(userId, guildId) {
   const key = `${guildId}_${userId}`;
@@ -421,18 +465,21 @@ function addXp(userId, guildId) {
   const newLevel = Math.floor(0.1 * Math.sqrt(xpData[key].xp));
   if (newLevel > xpData[key].level) {
     xpData[key].level = newLevel;
+    saveJsonFile(XP_DATA_PATH, xpData);
     return newLevel;
   }
+  saveJsonFile(XP_DATA_PATH, xpData);
   return null;
 }
 
 // ===================== WARN SYSTEM =====================
-const warns = {};
+let warns = loadJsonFile(WARNS_DATA_PATH, {});
 
 function addWarn(userId, guildId, reason, moderator) {
   const key = `${guildId}_${userId}`;
   if (!warns[key]) warns[key] = [];
   warns[key].push({ reason, moderator, date: new Date().toISOString() });
+  saveJsonFile(WARNS_DATA_PATH, warns);
   return warns[key].length;
 }
 
@@ -442,10 +489,16 @@ function getWarns(userId, guildId) {
 
 function clearWarns(userId, guildId) {
   warns[`${guildId}_${userId}`] = [];
+  saveJsonFile(WARNS_DATA_PATH, warns);
 }
 
 // ===================== TICKET SYSTEM =====================
-const tickets = new Map();
+let tickets = new Map(loadJsonFile(TICKETS_DATA_PATH, []));
+
+function saveTickets() {
+  const arr = Array.from(tickets.entries());
+  saveJsonFile(TICKETS_DATA_PATH, arr);
+}
 
 // ===================== ANTI-SPAM =====================
 const spamTracker = new Map();
@@ -1692,6 +1745,7 @@ client.on('interactionCreate', async (interaction) => {
         open: true,
         createdAt: new Date().toISOString()
       });
+      saveTickets();
       
       const closeRow = new ActionRowBuilder()
         .addComponents(
@@ -1720,6 +1774,7 @@ client.on('interactionCreate', async (interaction) => {
     }
     
     ticket.open = false;
+    saveTickets();
     await interaction.reply(`🔒 Ticket fermé par ${interaction.user.username}.`);
     
     if (config.ticketTranscript) {
@@ -1903,6 +1958,7 @@ client.on('interactionCreate', async (interaction) => {
     if (!ticket || !ticket.open) return;
     
     ticket.open = false;
+    saveTickets();
     await interaction.reply(`🔒 Ticket fermé.`);
     
     if (config.ticketTranscript) {
@@ -1927,6 +1983,37 @@ module.exports = {
   restoreBackup,
   nukeGuild
 };
+
+// ===================== GRACEFUL SHUTDOWN =====================
+function gracefulShutdown(signal) {
+  console.log(`\n🛑 Signal ${signal} reçu. Arrêt en cours...`);
+  try {
+    saveJsonFile(XP_DATA_PATH, xpData);
+    saveJsonFile(WARNS_DATA_PATH, warns);
+    saveTickets();
+    saveConfig(config);
+    console.log('💾 Données sauvegardées.');
+  } catch (e) {
+    console.error('❌ Erreur sauvegarde:', e);
+  }
+  try {
+    client.destroy();
+    console.log('👋 Bot déconnecté.');
+  } catch (e) {}
+  process.exit(0);
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+process.on('unhandledRejection', (error) => {
+  console.error('❌ Promesse non gérée:', error);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('❌ Exception non capturée:', error);
+  gracefulShutdown('uncaughtException');
+});
 
 // ===================== CONNEXION =====================
 client.login(DISCORD_TOKEN);

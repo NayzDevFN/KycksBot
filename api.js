@@ -268,4 +268,27 @@ server.listen(PORT, () => {
   console.log(`🌐 Serveur en ligne sur le port ${PORT}`);
   console.log(`🏠 Site: http://localhost:${PORT}`);
   console.log(`📋 Panel: http://localhost:${PORT}/panel`);
+  console.log(`🤖 Bot Discord connecté !`);
+  console.log(`📊 ACLClouds - Kycks Bot prêt`);
 });
+
+// ===================== GRACEFUL SHUTDOWN =====================
+function gracefulShutdown(signal) {
+  console.log(`\n🛑 Signal ${signal} reçu. Arrêt en cours...`);
+  try {
+    bot.saveConfig(bot.config);
+    console.log('💾 Configuration sauvegardée.');
+  } catch (e) {}
+  try {
+    bot.client.destroy();
+    console.log('👋 Bot déconnecté.');
+  } catch (e) {}
+  server.close(() => {
+    console.log('🌐 Serveur web arrêté.');
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(0), 5000);
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

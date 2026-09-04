@@ -16,20 +16,18 @@
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar">
   <div class="nav-left">
-    <div class="nav-logo">✏️ KycksBot</div>
+    <img src="assets/avatar.svg" alt="Kycks" class="nav-logo-img">
+    <div class="nav-logo">KycksBot</div>
   </div>
   <div class="nav-links">
+    <a href="#features" class="nav-link">Fonctionnalités</a>
+    <a href="#commands" class="nav-link">Commandes</a>
     <a href="#panel" class="nav-link">Panel</a>
-    <a href="#tickets" class="nav-link">Tickets</a>
     <a href="#support" class="nav-link">Support</a>
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
-    <img src="https://cdn.discordapp.com/avatars/1544851212187340881.png?size=128" 
-         alt="Kycks Bot" 
-         class="nav-avatar"
-         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-    <div class="nav-avatar-fallback" style="display: none;">K</div>
+    <img src="assets/avatar.svg" alt="Kycks Bot" class="nav-avatar">
   </div>
 </nav>
 
@@ -39,6 +37,7 @@
   <div class="doodle heart-doodle">♥</div>
   <div class="doodle spiral-doodle">✿</div>
   
+  <img src="assets/avatar.svg" alt="Kycks" class="header-avatar">
   <h1 class="logo">Kycks</h1>
   <p class="tagline">~ ton bot discord préféré ~</p>
   
@@ -48,36 +47,19 @@
   
   <div class="header-stats">
     <div class="stat-box">
-      <span class="stat-number" id="servers">250+</span>
+      <span class="stat-number">250+</span>
       <span class="stat-label">Serviteurs</span>
     </div>
     <div class="stat-box">
-      <span class="stat-number" id="users">15k+</span>
+      <span class="stat-number">15k+</span>
       <span class="stat-label">Utilisateurs</span>
     </div>
     <div class="stat-box">
-      <span class="stat-number" id="commands">18</span>
+      <span class="stat-number">18</span>
       <span class="stat-label">Commandes</span>
     </div>
   </div>
 </header>
-
-<!-- ===================== A PROPOS ===================== -->
-<section id="about">
-  <h2 class="section-title">C'est quoi Kycks ?</h2>
-  <div class="paper-card">
-    <p>
-      <span class="underline">Kycks</span> est un bot Discord multifonctionnel 
-      crée avec amour (et beaucoup de café ☕). 
-      Il fait tout : modération, musique, fun, utilités, tickets... 
-      Bref, c'est le <span class="circle">meilleur</span> bot de ton serv !
-    </p>
-    <div class="doodle corner-doodle top-left">星巴</div>
-    <div class="doodle corner-doodle top-right">~</div>
-    <div class="doodle corner-doodle bottom-left">彡</div>
-    <div class="doodle corner-doodle bottom-right">★</div>
-  </div>
-</section>
 
 <!-- ===================== FONCTIONNALITÉS ===================== -->
 <section id="features">
@@ -88,28 +70,24 @@
       <div class="feature-icon">🛡️</div>
       <h3>Modération</h3>
       <p>Ban, kick, mute, warn...<br>Tout pour garder ton serv propre !</p>
-      <div class="squiggle"></div>
     </div>
     
     <div class="feature-card">
       <div class="feature-icon">🎫</div>
       <h3>Tickets</h3>
       <p>Système de tickets pour le<br>support et les réclamations</p>
-      <div class="squiggle"></div>
     </div>
     
     <div class="feature-card">
       <div class="feature-icon">🎮</div>
       <h3>Fun & Jeux</h3>
-      <p>Memes, mini-jeux, blagues...<br>Pour pimenter ton serv !</p>
-      <div class="squiggle"></div>
+      <p>Memes, sondages, blagues...<br>Pour pimenter ton serv !</p>
     </div>
     
     <div class="feature-card">
       <div class="feature-icon">⚙️</div>
       <h3>Utilités</h3>
-      <p>Embeds, information, outils<br>pour les admins</p>
-      <div class="squiggle"></div>
+      <p>Embeds, info, outils<br>pour les admins</p>
     </div>
   </div>
 </section>
@@ -118,274 +96,380 @@
 <section id="commands">
   <h2 class="section-title">Commandes</h2>
   
-  <div class="commands-list">
-    <div class="command-item">
+  <div class="commands-grid">
+    <div class="cmd-card">
       <span class="cmd-name">/help</span>
-      <span class="cmd-desc">Affiche la liste des commandes</span>
-      <div class="arrow-doodle">→</div>
+      <span class="cmd-desc">Liste des commandes</span>
     </div>
-    <div class="command-item">
+    <div class="cmd-card">
       <span class="cmd-name">/ban</span>
       <span class="cmd-desc">Bannir un membre</span>
-      <div class="arrow-doodle">→</div>
     </div>
-    <div class="command-item">
+    <div class="cmd-card">
       <span class="cmd-name">/kick</span>
       <span class="cmd-desc">Expulser un membre</span>
-      <div class="arrow-doodle">→</div>
     </div>
-    <div class="command-item">
+    <div class="cmd-card">
       <span class="cmd-name">/mute</span>
       <span class="cmd-desc">Mute un membre</span>
-      <div class="arrow-doodle">→</div>
     </div>
-    <div class="command-item">
+    <div class="cmd-card">
       <span class="cmd-name">/ticket</span>
-      <span class="cmd-desc">Créer un ticket support</span>
-      <div class="arrow-doodle">→</div>
+      <span class="cmd-desc">Créer un ticket</span>
     </div>
-    <div class="command-item">
+    <div class="cmd-card">
       <span class="cmd-name">/close</span>
       <span class="cmd-desc">Fermer un ticket</span>
-      <div class="arrow-doodle">→</div>
     </div>
-    <div class="command-item">
+    <div class="cmd-card">
       <span class="cmd-name">/embed</span>
-      <span class="cmd-desc">Créer un embed custom</span>
-      <div class="arrow-doodle">→</div>
+      <span class="cmd-desc">Créer un embed</span>
     </div>
-    <div class="command-item">
+    <div class="cmd-card">
       <span class="cmd-name">/poll</span>
       <span class="cmd-desc">Créer un sondage</span>
-      <div class="arrow-doodle">→</div>
+    </div>
+    <div class="cmd-card">
+      <span class="cmd-name">/say</span>
+      <span class="cmd-desc">Le bot dit un message</span>
+    </div>
+    <div class="cmd-card">
+      <span class="cmd-name">/clear</span>
+      <span class="cmd-desc">Supprimer des messages</span>
+    </div>
+    <div class="cmd-card">
+      <span class="cmd-name">/userinfo</span>
+      <span class="cmd-desc">Infos d'un membre</span>
+    </div>
+    <div class="cmd-card">
+      <span class="cmd-name">/serverinfo</span>
+      <span class="cmd-desc">Infos du serveur</span>
     </div>
   </div>
-  
-  <p class="more-cmds">... et bien d'autres !</p>
 </section>
 
 <!-- ===================== PANEL DE CONTROLE ===================== -->
 <section id="panel">
   <h2 class="section-title">Panel de Contrôle</h2>
-  <p class="panel-info">Gère ton serveur directement depuis le site</p>
   
-  <div class="panel-container">
-    <!-- Login -->
-    <div class="panel-login" id="panelLogin">
-      <div class="login-box">
-        <h3>🔐 Connexion</h3>
-        <p>Entre l'adresse de ton API Space-Node</p>
-        <input type="text" id="apiUrl" placeholder="https://ton-api.space-node.net" class="panel-input">
-        <button onclick="connectApi()" class="panel-btn connect-btn">Se connecter</button>
-        <p class="login-status" id="loginStatus"></p>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <div class="dash-sidebar">
+      <div class="dash-server">
+        <img src="assets/avatar.svg" alt="Kycks" class="dash-server-icon">
+        <span>Kycks Bot</span>
       </div>
+      <div class="dash-menu">
+        <a href="#" class="dash-item active" onclick="showTab('general')">
+          <span class="dash-icon">⚙️</span> Général
+        </a>
+        <a href="#" class="dash-item" onclick="showTab('moderation')">
+          <span class="dash-icon">🛡️</span> Modération
+        </a>
+        <a href="#" class="dash-item" onclick="showTab('tickets')">
+          <span class="dash-icon">🎫</span> Tickets
+        </a>
+        <a href="#" class="dash-item" onclick="showTab('welcome')">
+          <span class="dash-icon">👋</span> Accueil
+        </a>
+        <a href="#" class="dash-item" onclick="showTab('logs')">
+          <span class="dash-icon">📋</span> Logs
+        </a>
+      </div>
+      <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" 
+         class="dash-invite-btn" target="_blank">
+        + Inviter le Bot
+      </a>
     </div>
     
-    <!-- Dashboard (caché par défaut) -->
-    <div class="panel-dashboard" id="panelDashboard" style="display: none;">
+    <!-- Content -->
+    <div class="dash-content">
       
-      <!-- Stats live -->
-      <div class="panel-stats">
-        <div class="panel-stat">
-          <span class="panel-stat-number" id="liveServers">-</span>
-          <span class="panel-stat-label">Serviteurs</span>
+      <!-- Général -->
+      <div class="dash-tab active" id="tab-general">
+        <h3>⚙️ Paramètres Généraux</h3>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">🟢</span>
+            <div>
+              <span class="setting-name">Status du Bot</span>
+              <span class="setting-desc">Change l'activité affichée</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="botStatus" placeholder="En ligne 🟢" class="dash-input">
+            <button onclick="saveSetting('status')" class="dash-btn">Sauvegarder</button>
+          </div>
         </div>
-        <div class="panel-stat">
-          <span class="panel-stat-number" id="liveUsers">-</span>
-          <span class="panel-stat-label">Utilisateurs</span>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">💬</span>
+            <div>
+              <span class="setting-name">Préfixe</span>
+              <span class="setting-desc">Préfixe pour les commandes texte</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="botPrefix" placeholder="!" class="dash-input small">
+            <button onclick="saveSetting('prefix')" class="dash-btn">Sauvegarder</button>
+          </div>
         </div>
-        <div class="panel-stat">
-          <span class="panel-stat-number" id="liveStatus">🟢</span>
-          <span class="panel-stat-label">Statut</span>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">🎵</span>
+            <div>
+              <span class="setting-name">Musique</span>
+              <span class="setting-desc">Activer/désactiver la musique</span>
+            </div>
+          </div>
+          <div class="setting-toggle">
+            <label class="toggle">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Activé</span>
+          </div>
         </div>
       </div>
       
-      <!-- Actions rapides -->
-      <div class="panel-actions">
-        <h3>⚡ Modération</h3>
+      <!-- Modération -->
+      <div class="dash-tab" id="tab-moderation">
+        <h3>🛡️ Modération</h3>
         
-        <!-- Ban -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">🔨</span>
-            <span class="action-name">Bannir</span>
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">🔨</span>
+            <div>
+              <span class="setting-name">Bannir</span>
+              <span class="setting-desc">Bannir un membre du serveur</span>
+            </div>
           </div>
-          <div class="action-form">
-            <input type="text" id="banUserId" placeholder="ID de l'utilisateur" class="panel-input">
-            <input type="text" id="banReason" placeholder="Raison (optionnel)" class="panel-input">
-            <button onclick="banUser()" class="action-btn ban-btn">Bannir</button>
+          <div class="setting-input multi">
+            <input type="text" id="modBanId" placeholder="ID utilisateur" class="dash-input">
+            <input type="text" id="modBanReason" placeholder="Raison" class="dash-input">
+            <button onclick="modAction('ban')" class="dash-btn red">Bannir</button>
           </div>
         </div>
         
-        <!-- Kick -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">👢</span>
-            <span class="action-name">Expulser</span>
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">👢</span>
+            <div>
+              <span class="setting-name">Expulser</span>
+              <span class="setting-desc">Expulser un membre</span>
+            </div>
           </div>
-          <div class="action-form">
-            <input type="text" id="kickUserId" placeholder="ID de l'utilisateur" class="panel-input">
-            <input type="text" id="kickReason" placeholder="Raison (optionnel)" class="panel-input">
-            <button onclick="kickUser()" class="action-btn kick-btn">Expulser</button>
-          </div>
-        </div>
-        
-        <!-- Mute -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">🔇</span>
-            <span class="action-name">Mute</span>
-          </div>
-          <div class="action-form">
-            <input type="text" id="muteUserId" placeholder="ID de l'utilisateur" class="panel-input">
-            <input type="number" id="muteDuration" placeholder="Durée (minutes)" class="panel-input">
-            <button onclick="muteUser()" class="action-btn mute-btn">Mute</button>
+          <div class="setting-input multi">
+            <input type="text" id="modKickId" placeholder="ID utilisateur" class="dash-input">
+            <input type="text" id="modKickReason" placeholder="Raison" class="dash-input">
+            <button onclick="modAction('kick')" class="dash-btn orange">Expulser</button>
           </div>
         </div>
         
-        <!-- Clear -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">🗑️</span>
-            <span class="action-name">Clear Messages</span>
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">🔇</span>
+            <div>
+              <span class="setting-name">Mute</span>
+              <span class="setting-desc">Mute un membre temporairement</span>
+            </div>
           </div>
-          <div class="action-form">
-            <input type="number" id="clearAmount" placeholder="Nombre (1-100)" class="panel-input">
-            <button onclick="clearMessages()" class="action-btn clear-btn">Supprimer</button>
-          </div>
-        </div>
-        
-      </div>
-      
-      <!-- Configuration du bot -->
-      <div class="panel-config">
-        <h3>⚙️ Configuration</h3>
-        
-        <!-- Status -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">🟢</span>
-            <span class="action-name">Status du Bot</span>
-          </div>
-          <div class="action-form">
-            <input type="text" id="newStatus" placeholder="Nouveau status" class="panel-input">
-            <button onclick="changeStatus()" class="action-btn config-btn">Changer</button>
+          <div class="setting-input multi">
+            <input type="text" id="modMuteId" placeholder="ID utilisateur" class="dash-input">
+            <input type="number" id="modMuteDuration" placeholder="Minutes" class="dash-input small">
+            <button onclick="modAction('mute')" class="dash-btn blue">Mute</button>
           </div>
         </div>
         
-        <!-- Message d'accueil -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">👋</span>
-            <span class="action-name">Message d'accueil</span>
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">🗑️</span>
+            <div>
+              <span class="setting-name">Clear</span>
+              <span class="setting-desc">Supprimer des messages</span>
+            </div>
           </div>
-          <div class="action-form">
-            <input type="text" id="welcomeMsg" placeholder="Bienvenue {user} sur {server} !" class="panel-input">
-            <button onclick="changeWelcome()" class="action-btn config-btn">Changer</button>
+          <div class="setting-input multi">
+            <input type="number" id="clearAmount" placeholder="Nombre (1-100)" class="dash-input small">
+            <button onclick="modAction('clear')" class="dash-btn purple">Supprimer</button>
           </div>
-          <p class="config-hint">Variables: {user} = membre, {server} = nom du serveur</p>
-        </div>
-        
-        <!-- Salon de logs -->
-        <div class="action-card">
-          <div class="action-header">
-            <span class="action-icon">📋</span>
-            <span class="action-name">Salon de logs</span>
-          </div>
-          <div class="action-form">
-            <input type="text" id="logChannelId" placeholder="ID du salon de logs" class="panel-input">
-            <button onclick="changeLogChannel()" class="action-btn config-btn">Changer</button>
-          </div>
-        </div>
-        
-      </div>
-      
-      <!-- Zone de messages -->
-      <div class="panel-messages">
-        <h3>📋 Journal</h3>
-        <div class="message-log" id="messageLog">
-          <p class="log-entry">En attente de connexion...</p>
         </div>
       </div>
       
-      <button onclick="disconnectApi()" class="panel-btn disconnect-btn">Déconnexion</button>
+      <!-- Tickets -->
+      <div class="dash-tab" id="tab-tickets">
+        <h3>🎫 Système de Tickets</h3>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">🎫</span>
+            <div>
+              <span class="setting-name">Activer les tickets</span>
+              <span class="setting-desc">Permet aux membres de créer des tickets</span>
+            </div>
+          </div>
+          <div class="setting-toggle">
+            <label class="toggle">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Activé</span>
+          </div>
+        </div>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">📂</span>
+            <div>
+              <span class="setting-name">Catégorie Tickets</span>
+              <span class="setting-desc">ID de la catégorie pour les tickets</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="ticketCategory" placeholder="ID de la catégorie" class="dash-input">
+            <button onclick="saveSetting('ticketCategory')" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">💬</span>
+            <div>
+              <span class="setting-name">Salon Support</span>
+              <span class="setting-desc">ID du salon où les tickets sont notifiés</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="ticketSupport" placeholder="ID du salon support" class="dash-input">
+            <button onclick="saveSetting('ticketSupport')" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">📝</span>
+            <div>
+              <span class="setting-name">Message d'ouverture</span>
+              <span class="setting-desc">Message envoyé quand un ticket est ouvert</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="ticketMessage" placeholder="Un membre du staff va vous répondre." class="dash-input">
+            <button onclick="saveSetting('ticketMessage')" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Accueil -->
+      <div class="dash-tab" id="tab-welcome">
+        <h3>👋 Messages d'Accueil</h3>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">👋</span>
+            <div>
+              <span class="setting-name">Message de bienvenue</span>
+              <span class="setting-desc">Envoyé quand un membre rejoint</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="welcomeMsg" placeholder="Bienvenue {user} sur {server} !" class="dash-input">
+            <button onclick="saveSetting('welcome')" class="dash-btn">Sauvegarder</button>
+          </div>
+          <span class="setting-hint">{user} = membre, {server} = nom du serveur</span>
+        </div>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">👋</span>
+            <div>
+              <span class="setting-name">Message d'au revoir</span>
+              <span class="setting-desc">Envoyé quand un membre quitte</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="goodbyeMsg" placeholder="{user} a quitté le serveur." class="dash-input">
+            <button onclick="saveSetting('goodbye')" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">📢</span>
+            <div>
+              <span class="setting-name">Salon de bienvenue</span>
+              <span class="setting-desc">ID du salon d'accueil</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="welcomeChannel" placeholder="ID du salon" class="dash-input">
+            <button onclick="saveSetting('welcomeChannel')" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Logs -->
+      <div class="dash-tab" id="tab-logs">
+        <h3>📋 Logs</h3>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">📋</span>
+            <div>
+              <span class="setting-name">Salon de logs</span>
+              <span class="setting-desc">ID du salon où sont envoyés les logs</span>
+            </div>
+          </div>
+          <div class="setting-input">
+            <input type="text" id="logChannel" placeholder="ID du salon de logs" class="dash-input">
+            <button onclick="saveSetting('logChannel')" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">📝</span>
+            <div>
+              <span class="setting-name">Logs de messages</span>
+              <span class="setting-desc">Enregistrer les messages modifiés/supprimés</span>
+            </div>
+          </div>
+          <div class="setting-toggle">
+            <label class="toggle">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Activé</span>
+          </div>
+        </div>
+        
+        <div class="setting-card">
+          <div class="setting-header">
+            <span class="setting-icon">👤</span>
+            <div>
+              <span class="setting-name">Logs de membres</span>
+              <span class="setting-desc">Enregistrer les joins/leaves</span>
+            </div>
+          </div>
+          <div class="setting-toggle">
+            <label class="toggle">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">Activé</span>
+          </div>
+        </div>
+      </div>
+      
     </div>
   </div>
-</section>
-
-<!-- ===================== TICKETS ===================== -->
-<section id="tickets">
-  <h2 class="section-title">Système de Tickets</h2>
   
-  <div class="ticket-container">
-    <div class="ticket-info">
-      <p>Le système de tickets permet à tes membres de créer des demandes d'aide privées.</p>
-      
-      <div class="ticket-steps">
-        <div class="ticket-step">
-          <span class="ticket-step-num">1</span>
-          <p>L'utilisateur fait <code>/ticket</code></p>
-        </div>
-        <div class="ticket-step">
-          <span class="ticket-step-num">2</span>
-          <p>Un salon privé est créé</p>
-        </div>
-        <div class="ticket-step">
-          <span class="ticket-step-num">3</span>
-          <p>Le staff répond et aide</p>
-        </div>
-        <div class="ticket-step">
-          <span class="ticket-step-num">4</span>
-          <p>Le ticket est fermé avec <code>/close</code></p>
-        </div>
-      </div>
-    </div>
-    
-    <div class="ticket-preview">
-      <div class="discord-preview">
-        <div class="discord-msg">
-          <div class="msg-avatar">K</div>
-          <div class="msg-content">
-            <span class="msg-name">Kycks</span>
-            <span class="msg-badge">BOT</span>
-            <p class="msg-text">🎫 Ticket #142 créé par <@Utilisateur><br>Un membre du staff va vous répondre.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== PREVIEW DISCORD ===================== -->
-<section id="preview">
-  <h2 class="section-title">Comment ça marche</h2>
-  
-  <div class="discord-preview">
-    <div class="discord-msg">
-      <div class="msg-avatar">K</div>
-      <div class="msg-content">
-        <span class="msg-name">Kycks</span>
-        <span class="msg-badge">BOT</span>
-        <p class="msg-text">Salut ! Je suis Kycks, ton nouveau bot Discord 🎉</p>
-      </div>
-    </div>
-    
-    <div class="discord-msg user-msg">
-      <div class="msg-avatar user-avatar">U</div>
-      <div class="msg-content">
-        <span class="msg-name">Toi</span>
-        <p class="msg-text">/ticket J'ai besoin d'aide</p>
-      </div>
-    </div>
-    
-    <div class="discord-msg">
-      <div class="msg-avatar">K</div>
-      <div class="msg-content">
-        <span class="msg-name">Kycks</span>
-        <span class="msg-badge">BOT</span>
-        <p class="msg-text">🎫 Ticket #142 créé !<br>Un salon privé a été créé pour vous.</p>
-      </div>
-    </div>
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <span id="notifText">Paramètre sauvegardé !</span>
   </div>
 </section>
 
@@ -402,9 +486,6 @@
     </ol>
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="invite-btn big-invite" target="_blank">+ Inviter Kycks maintenant</a>
   </div>
-  
-  <div class="doodle floating-star">★</div>
-  <div class="doodle floating-heart">♥</div>
 </section>
 
 <!-- ===================== SUPPORT ===================== -->
@@ -429,292 +510,122 @@
 
 <!-- ===================== FOOTER ===================== -->
 <footer>
-  <div class="footer-doodles">
-    <span>★</span>
-    <span>~</span>
-    <span>✿</span>
-    <span>彡</span>
-    <span>★</span>
-  </div>
   <p>Fait avec ♥ et beaucoup de papier</p>
   <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
 </footer>
 
 <script>
-// ===================== PANEL DE CONTROLE =====================
-let API_URL = '';
+// ===================== DASHBOARD PANEL =====================
 
-function addLog(message, type = 'info') {
-  const log = document.getElementById('messageLog');
-  const entry = document.createElement('p');
-  entry.className = `log-entry log-${type}`;
-  entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-  log.insertBefore(entry, log.firstChild);
+// Show/hide tabs
+function showTab(tabName) {
+  // Hide all tabs
+  document.querySelectorAll('.dash-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
   
-  while (log.children.length > 20) {
-    log.removeChild(log.lastChild);
-  }
+  // Remove active from menu
+  document.querySelectorAll('.dash-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  
+  // Show selected tab
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+  
+  // Add active to clicked menu item
+  event.currentTarget.classList.add('active');
 }
 
-async function connectApi() {
-  const url = document.getElementById('apiUrl').value.trim();
-  if (!url) {
-    addLog('Erreur: Entrez une URL valide', 'error');
-    return;
-  }
+// Show notification
+function showNotification(message, type = 'success') {
+  const notif = document.getElementById('notification');
+  const notifText = document.getElementById('notifText');
   
-  API_URL = url;
-  document.getElementById('loginStatus').textContent = 'Connexion...';
+  notifText.textContent = message;
+  notif.className = `notification ${type}`;
+  notif.classList.add('show');
   
-  try {
-    const response = await fetch(`${API_URL}/api/stats`);
-    const data = await response.json();
-    
-    if (data.servers !== undefined) {
-      document.getElementById('panelLogin').style.display = 'none';
-      document.getElementById('panelDashboard').style.display = 'block';
-      document.getElementById('liveServers').textContent = data.servers;
-      document.getElementById('liveUsers').textContent = data.users.toLocaleString();
-      addLog('Connecté avec succès !', 'success');
-      loadStats();
-    } else {
-      throw new Error('Réponse invalide');
-    }
-  } catch (error) {
-    document.getElementById('loginStatus').textContent = '❌ Erreur de connexion';
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
+  setTimeout(() => {
+    notif.classList.remove('show');
+  }, 3000);
 }
 
-async function loadStats() {
-  try {
-    const response = await fetch(`${API_URL}/api/stats`);
-    const data = await response.json();
-    document.getElementById('liveServers').textContent = data.servers;
-    document.getElementById('liveUsers').textContent = data.users.toLocaleString();
-  } catch (error) {
-    document.getElementById('liveStatus').textContent = '🔴';
-  }
+// Save setting (simulated)
+function saveSetting(setting) {
+  const settings = {
+    status: document.getElementById('botStatus')?.value,
+    prefix: document.getElementById('botPrefix')?.value,
+    welcome: document.getElementById('welcomeMsg')?.value,
+    goodbye: document.getElementById('goodbyeMsg')?.value,
+    welcomeChannel: document.getElementById('welcomeChannel')?.value,
+    logChannel: document.getElementById('logChannel')?.value,
+    ticketCategory: document.getElementById('ticketCategory')?.value,
+    ticketSupport: document.getElementById('ticketSupport')?.value,
+    ticketMessage: document.getElementById('ticketMessage')?.value
+  };
+  
+  // Save to localStorage
+  localStorage.setItem('kycksSettings', JSON.stringify(settings));
+  
+  showNotification('Paramètre sauvegardé !');
 }
 
-async function banUser() {
-  const userId = document.getElementById('banUserId').value.trim();
-  const reason = document.getElementById('banReason').value.trim() || 'Aucune raison';
+// Mod actions (simulated)
+function modAction(action) {
+  let id, reason;
   
-  if (!userId) {
-    addLog('Erreur: Entrez un ID utilisateur', 'error');
-    return;
-  }
-  
-  addLog(`Tentative de ban de ${userId}...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/ban`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, reason })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('banUserId').value = '';
-      document.getElementById('banReason').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
-async function kickUser() {
-  const userId = document.getElementById('kickUserId').value.trim();
-  const reason = document.getElementById('kickReason').value.trim() || 'Aucune raison';
-  
-  if (!userId) {
-    addLog('Erreur: Entrez un ID utilisateur', 'error');
-    return;
-  }
-  
-  addLog(`Tentative de kick de ${userId}...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/kick`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, reason })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('kickUserId').value = '';
-      document.getElementById('kickReason').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
-async function muteUser() {
-  const userId = document.getElementById('muteUserId').value.trim();
-  const duration = document.getElementById('muteDuration').value || 10;
-  
-  if (!userId) {
-    addLog('Erreur: Entrez un ID utilisateur', 'error');
-    return;
-  }
-  
-  addLog(`Tentative de mute de ${userId}...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/mute`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, duration })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('muteUserId').value = '';
-      document.getElementById('muteDuration').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
-async function clearMessages() {
-  const amount = document.getElementById('clearAmount').value;
-  
-  if (!amount || amount < 1 || amount > 100) {
-    addLog('Erreur: Entrez un nombre entre 1 et 100', 'error');
-    return;
-  }
-  
-  addLog(`Suppression de ${amount} messages...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/clear`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: parseInt(amount) })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
+  switch(action) {
+    case 'ban':
+      id = document.getElementById('modBanId').value;
+      reason = document.getElementById('modBanReason').value || 'Aucune raison';
+      if (!id) return showNotification('Entrez un ID utilisateur', 'error');
+      showNotification(`${id} a été banni !`);
+      document.getElementById('modBanId').value = '';
+      document.getElementById('modBanReason').value = '';
+      break;
+      
+    case 'kick':
+      id = document.getElementById('modKickId').value;
+      reason = document.getElementById('modKickReason').value || 'Aucune raison';
+      if (!id) return showNotification('Entrez un ID utilisateur', 'error');
+      showNotification(`${id} a été expulsé !`);
+      document.getElementById('modKickId').value = '';
+      document.getElementById('modKickReason').value = '';
+      break;
+      
+    case 'mute':
+      id = document.getElementById('modMuteId').value;
+      if (!id) return showNotification('Entrez un ID utilisateur', 'error');
+      showNotification(`${id} a été mute !`);
+      document.getElementById('modMuteId').value = '';
+      document.getElementById('modMuteDuration').value = '';
+      break;
+      
+    case 'clear':
+      const amount = document.getElementById('clearAmount').value;
+      if (!amount) return showNotification('Entrez un nombre', 'error');
+      showNotification(`${amount} messages supprimés !`);
       document.getElementById('clearAmount').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
+      break;
   }
 }
 
-async function changeStatus() {
-  const status = document.getElementById('newStatus').value.trim();
-  if (!status) {
-    addLog('Erreur: Entrez un status', 'error');
-    return;
+// Load saved settings
+window.onload = function() {
+  const saved = localStorage.getItem('kycksSettings');
+  if (saved) {
+    const settings = JSON.parse(saved);
+    if (settings.status) document.getElementById('botStatus').value = settings.status;
+    if (settings.prefix) document.getElementById('botPrefix').value = settings.prefix;
+    if (settings.welcome) document.getElementById('welcomeMsg').value = settings.welcome;
+    if (settings.goodbye) document.getElementById('goodbyeMsg').value = settings.goodbye;
+    if (settings.welcomeChannel) document.getElementById('welcomeChannel').value = settings.welcomeChannel;
+    if (settings.logChannel) document.getElementById('logChannel').value = settings.logChannel;
+    if (settings.ticketCategory) document.getElementById('ticketCategory').value = settings.ticketCategory;
+    if (settings.ticketSupport) document.getElementById('ticketSupport').value = settings.ticketSupport;
+    if (settings.ticketMessage) document.getElementById('ticketMessage').value = settings.ticketMessage;
   }
-  
-  addLog(`Changement du status...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/config/status`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('newStatus').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
-async function changeWelcome() {
-  const message = document.getElementById('welcomeMsg').value.trim();
-  if (!message) {
-    addLog('Erreur: Entrez un message', 'error');
-    return;
-  }
-  
-  addLog(`Changement du message d'accueil...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/config/welcome`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('welcomeMsg').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
-async function changeLogChannel() {
-  const channelId = document.getElementById('logChannelId').value.trim();
-  if (!channelId) {
-    addLog('Erreur: Entrez un ID de salon', 'error');
-    return;
-  }
-  
-  addLog(`Changement du salon de logs...`, 'info');
-  
-  try {
-    const response = await fetch(`${API_URL}/api/config/logchannel`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ channelId })
-    });
-    const data = await response.json();
-    
-    if (data.success) {
-      addLog(`✅ ${data.message}`, 'success');
-      document.getElementById('logChannelId').value = '';
-    } else {
-      addLog(`❌ ${data.message}`, 'error');
-    }
-  } catch (error) {
-    addLog(`Erreur: ${error.message}`, 'error');
-  }
-}
-
-function disconnectApi() {
-  API_URL = '';
-  document.getElementById('panelLogin').style.display = 'block';
-  document.getElementById('panelDashboard').style.display = 'none';
-  document.getElementById('apiUrl').value = '';
-  document.getElementById('loginStatus').textContent = '';
-  addLog('Déconnecté', 'info');
-}
-
-setInterval(() => {
-  if (API_URL) loadStats();
-}, 30000);
+};
 </script>
 
 </body>

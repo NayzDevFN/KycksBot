@@ -15,7 +15,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
-    <img src="assets/avatar.svg" alt="Kycks" class="nav-logo-img">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="nav-logo-img">
     <div class="nav-logo">KycksBot</div>
   </div>
   <div class="nav-links">
@@ -27,7 +27,7 @@
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
-    <img src="assets/avatar.svg" alt="Kycks Bot" class="nav-avatar">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar">
   </div>
 </nav>
 
@@ -39,7 +39,7 @@
     <!-- SIDEBAR -->
     <div class="dash-sidebar">
       <div class="dash-server">
-        <img src="assets/avatar.svg" alt="Kycks" class="dash-server-icon">
+        <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="dash-server-icon">
         <span id="serverName">Kycks Bot</span>
       </div>
       <div class="dash-menu">
@@ -68,7 +68,7 @@
       <div class="dash-tab active" id="tab-accueil">
         <h3>🏠 Accueil</h3>
         <div class="welcome-card">
-          <img src="assets/avatar.svg" alt="Kycks" class="welcome-avatar">
+          <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="welcome-avatar">
           <h4>Bienvenue sur Kycks Bot !</h4>
           <p id="serverGreeting">Gère ton serveur directement depuis ici.</p>
           <div class="welcome-stats">
@@ -465,24 +465,12 @@ let selectors = { textChannels: [], voiceChannels: [], categories: [], roles: []
 
 // ===================== INIT =====================
 window.onload = async function() {
-  loadBotAvatar();
   await loadSelectors();
   await loadConfig();
   await loadBackups();
   loadStats();
   renderCustomCmds();
 };
-
-// ===================== BOT AVATAR =====================
-function loadBotAvatar() {
-  const avatarUrl = `https://cdn.discordapp.com/avatars/${BOT_CLIENT_ID}/avatar.png?size=128`;
-  const fallbackUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
-  const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon');
-  const img = new Image();
-  img.onload = function() { imgs.forEach(el => el.src = avatarUrl); };
-  img.onerror = function() { imgs.forEach(el => el.src = fallbackUrl); };
-  img.src = avatarUrl;
-}
 
 // ===================== LOAD SELECTORS =====================
 async function loadSelectors() {

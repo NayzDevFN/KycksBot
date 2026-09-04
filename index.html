@@ -15,7 +15,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
-    <img src="assets/avatar.svg" alt="Kycks" class="nav-logo-img">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="nav-logo-img">
     <div class="nav-logo">KycksBot</div>
   </div>
   <div class="nav-links">
@@ -26,7 +26,7 @@
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
-    <img src="assets/avatar.svg" alt="Kycks Bot" class="nav-avatar">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar">
   </div>
 </nav>
 
@@ -35,7 +35,7 @@
   <div class="doodle star-doodle">★</div>
   <div class="doodle heart-doodle">♥</div>
   <div class="doodle spiral-doodle">✿</div>
-  <img src="assets/avatar.svg" alt="Kycks" class="header-avatar">
+  <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="header-avatar">
   <h1 class="logo">Kycks</h1>
   <p class="tagline">~ ton bot discord préféré ~</p>
   <div class="invite-btn-container">
@@ -155,20 +155,7 @@ async function loadRealStats() {
   } catch (e) {}
 }
 
-// Load bot avatar from Discord
-function loadBotAvatar() {
-  const BOT_CLIENT_ID = '1544851212187340881';
-  const avatarUrl = `https://cdn.discordapp.com/avatars/${BOT_CLIENT_ID}/avatar.png?size=128`;
-  const fallbackUrl = `https://cdn.discordapp.com/embed/avatars/0.png`;
-  const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .header-avatar');
-  const img = new Image();
-  img.onload = function() { imgs.forEach(el => el.src = avatarUrl); };
-  img.onerror = function() { imgs.forEach(el => el.src = fallbackUrl); };
-  img.src = avatarUrl;
-}
-
 loadRealStats();
-loadBotAvatar();
 </script>
 
 </body>

@@ -155,20 +155,7 @@ async function loadRealStats() {
   } catch (e) {}
 }
 
-// Load bot avatar from API
-async function loadBotAvatar() {
-  try {
-    const res = await fetch('http://localhost:3000/api/avatar');
-    const data = await res.json();
-    if (data.avatar) {
-      const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .header-avatar');
-      imgs.forEach(el => el.src = data.avatar);
-    }
-  } catch (e) {}
-}
-
 loadRealStats();
-loadBotAvatar();
 </script>
 
 </body>

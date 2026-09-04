@@ -341,12 +341,6 @@ app.get('/api/transcripts', (req, res) => {
   }
 });
 
-// ===================== LANCER LE SERVEUR =====================
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🌐 API en ligne sur le port ${PORT}`);
-});
-
 // ===================== AVATAR API =====================
 app.get('/api/avatar', (req, res) => {
   const avatar = getSetting('botAvatar');
@@ -365,8 +359,6 @@ app.post('/api/avatar', (req, res) => {
 
 app.post('/api/avatar/upload', (req, res) => {
   try {
-    // Handle multipart form data manually or use multer
-    // For simplicity, we'll expect base64
     const { image, filename } = req.body;
     if (!image) return res.json({ success: false, message: 'No image provided' });
     
@@ -374,14 +366,30 @@ app.post('/api/avatar/upload', (req, res) => {
     const SafeFilename = `bot-avatar.${ext}`;
     const filepath = path.join(__dirname, 'assets', 'avatar', SafeFilename);
     
-    // Remove data:image/xxx;base64, prefix
     const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
     const buffer = Buffer.from(base64Data, 'base64');
     
     fs.writeFileSync(filepath, buffer);
     setSetting('botAvatar', `assets/avatar/${SafeFilename}`);
-    res.json({ success: true, message: 'Avatar uploadé', path: `assets/avatar/${SafeFilename}` });
+    res.json({ success: true, message: 'Avatar uploadé', path: `/assets/avatar/${SafeFilename}` });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
+});
+
+// ===================== SERVE HTML =====================
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/panel', (req, res) => {
+  res.sendFile(path.join(__dirname, 'panel.html'));
+});
+
+// ===================== LANCER LE SERVEUR =====================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🌐 API en ligne sur le port ${PORT}`);
+  console.log(`🏠 Site: http://localhost:${PORT}`);
+  console.log(`📋 Panel: http://localhost:${PORT}/panel`);
 });

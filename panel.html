@@ -475,25 +475,12 @@ let selectors = { textChannels: [], voiceChannels: [], categories: [], roles: []
 
 // ===================== INIT =====================
 window.onload = async function() {
-  await loadBotAvatar();
   await loadSelectors();
   await loadConfig();
   await loadBackups();
   loadStats();
   renderCustomCmds();
 };
-
-// ===================== BOT AVATAR =====================
-async function loadBotAvatar() {
-  try {
-    const res = await fetch(`${API}/api/avatar`);
-    const data = await res.json();
-    if (data.avatar) {
-      const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon');
-      imgs.forEach(el => el.src = data.avatar);
-    }
-  } catch (e) {}
-}
 
 // ===================== LOAD SELECTORS =====================
 async function loadSelectors() {

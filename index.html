@@ -150,6 +150,168 @@
   <p class="more-cmds">... et bien d'autres !</p>
 </section>
 
+<!-- ===================== PANEL DE CONTROLE ===================== -->
+<section id="panel">
+  <h2 class="section-title">Panel de Contrôle</h2>
+  <p class="panel-info">Connecte-toi pour gérer ton serveur depuis le site</p>
+  
+  <div class="panel-container">
+    <!-- Login -->
+    <div class="panel-login" id="panelLogin">
+      <div class="login-box">
+        <h3>🔐 Connexion</h3>
+        <p>Entre l'adresse de ton API Space-Node</p>
+        <input type="text" id="apiUrl" placeholder="https://ton-api.space-node.net" class="panel-input">
+        <button onclick="connectApi()" class="panel-btn connect-btn">Se connecter</button>
+        <p class="login-status" id="loginStatus"></p>
+      </div>
+    </div>
+    
+    <!-- Dashboard (caché par défaut) -->
+    <div class="panel-dashboard" id="panelDashboard" style="display: none;">
+      
+      <!-- Stats live -->
+      <div class="panel-stats">
+        <div class="panel-stat">
+          <span class="panel-stat-number" id="liveServers">-</span>
+          <span class="panel-stat-label">Serviteurs</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-number" id="liveUsers">-</span>
+          <span class="panel-stat-label">Utilisateurs</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-number" id="liveStatus">🟢</span>
+          <span class="panel-stat-label">Statut</span>
+        </div>
+      </div>
+      
+      <!-- Actions rapides -->
+      <div class="panel-actions">
+        <h3>⚡ Actions Rapides</h3>
+        
+        <!-- Ban -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">🔨</span>
+            <span class="action-name">Bannir</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="banUserId" placeholder="ID de l'utilisateur" class="panel-input">
+            <input type="text" id="banReason" placeholder="Raison (optionnel)" class="panel-input">
+            <button onclick="banUser()" class="action-btn ban-btn">Bannir</button>
+          </div>
+        </div>
+        
+        <!-- Kick -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">👢</span>
+            <span class="action-name">Expulser</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="kickUserId" placeholder="ID de l'utilisateur" class="panel-input">
+            <input type="text" id="kickReason" placeholder="Raison (optionnel)" class="panel-input">
+            <button onclick="kickUser()" class="action-btn kick-btn">Expulser</button>
+          </div>
+        </div>
+        
+        <!-- Mute -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">🔇</span>
+            <span class="action-name">Mute</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="muteUserId" placeholder="ID de l'utilisateur" class="panel-input">
+            <input type="number" id="muteDuration" placeholder="Durée (minutes)" class="panel-input">
+            <button onclick="muteUser()" class="action-btn mute-btn">Mute</button>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Configuration du bot -->
+      <div class="panel-config">
+        <h3>⚙️ Configuration du Bot</h3>
+        
+        <!-- Status -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">🟢</span>
+            <span class="action-name">Status du Bot</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="newStatus" placeholder="Nouveau status (ex: En ligne 🟢)" class="panel-input">
+            <button onclick="changeStatus()" class="action-btn config-btn">Changer</button>
+          </div>
+        </div>
+        
+        <!-- Message d'accueil -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">👋</span>
+            <span class="action-name">Message d'accueil</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="welcomeMsg" placeholder="Bienvenue {user} sur {server} !" class="panel-input">
+            <button onclick="changeWelcome()" class="action-btn config-btn">Changer</button>
+          </div>
+          <p class="config-hint">Variables: {user} = membre, {server} = nom du serveur</p>
+        </div>
+        
+        <!-- Message d'au revoir -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">👋</span>
+            <span class="action-name">Message d'au revoir</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="goodbyeMsg" placeholder="{user} a quitté le serveur." class="panel-input">
+            <button onclick="changeGoodbye()" class="action-btn config-btn">Changer</button>
+          </div>
+        </div>
+        
+        <!-- Salon de logs -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">📋</span>
+            <span class="action-name">Salon de logs</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="logChannelId" placeholder="ID du salon de logs" class="panel-input">
+            <button onclick="changeLogChannel()" class="action-btn config-btn">Changer</button>
+          </div>
+        </div>
+        
+        <!-- Envoyer un message -->
+        <div class="action-card">
+          <div class="action-header">
+            <span class="action-icon">✉️</span>
+            <span class="action-name">Envoyer un message</span>
+          </div>
+          <div class="action-form">
+            <input type="text" id="sendChannelId" placeholder="ID du salon" class="panel-input">
+            <input type="text" id="sendMessage" placeholder="Message à envoyer" class="panel-input">
+            <button onclick="sendMessage()" class="action-btn config-btn">Envoyer</button>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Zone de messages -->
+      <div class="panel-messages">
+        <h3>📋 Journal</h3>
+        <div class="message-log" id="messageLog">
+          <p class="log-entry">En attente de connexion...</p>
+        </div>
+      </div>
+      
+      <button onclick="disconnectApi()" class="panel-btn disconnect-btn">Déconnexion</button>
+    </div>
+  </div>
+</section>
+
 <!-- ===================== PREVIEW DISCORD ===================== -->
 <section id="preview">
   <h2 class="section-title">Comment ça marche</h2>
@@ -308,6 +470,314 @@ function drawPencilTrail() {
 }
 
 drawPencilTrail();
+
+// ===================== PANEL DE CONTROLE =====================
+let API_URL = '';
+
+function addLog(message, type = 'info') {
+  const log = document.getElementById('messageLog');
+  const entry = document.createElement('p');
+  entry.className = `log-entry log-${type}`;
+  entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+  log.insertBefore(entry, log.firstChild);
+  
+  // Limiter à 20 messages
+  while (log.children.length > 20) {
+    log.removeChild(log.lastChild);
+  }
+}
+
+async function connectApi() {
+  const url = document.getElementById('apiUrl').value.trim();
+  if (!url) {
+    addLog('Erreur: Entrez une URL valide', 'error');
+    return;
+  }
+  
+  API_URL = url;
+  document.getElementById('loginStatus').textContent = 'Connexion...';
+  
+  try {
+    const response = await fetch(`${API_URL}/api/stats`);
+    const data = await response.json();
+    
+    if (data.servers !== undefined) {
+      document.getElementById('panelLogin').style.display = 'none';
+      document.getElementById('panelDashboard').style.display = 'block';
+      document.getElementById('liveServers').textContent = data.servers;
+      document.getElementById('liveUsers').textContent = data.users.toLocaleString();
+      addLog('Connecté avec succès !', 'success');
+      loadStats();
+    } else {
+      throw new Error('Réponse invalide');
+    }
+  } catch (error) {
+    document.getElementById('loginStatus').textContent = '❌ Erreur de connexion';
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+async function loadStats() {
+  try {
+    const response = await fetch(`${API_URL}/api/stats`);
+    const data = await response.json();
+    document.getElementById('liveServers').textContent = data.servers;
+    document.getElementById('liveUsers').textContent = data.users.toLocaleString();
+  } catch (error) {
+    document.getElementById('liveStatus').textContent = '🔴';
+  }
+}
+
+async function banUser() {
+  const userId = document.getElementById('banUserId').value.trim();
+  const reason = document.getElementById('banReason').value.trim() || 'Aucune raison';
+  
+  if (!userId) {
+    addLog('Erreur: Entrez un ID utilisateur', 'error');
+    return;
+  }
+  
+  addLog(`Tentative de ban de ${userId}...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/ban`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, reason })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('banUserId').value = '';
+      document.getElementById('banReason').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+async function kickUser() {
+  const userId = document.getElementById('kickUserId').value.trim();
+  const reason = document.getElementById('kickReason').value.trim() || 'Aucune raison';
+  
+  if (!userId) {
+    addLog('Erreur: Entrez un ID utilisateur', 'error');
+    return;
+  }
+  
+  addLog(`Tentative de kick de ${userId}...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/kick`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, reason })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('kickUserId').value = '';
+      document.getElementById('kickReason').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+async function muteUser() {
+  const userId = document.getElementById('muteUserId').value.trim();
+  const duration = document.getElementById('muteDuration').value || 10;
+  
+  if (!userId) {
+    addLog('Erreur: Entrez un ID utilisateur', 'error');
+    return;
+  }
+  
+  addLog(`Tentative de mute de ${userId}...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/mute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, duration })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('muteUserId').value = '';
+      document.getElementById('muteDuration').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+// ===================== CONFIGURATION DU BOT =====================
+async function changeStatus() {
+  const status = document.getElementById('newStatus').value.trim();
+  if (!status) {
+    addLog('Erreur: Entrez un status', 'error');
+    return;
+  }
+  
+  addLog(`Changement du status...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/config/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('newStatus').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+async function changeWelcome() {
+  const message = document.getElementById('welcomeMsg').value.trim();
+  if (!message) {
+    addLog('Erreur: Entrez un message', 'error');
+    return;
+  }
+  
+  addLog(`Changement du message d'accueil...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/config/welcome`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('welcomeMsg').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+async function changeGoodbye() {
+  const message = document.getElementById('goodbyeMsg').value.trim();
+  if (!message) {
+    addLog('Erreur: Entrez un message', 'error');
+    return;
+  }
+  
+  addLog(`Changement du message d'au revoir...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/config/goodbye`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('goodbyeMsg').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+async function changeLogChannel() {
+  const channelId = document.getElementById('logChannelId').value.trim();
+  if (!channelId) {
+    addLog('Erreur: Entrez un ID de salon', 'error');
+    return;
+  }
+  
+  addLog(`Changement du salon de logs...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/config/logchannel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channelId })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('logChannelId').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+async function sendMessage() {
+  const channelId = document.getElementById('sendChannelId').value.trim();
+  const message = document.getElementById('sendMessage').value.trim();
+  
+  if (!channelId || !message) {
+    addLog('Erreur: Entrez un ID de salon et un message', 'error');
+    return;
+  }
+  
+  addLog(`Envoi du message...`, 'info');
+  
+  try {
+    const response = await fetch(`${API_URL}/api/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channelId, message })
+    });
+    const data = await response.json();
+    
+    if (data.success) {
+      addLog(`✅ ${data.message}`, 'success');
+      document.getElementById('sendChannelId').value = '';
+      document.getElementById('sendMessage').value = '';
+    } else {
+      addLog(`❌ ${data.message}`, 'error');
+    }
+  } catch (error) {
+    addLog(`Erreur: ${error.message}`, 'error');
+  }
+}
+
+function disconnectApi() {
+  API_URL = '';
+  document.getElementById('panelLogin').style.display = 'block';
+  document.getElementById('panelDashboard').style.display = 'none';
+  document.getElementById('apiUrl').value = '';
+  document.getElementById('loginStatus').textContent = '';
+  addLog('Déconnecté', 'info');
+}
+
+// Actualiser les stats toutes les 30 secondes
+setInterval(() => {
+  if (API_URL) loadStats();
+}, 30000);
 </script>
 
 </body>

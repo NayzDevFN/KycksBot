@@ -888,3 +888,282 @@ footer p {
 .big-invite::before {
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
 }
+
+/* ===================== PANEL DE CONTROLE ===================== */
+#panel {
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(114, 137, 218, 0.1) 0%, transparent 50%);
+}
+
+.panel-info {
+  color: #666;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.panel-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Login Box */
+.login-box {
+  background: #fffef9;
+  border: 3px solid #2d2d2d;
+  border-radius: 12px;
+  padding: 40px;
+  position: relative;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
+}
+
+.login-box::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 80px;
+  height: 25px;
+  background: linear-gradient(180deg, rgba(255,255,200,0.7) 0%, rgba(255,255,180,0.5) 50%, rgba(255,255,200,0.7) 100%);
+  border: 1px solid rgba(200,200,150,0.6);
+  border-radius: 2px;
+  z-index: 10;
+}
+
+.login-box h3 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 28px;
+  color: #7289da;
+  margin-bottom: 15px;
+}
+
+.login-box p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.panel-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #2d2d2d;
+  border-radius: 8px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 16px;
+  margin-bottom: 15px;
+  background: #fff;
+}
+
+.panel-input:focus {
+  outline: none;
+  border-color: #7289da;
+  box-shadow: 0 0 0 3px rgba(114,137,218,0.2);
+}
+
+.panel-btn {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid #2d2d2d;
+  border-radius: 8px;
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 3px 3px 0 #2d2d2d;
+}
+
+.panel-btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #2d2d2d;
+}
+
+.connect-btn {
+  background: #43b581;
+  color: white;
+}
+
+.login-status {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+/* Dashboard */
+.panel-dashboard {
+  text-align: left;
+}
+
+.panel-stats {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.panel-stat {
+  background: #fffef9;
+  border: 2px solid #2d2d2d;
+  border-radius: 12px;
+  padding: 20px 30px;
+  text-align: center;
+  min-width: 120px;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+}
+
+.panel-stat-number {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 32px;
+  color: #7289da;
+  display: block;
+}
+
+.panel-stat-label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.panel-actions h3 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 24px;
+  color: #2d2d2d;
+  margin-bottom: 20px;
+}
+
+.action-card {
+  background: #fffef9;
+  border: 2px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.action-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.action-icon {
+  font-size: 24px;
+}
+
+.action-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 20px;
+  color: #2d2d2d;
+}
+
+.action-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-form .panel-input {
+  flex: 1;
+  min-width: 150px;
+  margin-bottom: 0;
+}
+
+.action-btn {
+  padding: 10px 20px;
+  border: 2px solid #2d2d2d;
+  border-radius: 8px;
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 2px 2px 0 #2d2d2d;
+}
+
+.action-btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #2d2d2d;
+}
+
+.ban-btn { background: #ff6b6b; color: white; }
+.kick-btn { background: #ffa500; color: white; }
+.mute-btn { background: #7289da; color: white; }
+
+.panel-messages {
+  margin-top: 30px;
+}
+
+.panel-messages h3 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 20px;
+  color: #2d2d2d;
+  margin-bottom: 15px;
+}
+
+.message-log {
+  background: #1a1a2e;
+  border: 2px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.log-entry {
+  color: #a0a0a0;
+  margin: 5px 0;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.log-success { color: #43b581; }
+.log-error { color: #ff6b6b; }
+.log-info { color: #7289da; }
+
+.disconnect-btn {
+  margin-top: 20px;
+  background: #ff6b6b;
+  color: white;
+}
+
+/* Configuration du bot */
+.panel-config {
+  margin-top: 30px;
+}
+
+.panel-config h3 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 24px;
+  color: #2d2d2d;
+  margin-bottom: 20px;
+}
+
+.config-btn {
+  background: #7289da;
+  color: white;
+}
+
+.config-hint {
+  font-size: 12px;
+  color: #888;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Responsive panel */
+@media (max-width: 600px) {
+  .action-form {
+    flex-direction: column;
+  }
+  
+  .action-form .panel-input {
+    width: 100%;
+  }
+  
+  .panel-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+}

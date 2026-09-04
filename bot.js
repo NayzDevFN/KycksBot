@@ -372,11 +372,12 @@ async function restoreBackup(guild, backupName) {
 
 async function nukeGuild(guild, confirm = true) {
   if (confirm) {
-    // Sauvegarder avec les messages
+    await guild.channels.fetch();
     const backup = await createBackup(guild, `pre_nuke_${Date.now()}`);
     
     // Supprimer tous les salons
-    for (const [id, channel] of guild.channels.cache) {
+    const channels = [...guild.channels.cache.values()];
+    for (const channel of channels) {
       try {
         await channel.delete('Nuke');
       } catch (e) {}

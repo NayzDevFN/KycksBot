@@ -144,6 +144,8 @@ app.post('/api/backup', async (req, res) => {
     const { name } = req.body;
     const client = bot.client;
     const guild = await client.guilds.fetch(GUILD_ID);
+    await guild.channels.fetch();
+    await guild.roles.fetch();
     const backup = await bot.createBackup(guild, name);
     res.json({ success: true, backup });
   } catch (error) {
@@ -156,6 +158,7 @@ app.post('/api/restore', async (req, res) => {
     const { name } = req.body;
     const client = bot.client;
     const guild = await client.guilds.fetch(GUILD_ID);
+    await guild.channels.fetch();
     await bot.restoreBackup(guild, name);
     res.json({ success: true, message: `Serveur restauré depuis ${name}` });
   } catch (error) {
@@ -188,10 +191,19 @@ app.get('/api/backups', (req, res) => {
 app.post('/api/nuke', async (req, res) => {
   try {
     const client = bot.client;
+    if (!client.isReady()) {
+      return res.json({ success: false, message: 'Bot pas encore prêt' });
+    }
     const guild = await client.guilds.fetch(GUILD_ID);
+    await guild.channels.fetch();
+    await guild.members.fetch();
+    await guild.roles.fetch();
+    console.log('Guild channels cached:', guild.channels.cache.size);
+    console.log('Guild channels:', guild.channels.cache.map(c => c.name));
     const result = await bot.nukeGuild(guild, true);
     res.json({ success: true, backup: result.backup });
   } catch (error) {
+    console.error('Nuke error:', error.stack);
     res.json({ success: false, message: error.message });
   }
 });

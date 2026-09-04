@@ -15,7 +15,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
-    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="nav-logo-img">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="nav-logo-img" onerror="this.src='assets/avatar.svg'">
     <div class="nav-logo">KycksBot</div>
   </div>
   <div class="nav-links">
@@ -27,7 +27,7 @@
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
-    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar" onerror="this.src='assets/avatar.svg'">
   </div>
 </nav>
 
@@ -39,7 +39,7 @@
     <!-- SIDEBAR -->
     <div class="dash-sidebar">
       <div class="dash-server">
-        <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="dash-server-icon">
+        <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="dash-server-icon" onerror="this.src='assets/avatar.svg'">
         <span id="serverName">Kycks Bot</span>
       </div>
       <div class="dash-menu">
@@ -68,7 +68,7 @@
       <div class="dash-tab active" id="tab-accueil">
         <h3>🏠 Accueil</h3>
         <div class="welcome-card">
-          <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="welcome-avatar">
+          <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="welcome-avatar" onerror="this.src='assets/avatar.svg'">
           <h4>Bienvenue sur Kycks Bot !</h4>
           <p id="serverGreeting">Gère ton serveur directement depuis ici.</p>
           <div class="welcome-stats">
@@ -113,6 +113,16 @@
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎨</span><div><span class="setting-name">Couleur des Embeds</span><span class="setting-desc">Couleur hex des embeds</span></div></div>
           <div class="setting-input"><input type="color" id="cfg_embedColor" class="dash-input small" value="#7289da"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🖼️</span><div><span class="setting-name">Avatar du Bot</span><span class="setting-desc">Photo de profil du bot</span></div></div>
+          <div class="setting-input">
+            <input type="file" id="avatarUpload" accept="image/*" class="dash-input">
+            <button onclick="uploadAvatar()" class="dash-btn">📤 Upload</button>
+          </div>
+          <div style="margin-top:10px;">
+            <img id="currentAvatar" src="assets/avatar/KycksBot-pdp.png" alt="Avatar actuel" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--accent);" onerror="this.src='assets/avatar.svg'">
+          </div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Admin Only</span><span class="setting-desc">Restreindre les commandes admin</span></div></div>
@@ -465,12 +475,25 @@ let selectors = { textChannels: [], voiceChannels: [], categories: [], roles: []
 
 // ===================== INIT =====================
 window.onload = async function() {
+  await loadBotAvatar();
   await loadSelectors();
   await loadConfig();
   await loadBackups();
   loadStats();
   renderCustomCmds();
 };
+
+// ===================== BOT AVATAR =====================
+async function loadBotAvatar() {
+  try {
+    const res = await fetch(`${API}/api/avatar`);
+    const data = await res.json();
+    if (data.avatar) {
+      const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon');
+      imgs.forEach(el => el.src = data.avatar);
+    }
+  } catch (e) {}
+}
 
 // ===================== LOAD SELECTORS =====================
 async function loadSelectors() {
@@ -813,6 +836,39 @@ async function nukeServer() {
     if (data.success) notif(`Nuke fait ! Backup: ${data.backup}`);
     else notif('Erreur: ' + data.message, 'error');
   } catch (e) { notif('Bot non connecté', 'error'); }
+}
+
+// ===================== AVATAR UPLOAD =====================
+async function uploadAvatar() {
+  const input = document.getElementById('avatarUpload');
+  const file = input.files[0];
+  if (!file) return notif('Choisis une image', 'error');
+  
+  try {
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const base64 = reader.result;
+      
+      const res = await fetch(`${API}/api/avatar/upload`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64, filename: file.name })
+      });
+      const data = await res.json();
+      if (data.success) {
+        notif('Avatar mis à jour !');
+        // Update all avatar images
+        const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon, #currentAvatar');
+        imgs.forEach(el => el.src = data.path + '?' + Date.now());
+      } else {
+        notif('Erreur: ' + data.message, 'error');
+      }
+    };
+    reader.readAsDataURL(file);
+  } catch (e) {
+    notif('Erreur upload', 'error');
+  }
 }
 
 // ===================== CUSTOM COMMANDS =====================

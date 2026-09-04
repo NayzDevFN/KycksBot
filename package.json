@@ -9,9 +9,11 @@
     "api": "node api.js"
   },
   "dependencies": {
+    "better-sqlite3": "^11.8.1",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "cors": "^2.8.5"
   }
+}
 }

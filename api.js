@@ -3,10 +3,45 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const Database = require('better-sqlite3');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from assets
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
+// ===================== DATABASE =====================
+const DB_PATH = path.join(__dirname, 'bot.db');
+const db = new Database(DB_PATH);
+
+// Create tables
+db.exec(`
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  )
+`);
+
+// Initialize default settings
+const defaultSettings = {
+  botAvatar: 'assets/avatar/KycksBot-pdp.png'
+};
+
+const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
+for (const [key, value] of Object.entries(defaultSettings)) {
+  insertSetting.run(key, value);
+}
+
+function getSetting(key) {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key);
+  return row ? row.value : null;
+}
+
+function setSetting(key, value) {
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, value);
+}
 
 const bot = require('./bot');
 
@@ -310,4 +345,43 @@ app.get('/api/transcripts', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🌐 API en ligne sur le port ${PORT}`);
+});
+
+// ===================== AVATAR API =====================
+app.get('/api/avatar', (req, res) => {
+  const avatar = getSetting('botAvatar');
+  res.json({ avatar });
+});
+
+app.post('/api/avatar', (req, res) => {
+  try {
+    const { avatar } = req.body;
+    setSetting('botAvatar', avatar);
+    res.json({ success: true, message: 'Avatar mis à jour' });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/avatar/upload', (req, res) => {
+  try {
+    // Handle multipart form data manually or use multer
+    // For simplicity, we'll expect base64
+    const { image, filename } = req.body;
+    if (!image) return res.json({ success: false, message: 'No image provided' });
+    
+    const ext = filename ? filename.split('.').pop() : 'png';
+    const SafeFilename = `bot-avatar.${ext}`;
+    const filepath = path.join(__dirname, 'assets', 'avatar', SafeFilename);
+    
+    // Remove data:image/xxx;base64, prefix
+    const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    fs.writeFileSync(filepath, buffer);
+    setSetting('botAvatar', `assets/avatar/${SafeFilename}`);
+    res.json({ success: true, message: 'Avatar uploadé', path: `assets/avatar/${SafeFilename}` });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
 });

@@ -15,7 +15,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
-    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="nav-logo-img">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="nav-logo-img" onerror="this.src='assets/avatar.svg'">
     <div class="nav-logo">KycksBot</div>
   </div>
   <div class="nav-links">
@@ -26,7 +26,7 @@
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
-    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar">
+    <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar" onerror="this.src='assets/avatar.svg'">
   </div>
 </nav>
 
@@ -35,7 +35,7 @@
   <div class="doodle star-doodle">★</div>
   <div class="doodle heart-doodle">♥</div>
   <div class="doodle spiral-doodle">✿</div>
-  <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="header-avatar">
+  <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks" class="header-avatar" onerror="this.src='assets/avatar.svg'">
   <h1 class="logo">Kycks</h1>
   <p class="tagline">~ ton bot discord préféré ~</p>
   <div class="invite-btn-container">
@@ -155,7 +155,20 @@ async function loadRealStats() {
   } catch (e) {}
 }
 
+// Load bot avatar from API
+async function loadBotAvatar() {
+  try {
+    const res = await fetch('http://localhost:3000/api/avatar');
+    const data = await res.json();
+    if (data.avatar) {
+      const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .header-avatar');
+      imgs.forEach(el => el.src = data.avatar);
+    }
+  } catch (e) {}
+}
+
 loadRealStats();
+loadBotAvatar();
 </script>
 
 </body>

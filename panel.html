@@ -45,15 +45,18 @@
       <div class="dash-menu">
         <a class="dash-item active" onclick="showTab('accueil')"><span class="dash-icon">🏠</span> Accueil</a>
         <a class="dash-item" onclick="showTab('general')"><span class="dash-icon">⚙️</span> Général</a>
-        <a class="dash-item" onclick="showTab('moderation')"><span class="dash-icon">🛡️</span> Modération</a>
-        <a class="dash-item" onclick="showTab('automod')"><span class="dash-icon">🤖</span> Automod</a>
         <a class="dash-item" onclick="showTab('welcome')"><span class="dash-icon">👋</span> Bienvenue</a>
+        <a class="dash-item" onclick="showTab('automod')"><span class="dash-icon">🤖</span> Automod</a>
+        <a class="dash-item" onclick="showTab('moderation')"><span class="dash-icon">🛡️</span> Modération</a>
         <a class="dash-item" onclick="showTab('tickets')"><span class="dash-icon">🎫</span> Tickets</a>
         <a class="dash-item" onclick="showTab('levels')"><span class="dash-icon">📈</span> Niveaux</a>
         <a class="dash-item" onclick="showTab('music')"><span class="dash-icon">🎵</span> Musique</a>
         <a class="dash-item" onclick="showTab('autorole')"><span class="dash-icon">🎭</span> Autorole</a>
         <a class="dash-item" onclick="showTab('logs')"><span class="dash-icon">📋</span> Logs</a>
         <a class="dash-item" onclick="showTab('custom')"><span class="dash-icon">✨</span> Commandes Custom</a>
+        <a class="dash-item" onclick="showTab('starboard')"><span class="dash-icon">⭐</span> Starboard</a>
+        <a class="dash-item" onclick="showTab('reactionrole')"><span class="dash-icon">🎭</span> Reaction Role</a>
+        <a class="dash-item" onclick="showTab('backup')"><span class="dash-icon">💾</span> Backup & Nuke</a>
       </div>
       <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="dash-invite-btn" target="_blank">+ Inviter le Bot</a>
     </div>
@@ -71,16 +74,16 @@
           <div class="welcome-stats">
             <div class="ws-item"><span class="ws-num" id="dashServers">0</span><span>Serveurs</span></div>
             <div class="ws-item"><span class="ws-num" id="dashUsers">0</span><span>Utilisateurs</span></div>
-            <div class="ws-item"><span class="ws-num">18</span><span>Commandes</span></div>
+            <div class="ws-item"><span class="ws-num">70+</span><span>Commandes</span></div>
           </div>
         </div>
         <div class="quick-actions">
           <h4>⚡ Actions Rapides</h4>
           <div class="qa-grid">
             <button onclick="showTab('general')" class="qa-btn">⚙️ Paramètres</button>
-            <button onclick="showTab('moderation')" class="qa-btn">🛡️ Modération</button>
-            <button onclick="showTab('welcome')" class="qa-btn">👋 Bienvenue</button>
-            <button onclick="showTab('logs')" class="qa-btn">📋 Logs</button>
+            <button onclick="showTab('automod')" class="qa-btn">🤖 Automod</button>
+            <button onclick="showTab('tickets')" class="qa-btn">🎫 Tickets</button>
+            <button onclick="showTab('backup')" class="qa-btn">💾 Backup</button>
           </div>
         </div>
       </div>
@@ -90,80 +93,26 @@
         <h3>⚙️ Paramètres Généraux</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">💬</span><div><span class="setting-name">Préfixe</span><span class="setting-desc">Préfixe pour les commandes texte</span></div></div>
-          <div class="setting-input"><input type="text" id="sPrefix" placeholder="!" class="dash-input small" value="!"><button onclick="save('prefix')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="text" id="cfg_prefix" placeholder="!" class="dash-input small"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🟢</span><div><span class="setting-name">Status du Bot</span><span class="setting-desc">Activité affichée</span></div></div>
-          <div class="setting-input"><input type="text" id="sStatus" placeholder="En ligne 🟢" class="dash-input"><button onclick="save('status')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="text" id="cfg_status" placeholder="En ligne 🟢" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🌍</span><div><span class="setting-name">Langue</span><span class="setting-desc">Langue du bot</span></div></div>
           <div class="setting-input">
-            <select id="sLang" class="dash-input"><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option></select>
-            <button onclick="save('lang')" class="dash-btn">Sauvegarder</button>
+            <select id="cfg_language" class="dash-input"><option value="fr">Français</option><option value="en">English</option><option value="es">Español</option><option value="de">Deutsch</option></select>
+            <button onclick="saveConfig()" class="dash-btn">Sauvegarder</button>
           </div>
         </div>
         <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎨</span><div><span class="setting-name">Couleur des Embeds</span><span class="setting-desc">Couleur hex des embeds</span></div></div>
+          <div class="setting-input"><input type="color" id="cfg_embedColor" class="dash-input small" value="#7289da"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Admin Only</span><span class="setting-desc">Restreindre les commandes admin</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
-        </div>
-      </div>
-      
-      <!-- MODÉRATION -->
-      <div class="dash-tab" id="tab-moderation">
-        <h3>🛡️ Modération</h3>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🔨</span><div><span class="setting-name">Bannir</span><span class="setting-desc">Bannir un membre du serveur</span></div></div>
-          <div class="setting-input multi"><input type="text" id="mBanId" placeholder="ID utilisateur" class="dash-input"><input type="text" id="mBanReason" placeholder="Raison" class="dash-input"><button onclick="mod('ban')" class="dash-btn red">Bannir</button></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">👢</span><div><span class="setting-name">Expulser</span><span class="setting-desc">Expulser un membre</span></div></div>
-          <div class="setting-input multi"><input type="text" id="mKickId" placeholder="ID utilisateur" class="dash-input"><input type="text" id="mKickReason" placeholder="Raison" class="dash-input"><button onclick="mod('kick')" class="dash-btn orange">Expulser</button></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🔇</span><div><span class="setting-name">Mute</span><span class="setting-desc">Mute temporaire</span></div></div>
-          <div class="setting-input multi"><input type="text" id="mMuteId" placeholder="ID" class="dash-input"><input type="number" id="mMuteDur" placeholder="Min" class="dash-input small"><button onclick="mod('mute')" class="dash-btn blue">Mute</button></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🗑️</span><div><span class="setting-name">Clear</span><span class="setting-desc">Supprimer des messages</span></div></div>
-          <div class="setting-input multi"><input type="number" id="mClearN" placeholder="1-100" class="dash-input small"><button onclick="mod('clear')" class="dash-btn purple">Supprimer</button></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">⚡</span><div><span class="setting-name">Mod Role</span><span class="setting-desc">Rôle avec permissions modération</span></div></div>
-          <div class="setting-input"><input type="text" id="sModRole" placeholder="ID du rôle" class="dash-input"><button onclick="save('modRole')" class="dash-btn">Sauvegarder</button></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🚫</span><div><span class="setting-name">Anti-Spam</span><span class="setting-desc">Protéger contre le spam</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🔗</span><div><span class="setting-name">Anti-Liens</span><span class="setting-desc">Bloquer les liens Discord</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
-        </div>
-      </div>
-      
-      <!-- AUTOMOD -->
-      <div class="dash-tab" id="tab-automod">
-        <h3>🤖 Automodération</h3>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🤖</span><div><span class="setting-name">Automod Activé</span><span class="setting-desc">Active l'automodération automatique</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🤐</span><div><span class="setting-name">Mots Interdits</span><span class="setting-desc">Mots automatiquement supprimés</span></div></div>
-          <div class="setting-input"><input type="text" id="sBadwords" placeholder="mot1, mot2, mot3" class="dash-input"><button onclick="save('badwords')" class="dash-btn">Sauvegarder</button></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">📏</span><div><span class="setting-name">Limite Caractères</span><span class="setting-desc">Longueur max d'un message</span></div></div>
-          <div class="setting-input"><input type="number" id="sMaxLen" placeholder="2000" class="dash-input small" value="2000"><button onclick="save('maxlen')" class="dash-btn">Sauvegarder</button></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Anti-Raid</span><span class="setting-desc">Protection contre les raids</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">⚠️</span><div><span class="setting-name">Système Warns</span><span class="setting-desc">3 warns = ban automatique</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_adminOnly"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
         </div>
       </div>
       
@@ -172,83 +121,191 @@
         <h3>👋 Messages de Bienvenue</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">👋</span><div><span class="setting-name">Message de bienvenue</span><span class="setting-desc">Envoyé quand un membre rejoint</span></div></div>
-          <div class="setting-input"><input type="text" id="sWelcomeMsg" placeholder="Bienvenue {user} sur {server} !" class="dash-input"><button onclick="save('welcomeMsg')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="text" id="cfg_welcomeMessage" placeholder="Bienvenue {user} sur {server} !" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
           <span class="setting-hint">{user} = membre, {server} = serveur, {count} = nombre de membres</span>
         </div>
         <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">😢</span><div><span class="setting-name">Message d'au revoir</span><span class="setting-desc">Envoyé quand un membre quitte</span></div></div>
-          <div class="setting-input"><input type="text" id="sGoodbyeMsg" placeholder="{user} a quitté le serveur." class="dash-input"><button onclick="save('goodbyeMsg')" class="dash-btn">Sauvegarder</button></div>
-        </div>
-        <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Salon de bienvenue</span><span class="setting-desc">ID du salon d'accueil</span></div></div>
-          <div class="setting-input"><input type="text" id="sWelcomeChan" placeholder="ID du salon" class="dash-input"><button onclick="save('welcomeChan')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input" id="welcomeChannelList"><input type="text" id="cfg_welcomeChannel" placeholder="ID du salon" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🖼️</span><div><span class="setting-name">Image de bienvenue</span><span class="setting-desc">URL de l'image d'accueil</span></div></div>
-          <div class="setting-input"><input type="text" id="sWelcomeImg" placeholder="https://..." class="dash-input"><button onclick="save('welcomeImg')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="text" id="cfg_welcomeImage" placeholder="https://..." class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">👋</span><div><span class="setting-name">DM de bienvenue</span><span class="setting-desc">Envoyer un MP aux nouveaux membres</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_welcomeDM"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">✉️</span><div><span class="setting-name">Message DM</span><span class="setting-desc">Message envoyé en MP</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_welcomeDMMessage" placeholder="Bienvenue sur {server} !" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">😢</span><div><span class="setting-name">Message d'au revoir</span><span class="setting-desc">Envoyé quand un membre quitte</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_goodbyeMessage" placeholder="{user} a quitté le serveur." class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Salon d'au revoir</span><span class="setting-desc">ID du salon pour les départs</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_goodbyeChannel" placeholder="ID du salon" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+      </div>
+      
+      <!-- AUTOMOD -->
+      <div class="dash-tab" id="tab-automod">
+        <h3>🤖 Automodération</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🤖</span><div><span class="setting-name">Automod Activé</span><span class="setting-desc">Active l'automodération</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_automodEnabled" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🚫</span><div><span class="setting-name">Anti-Spam</span><span class="setting-desc">Détecter et punir le spam</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_antiSpam" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔢</span><div><span class="setting-name">Limite Anti-Spam</span><span class="setting-desc">Messages max en X secondes</span></div></div>
+          <div class="setting-input">
+            <input type="number" id="cfg_automodSpamLimit" placeholder="5" class="dash-input small" value="5">
+            <span>messages en</span>
+            <input type="number" id="cfg_automodSpamTime" placeholder="5" class="dash-input small" value="5">
+            <span>secondes</span>
+            <button onclick="saveConfig()" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔗</span><div><span class="setting-name">Anti-Liens</span><span class="setting-desc">Bloquer les liens Discord/externes</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_antiLink"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">✅</span><div><span class="setting-name">Whitelist Liens</span><span class="setting-desc">Domaines autorisés (séparés par ,)</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_automodLinkWhitelist" placeholder="youtube.com, twitter.com" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🤐</span><div><span class="setting-name">Mots Interdits</span><span class="setting-desc">Mots automatiquement supprimés (séparés par ,)</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_badWords" placeholder="mot1, mot2, mot3" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📏</span><div><span class="setting-name">Limite Caractères</span><span class="setting-desc">Longueur max d'un message</span></div></div>
+          <div class="setting-input"><input type="number" id="cfg_maxMessageLength" placeholder="2000" class="dash-input small" value="2000"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Anti-Raid</span><span class="setting-desc">Protection contre les raids</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_antiRaid" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔤</span><div><span class="setting-name">Filtre Majuscules</span><span class="setting-desc">Bloquer les messages 100% majuscules</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_automodCapsFilter"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📊</span><div><span class="setting-name">Seuil Majuscules</span><span class="setting-desc">Pourcentage max de majuscules</span></div></div>
+          <div class="setting-input"><input type="number" id="cfg_automodCapsLimit" placeholder="70" class="dash-input small" value="70"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⚠️</span><div><span class="setting-name">Système Warns</span><span class="setting-desc">3 warns = action automatique</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_automodEnabled"><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⚡</span><div><span class="setting-name">Limite Warns</span><span class="setting-desc">Nombre de warns avant action</span></div></div>
+          <div class="setting-input"><input type="number" id="cfg_warnLimit" placeholder="3" class="dash-input small" value="3"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔨</span><div><span class="setting-name">Action Warn</span><span class="setting-desc">Action après X warns</span></div></div>
+          <div class="setting-input">
+            <select id="cfg_warnAction" class="dash-input"><option value="kick">Expulser</option><option value="ban">Bannir</option><option value="mute">Mute</option></select>
+            <button onclick="saveConfig()" class="dash-btn">Sauvegarder</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- MODÉRATION -->
+      <div class="dash-tab" id="tab-moderation">
+        <h3>🛡️ Modération</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⚡</span><div><span class="setting-name">Mod Role</span><span class="setting-desc">Rôle avec permissions modération</span></div></div>
+          <div class="setting-input" id="modRoleList"><input type="text" id="cfg_modRole" placeholder="ID du rôle" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔨</span><div><span class="setting-name">Bannir</span><span class="setting-desc">Bannir un membre du serveur</span></div></div>
+          <div class="setting-input multi"><input type="text" id="mBanId" placeholder="ID utilisateur" class="dash-input"><input type="text" id="mBanReason" placeholder="Raison" class="dash-input"><button onclick="modAction('ban')" class="dash-btn red">Bannir</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">👢</span><div><span class="setting-name">Expulser</span><span class="setting-desc">Expulser un membre</span></div></div>
+          <div class="setting-input multi"><input type="text" id="mKickId" placeholder="ID utilisateur" class="dash-input"><input type="text" id="mKickReason" placeholder="Raison" class="dash-input"><button onclick="modAction('kick')" class="dash-btn orange">Expulser</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔇</span><div><span class="setting-name">Mute</span><span class="setting-desc">Mute temporaire</span></div></div>
+          <div class="setting-input multi"><input type="text" id="mMuteId" placeholder="ID" class="dash-input"><input type="number" id="mMuteDur" placeholder="Min" class="dash-input small"><button onclick="modAction('mute')" class="dash-btn blue">Mute</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🗑️</span><div><span class="setting-name">Clear</span><span class="setting-desc">Supprimer des messages</span></div></div>
+          <div class="setting-input multi"><input type="number" id="mClearN" placeholder="1-100" class="dash-input small"><button onclick="modAction('clear')" class="dash-btn purple">Supprimer</button></div>
         </div>
       </div>
       
       <!-- TICKETS -->
       <div class="dash-tab" id="tab-tickets">
-        <h3>🎫 Système de Tickets</h3>
+        <h3>🎫 Système de Tickets (Ticketool)</h3>
         <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🎫</span><div><span class="setting-name">Tickets Activés</span><span class="setting-desc">Permet aux membres de créer des tickets</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-header"><span class="setting-icon">🎫</span><div><span class="setting-name">Tickets Activés</span><span class="setting-desc">Active le système de tickets</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_ticketEnabled" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📂</span><div><span class="setting-name">Catégorie Tickets</span><span class="setting-desc">ID de la catégorie pour les tickets</span></div></div>
-          <div class="setting-input"><input type="text" id="sTicketCat" placeholder="ID catégorie" class="dash-input"><button onclick="save('ticketCat')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input" id="ticketCategoryList"><input type="text" id="cfg_ticketCategory" placeholder="ID catégorie" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">💬</span><div><span class="setting-name">Salon Support</span><span class="setting-desc">ID du salon de notification</span></div></div>
-          <div class="setting-input"><input type="text" id="sTicketSup" placeholder="ID salon support" class="dash-input"><button onclick="save('ticketSup')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input" id="ticketLogList"><input type="text" id="cfg_ticketLogChannel" placeholder="ID salon support" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📝</span><div><span class="setting-name">Message d'ouverture</span><span class="setting-desc">Message quand un ticket est ouvert</span></div></div>
-          <div class="setting-input"><input type="text" id="sTicketMsg" placeholder="Un staff va vous répondre." class="dash-input"><button onclick="save('ticketMsg')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="text" id="cfg_ticketMessage" placeholder="Un staff va vous répondre." class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🎫</span><div><span class="setting-name">Max Tickets</span><span class="setting-desc">Nombre max de tickets par utilisateur</span></div></div>
-          <div class="setting-input"><input type="number" id="sTicketMax" placeholder="3" class="dash-input small" value="3"><button onclick="save('ticketMax')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-header"><span class="setting-icon">🎫</span><div><span class="setting-name">Max Tickets par utilisateur</span><span class="setting-desc">Nombre max de tickets ouverts</span></div></div>
+          <div class="setting-input"><input type="number" id="cfg_ticketMaxPerUser" placeholder="3" class="dash-input small" value="3"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📋</span><div><span class="setting-name">Transcript</span><span class="setting-desc">Sauvegarder les conversations</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_ticketTranscript" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Message de fermeture</span><span class="setting-desc">Message quand le ticket est fermé</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_ticketCloseMessage" placeholder="Ticket fermé." class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
       </div>
       
       <!-- NIVEAUX -->
       <div class="dash-tab" id="tab-levels">
-        <h3>📈 Système de Niveaux</h3>
+        <h3>📈 Système de Niveaux (Draftbot)</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📈</span><div><span class="setting-name">XP Activé</span><span class="setting-desc">Les membres gagnent de l'XP en parlant</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_levelEnabled" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎯</span><div><span class="setting-name">XP par message</span><span class="setting-desc">Quantité d'XP gagnée par message</span></div></div>
-          <div class="setting-input"><input type="number" id="sXpAmount" placeholder="15" class="dash-input small" value="15"><button onclick="save('xpAmount')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="number" id="cfg_xpPerMessage" placeholder="15" class="dash-input small" value="15"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⏱️</span><div><span class="setting-name">Cooldown XP</span><span class="setting-desc">Temps entre chaque gain d'XP (secondes)</span></div></div>
-          <div class="setting-input"><input type="number" id="sXpCooldown" placeholder="60" class="dash-input small" value="60"><button onclick="save('xpCooldown')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="number" id="cfg_xpCooldown" placeholder="60" class="dash-input small" value="60"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Annonce de level up</span><span class="setting-desc">ID du salon pour les level ups</span></div></div>
-          <div class="setting-input"><input type="text" id="sLevelChan" placeholder="ID salon" class="dash-input"><button onclick="save('levelChan')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input" id="levelUpChannelList"><input type="text" id="cfg_levelUpChannel" placeholder="ID salon" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎉</span><div><span class="setting-name">Message de level up</span><span class="setting-desc">Message personnalisé</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_levelUpMessage" placeholder="{user} a atteint le niveau {level} !" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <span class="setting-hint">{user} = membre, {level} = niveau</span>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎁</span><div><span class="setting-name">Récompenses de rôles</span><span class="setting-desc">Rôles donnés à certains niveaux</span></div></div>
-          <div class="setting-input"><input type="text" id="sRoleRewards" placeholder="niveau:roleID, niveau:roleID" class="dash-input"><button onclick="save('roleRewards')" class="dash-btn">Sauvegarder</button></div>
-          <span class="setting-hint">Format: 5:123456789, 10:987654321</span>
+          <div class="setting-input"><input type="text" id="cfg_roleRewards" placeholder="5:123456789, 10:987654321" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <span class="setting-hint">Format: niveau:roleID, niveau:roleID</span>
         </div>
         <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🚫</span><div><span class="setting-name">Salons ignorés</span><span class="setting-desc">Salons où l'XP n'est pas gagné</span></div></div>
-          <div class="setting-input"><input type="text" id="sIgnoredChannels" placeholder="ID1, ID2" class="dash-input"><button onclick="save('ignoredChannels')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-header"><span class="setting-icon">🚫</span><div><span class="setting-name">Salons ignorés</span><span class="setting-desc">Salons où l'XP n'est pas gagné (IDs séparés par ,)</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_ignoredChannels" placeholder="ID1, ID2" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
       </div>
       
@@ -257,23 +314,23 @@
         <h3>🎵 Musique</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎵</span><div><span class="setting-name">Musique Activée</span><span class="setting-desc">Active le système de musique</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_musicEnabled" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔊</span><div><span class="setting-name">Volume par défaut</span><span class="setting-desc">Volume de départ (1-100)</span></div></div>
-          <div class="setting-input"><input type="number" id="sMusicVol" placeholder="80" class="dash-input small" value="80"><button onclick="save('musicVol')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="number" id="cfg_musicVolume" placeholder="80" class="dash-input small" value="80"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⏭️</span><div><span class="setting-name">Auto-Play</span><span class="setting-desc">Lancer automatiquement la musique</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_musicAutoPlay"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔁</span><div><span class="setting-name">Loop</span><span class="setting-desc">Répéter la musique en boucle</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_musicLoop"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔗</span><div><span class="setting-name">Sources</span><span class="setting-desc">Sites supportés</span></div></div>
-          <div class="setting-tags"><span class="tag">YouTube</span><span class="tag">Spotify</span><span class="tag">SoundCloud</span><span class="tag">Twitch</span></div>
+          <div class="setting-tags"><span class="tag">YouTube</span><span class="tag">Spotify</span><span class="tag">SoundCloud</span><span class="tag">Twitch</span><span class="tag">Deezer</span><span class="tag">Apple Music</span></div>
         </div>
       </div>
       
@@ -281,20 +338,16 @@
       <div class="dash-tab" id="tab-autorole">
         <h3>🎭 Autorole</h3>
         <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🎭</span><div><span class="setting-name">Autorole Activé</span><span class="setting-desc">Donne un rôle automatiquement aux nouveaux membres</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
-        </div>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">🏷️</span><div><span class="setting-name">Rôle à donner</span><span class="setting-desc">ID du rôle automatique</span></div></div>
-          <div class="setting-input"><input type="text" id="sAutoRole" placeholder="ID du rôle" class="dash-input"><button onclick="save('autoRole')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-header"><span class="setting-icon">🎭</span><div><span class="setting-name">Rôle à donner</span><span class="setting-desc">ID du rôle automatique</span></div></div>
+          <div class="setting-input" id="autoRoleList"><input type="text" id="cfg_autoRole" placeholder="ID du rôle" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⏰</span><div><span class="setting-name">Délai</span><span class="setting-desc">Temps d'attente avant de donner le rôle (secondes)</span></div></div>
-          <div class="setting-input"><input type="number" id="sAutoRoleDelay" placeholder="0" class="dash-input small" value="0"><button onclick="save('autoRoleDelay')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><input type="number" id="cfg_autoRoleDelay" placeholder="0" class="dash-input small" value="0"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">✅</span><div><span class="setting-name">Vérification requise</span><span class="setting-desc">Attendre la vérification du compte</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_autoroleVerify"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
         </div>
       </div>
       
@@ -303,37 +356,33 @@
         <h3>📋 Système de Logs</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📋</span><div><span class="setting-name">Salon de logs</span><span class="setting-desc">ID du salon pour tous les logs</span></div></div>
-          <div class="setting-input"><input type="text" id="sLogChan" placeholder="ID salon logs" class="dash-input"><button onclick="save('logChan')" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input" id="logChannelList"><input type="text" id="cfg_logChannel" placeholder="ID salon logs" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📝</span><div><span class="setting-name">Logs de messages</span><span class="setting-desc">Messages modifiés/supprimés</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_logsMessages" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">👤</span><div><span class="setting-name">Logs de membres</span><span class="setting-desc">Joins/Leaves</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_logsMembers" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🛡️</span><div><span class="setting-name">Logs de modération</span><span class="setting-desc">Ban/Kick/Mute</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_logsModeration" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔊</span><div><span class="setting-name">Logs vocaux</span><span class="setting-desc">Join/Leave salons vocaux</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_logsVoice"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
         </div>
         <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">⚙️</span><div><span class="setting-name">Logs de serveur</span><span class="setting-desc">Changements de serveur</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
+          <div class="setting-header"><span class="setting-icon">⚙️</span><div><span class="setting-name">Logs de serveur</span><span class="setting-desc">Création/suppression de salons</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_logsServer" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
         </div>
       </div>
       
       <!-- COMMANDES CUSTOM -->
       <div class="dash-tab" id="tab-custom">
         <h3>✨ Commandes Custom</h3>
-        <div class="setting-card">
-          <div class="setting-header"><span class="setting-icon">✨</span><div><span class="setting-name">Commandes Custom</span><span class="setting-desc">Crée tes propres commandes</span></div></div>
-          <div class="setting-toggle"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label><span class="toggle-label">Activé</span></div>
-        </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">➕</span><div><span class="setting-name">Ajouter une commande</span><span class="setting-desc">Crée une nouvelle commande custom</span></div></div>
           <div class="setting-input multi">
@@ -345,6 +394,67 @@
         <div class="custom-list" id="customCmdList">
           <h4>📋 Commandes existantes</h4>
           <div class="empty-state">Aucune commande custom. Crée-en une !</div>
+        </div>
+      </div>
+      
+      <!-- STARBOARD -->
+      <div class="dash-tab" id="tab-starboard">
+        <h3>⭐ Starboard</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⭐</span><div><span class="setting-name">Salon Starboard</span><span class="setting-desc">ID du salon pour les messages étoilés</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_starboardChannel" placeholder="ID salon" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">⭐</span><div><span class="setting-name">Seuil d'étoiles</span><span class="setting-desc">Nombre d'étoiles nécessaires</span></div></div>
+          <div class="setting-input"><input type="number" id="cfg_starboardThreshold" placeholder="5" class="dash-input small" value="5"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+      </div>
+      
+      <!-- REACTION ROLE -->
+      <div class="dash-tab" id="tab-reactionrole">
+        <h3>🎭 Reaction Role</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">💬</span><div><span class="setting-name">ID du Message</span><span class="setting-desc">ID du message pour les reaction roles</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_reactionRoleMessage" placeholder="ID du message" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎭</span><div><span class="setting-name">Reaction Roles</span><span class="setting-desc">Format: emoji:roleID, emoji:roleID</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_reactionRoles" placeholder="👍:123456789, ❤️:987654321" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+      </div>
+      
+      <!-- BACKUP & NUKE -->
+      <div class="dash-tab" id="tab-backup">
+        <h3>💾 Backup & Nuke</h3>
+        
+        <div class="setting-card" style="border-color: #2ecc71;">
+          <div class="setting-header"><span class="setting-icon">💾</span><div><span class="setting-name">Sauvegarde</span><span class="setting-desc">Créer une sauvegarde complète du serveur</span></div></div>
+          <p style="font-family:'Patrick Hand',cursive; margin-bottom:10px;">Sauvegarde les salons, catégories et rôles.</p>
+          <div class="setting-input multi">
+            <input type="text" id="backupName" placeholder="Nom (optionnel)" class="dash-input">
+            <button onclick="createBackup()" class="dash-btn green">💾 Créer une sauvegarde</button>
+          </div>
+        </div>
+        
+        <div class="setting-card" style="border-color: #3498db;">
+          <div class="setting-header"><span class="setting-icon">📋</span><div><span class="setting-name">Sauvegardes existantes</span><span class="setting-desc">Clique sur une backup pour la restaurer</span></div></div>
+          <div id="backupList" class="backup-list">
+            <div class="empty-state">Chargement...</div>
+          </div>
+          <button onclick="loadBackups()" class="dash-btn" style="margin-top:10px;">🔄 Rafraîchir</button>
+        </div>
+        
+        <div class="setting-card" style="border-color: #e67e22;">
+          <div class="setting-header"><span class="setting-icon">📝</span><div><span class="setting-name">Transcripts</span><span class="setting-desc">Conversations de tickets sauvegardées</span></div></div>
+          <div id="transcriptList" class="backup-list">
+            <div class="empty-state">Chargement...</div>
+          </div>
+        </div>
+        
+        <div class="setting-card" style="border-color: #e74c3c;">
+          <div class="setting-header"><span class="setting-icon">💥</span><div><span class="setting-name">Nuke</span><span class="setting-desc">⚠️ SUPPRIME TOUS LES SALONS DU SERVEUR ⚠️</span></div></div>
+          <p style="font-family:'Patrick Hand',cursive; color:#e74c3c; margin-bottom:10px;">Une sauvegarde sera créée automatiquement avant la suppression.</p>
+          <button onclick="nukeServer()" class="dash-btn red" style="font-size:1.2em;">💥 NUKE LE SERVEUR</button>
         </div>
       </div>
       
@@ -360,71 +470,388 @@
 </footer>
 
 <script>
-let customCommands = JSON.parse(localStorage.getItem('kycksCustomCmds') || '[]');
+const API = 'http://localhost:3000';
+let currentConfig = {};
+let customCommands = [];
 
-function showTab(tab) {
-  document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.dash-item').forEach(i => i.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.currentTarget.classList.add('active');
-  
-  const titles = {
-    accueil: 'Panel de Contrôle',
-    general: '⚙️ Général',
-    moderation: '🛡️ Modération',
-    automod: '🤖 Automod',
-    welcome: '👋 Bienvenue',
-    tickets: '🎫 Tickets',
-    levels: '📈 Niveaux',
-    music: '🎵 Musique',
-    autorole: '🎭 Autorole',
-    logs: '📋 Logs',
-    custom: '✨ Commandes Custom'
-  };
-  document.getElementById('panelTitle').textContent = titles[tab] || 'Panel de Contrôle';
-}
+// ===================== INIT =====================
+window.onload = async function() {
+  await loadConfig();
+  await loadBackups();
+  await loadTranscripts();
+  loadStats();
+  renderCustomCmds();
+};
 
-function notif(msg, type='success') {
-  const n = document.getElementById('notif');
-  document.getElementById('notifText').textContent = msg;
-  n.className = 'notification ' + type;
-  n.classList.add('show');
-  setTimeout(() => n.classList.remove('show'), 3000);
-}
-
-function save(key) {
-  const val = document.getElementById('s' + key.charAt(0).toUpperCase() + key.slice(1))?.value;
-  if (val !== undefined) {
-    localStorage.setItem('kycks_' + key, val);
-    notif('Paramètre sauvegardé !');
+// ===================== LOAD CONFIG =====================
+async function loadConfig() {
+  try {
+    const res = await fetch(`${API}/api/config`);
+    currentConfig = await res.json();
+    applyConfig();
+  } catch (e) {
+    console.error('Erreur chargement config:', e);
+    // Fallback: charger depuis localStorage
+    currentConfig = JSON.parse(localStorage.getItem('kycksConfig') || '{}');
+    applyConfig();
   }
 }
 
-function mod(action) {
-  const ids = { ban: 'mBanId', kick: 'mKickId', mute: 'mMuteId', clear: 'mClearN' };
-  const el = document.getElementById(ids[action]);
-  if (!el || !el.value) return notif('Remplis le champ', 'error');
-  notif(action.charAt(0).toUpperCase() + action.slice(1) + ' effectué !');
-  el.value = '';
+function applyConfig() {
+  // Général
+  setVal('cfg_prefix', currentConfig.prefix);
+  setVal('cfg_status', currentConfig.status);
+  setVal('cfg_language', currentConfig.language);
+  setVal('cfg_embedColor', currentConfig.embedColor);
+  setCheck('cfg_adminOnly', currentConfig.adminOnly);
+  
+  // Bienvenue
+  setVal('cfg_welcomeMessage', currentConfig.welcomeMessage);
+  setVal('cfg_welcomeChannel', currentConfig.welcomeChannel);
+  setVal('cfg_welcomeImage', currentConfig.welcomeImage);
+  setCheck('cfg_welcomeDM', currentConfig.welcomeDM);
+  setVal('cfg_welcomeDMMessage', currentConfig.welcomeDMMessage);
+  setVal('cfg_goodbyeMessage', currentConfig.goodbyeMessage);
+  setVal('cfg_goodbyeChannel', currentConfig.goodbyeChannel);
+  
+  // Automod
+  setCheck('cfg_automodEnabled', currentConfig.automodEnabled);
+  setCheck('cfg_antiSpam', currentConfig.antiSpam);
+  setVal('cfg_automodSpamLimit', currentConfig.automodSpamLimit);
+  setVal('cfg_automodSpamTime', currentConfig.automodSpamTime);
+  setCheck('cfg_antiLink', currentConfig.antiLink);
+  setVal('cfg_automodLinkWhitelist', (currentConfig.automodLinkWhitelist || []).join(', '));
+  setVal('cfg_badWords', (currentConfig.badWords || []).join(', '));
+  setVal('cfg_maxMessageLength', currentConfig.maxMessageLength);
+  setCheck('cfg_antiRaid', currentConfig.antiRaid);
+  setCheck('cfg_automodCapsFilter', currentConfig.automodCapsFilter);
+  setVal('cfg_automodCapsLimit', currentConfig.automodCapsLimit);
+  setVal('cfg_warnLimit', currentConfig.warnLimit);
+  setVal('cfg_warnAction', currentConfig.warnAction);
+  
+  // Modération
+  setVal('cfg_modRole', currentConfig.modRole);
+  
+  // Tickets
+  setCheck('cfg_ticketEnabled', currentConfig.ticketEnabled);
+  setVal('cfg_ticketCategory', currentConfig.ticketCategory);
+  setVal('cfg_ticketLogChannel', currentConfig.ticketLogChannel);
+  setVal('cfg_ticketMessage', currentConfig.ticketMessage);
+  setVal('cfg_ticketMaxPerUser', currentConfig.ticketMaxPerUser);
+  setCheck('cfg_ticketTranscript', currentConfig.ticketTranscript);
+  setVal('cfg_ticketCloseMessage', currentConfig.ticketCloseMessage);
+  
+  // Niveaux
+  setCheck('cfg_levelEnabled', currentConfig.levelEnabled);
+  setVal('cfg_xpPerMessage', currentConfig.xpPerMessage);
+  setVal('cfg_xpCooldown', currentConfig.xpCooldown);
+  setVal('cfg_levelUpChannel', currentConfig.levelUpChannel);
+  setVal('cfg_levelUpMessage', currentConfig.levelUpMessage);
+  setVal('cfg_ignoredChannels', (currentConfig.ignoredChannels || []).join(', '));
+  
+  // Musique
+  setCheck('cfg_musicEnabled', currentConfig.musicEnabled);
+  setVal('cfg_musicVolume', currentConfig.musicVolume);
+  setCheck('cfg_musicAutoPlay', currentConfig.musicAutoPlay);
+  setCheck('cfg_musicLoop', currentConfig.musicLoop);
+  
+  // Autorole
+  setVal('cfg_autoRole', currentConfig.autoRole);
+  setVal('cfg_autoRoleDelay', currentConfig.autoRoleDelay);
+  setCheck('cfg_autoroleVerify', currentConfig.autoroleVerify);
+  
+  // Logs
+  setVal('cfg_logChannel', currentConfig.logChannel);
+  setCheck('cfg_logsMessages', currentConfig.logsMessages);
+  setCheck('cfg_logsMembers', currentConfig.logsMembers);
+  setCheck('cfg_logsModeration', currentConfig.logsModeration);
+  setCheck('cfg_logsVoice', currentConfig.logsVoice);
+  setCheck('cfg_logsServer', currentConfig.logsServer);
+  
+  // Starboard
+  setVal('cfg_starboardChannel', currentConfig.starboardChannel);
+  setVal('cfg_starboardThreshold', currentConfig.starboardThreshold);
+  
+  // Reaction Role
+  setVal('cfg_reactionRoleMessage', currentConfig.reactionRoleMessage);
+  setVal('cfg_reactionRoles', (currentConfig.reactionRoles || {}));
+  
+  // Custom commands
+  customCommands = currentConfig.customCommands || [];
 }
 
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el && val !== undefined && val !== null) el.value = val;
+}
+function setCheck(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.checked = !!val;
+}
+
+// ===================== SAVE CONFIG =====================
+async function saveConfig() {
+  // Collecter toutes les valeurs
+  currentConfig.prefix = getVal('cfg_prefix');
+  currentConfig.status = getVal('cfg_status');
+  currentConfig.language = getVal('cfg_language');
+  currentConfig.embedColor = getVal('cfg_embedColor');
+  currentConfig.adminOnly = getCheck('cfg_adminOnly');
+  
+  currentConfig.welcomeMessage = getVal('cfg_welcomeMessage');
+  currentConfig.welcomeChannel = getVal('cfg_welcomeChannel') || null;
+  currentConfig.welcomeImage = getVal('cfg_welcomeImage') || null;
+  currentConfig.welcomeDM = getCheck('cfg_welcomeDM');
+  currentConfig.welcomeDMMessage = getVal('cfg_welcomeDMMessage');
+  currentConfig.goodbyeMessage = getVal('cfg_goodbyeMessage');
+  currentConfig.goodbyeChannel = getVal('cfg_goodbyeChannel') || null;
+  
+  currentConfig.automodEnabled = getCheck('cfg_automodEnabled');
+  currentConfig.antiSpam = getCheck('cfg_antiSpam');
+  currentConfig.automodSpamLimit = parseInt(getVal('cfg_automodSpamLimit')) || 5;
+  currentConfig.automodSpamTime = parseInt(getVal('cfg_automodSpamTime')) || 5;
+  currentConfig.antiLink = getCheck('cfg_antiLink');
+  currentConfig.automodLinkWhitelist = getVal('cfg_automodLinkWhitelist').split(',').map(s => s.trim()).filter(Boolean);
+  currentConfig.badWords = getVal('cfg_badWords').split(',').map(s => s.trim()).filter(Boolean);
+  currentConfig.maxMessageLength = parseInt(getVal('cfg_maxMessageLength')) || 2000;
+  currentConfig.antiRaid = getCheck('cfg_antiRaid');
+  currentConfig.automodCapsFilter = getCheck('cfg_automodCapsFilter');
+  currentConfig.automodCapsLimit = parseInt(getVal('cfg_automodCapsLimit')) || 70;
+  currentConfig.warnLimit = parseInt(getVal('cfg_warnLimit')) || 3;
+  currentConfig.warnAction = getVal('cfg_warnAction');
+  
+  currentConfig.modRole = getVal('cfg_modRole') || null;
+  
+  currentConfig.ticketEnabled = getCheck('cfg_ticketEnabled');
+  currentConfig.ticketCategory = getVal('cfg_ticketCategory') || null;
+  currentConfig.ticketLogChannel = getVal('cfg_ticketLogChannel') || null;
+  currentConfig.ticketMessage = getVal('cfg_ticketMessage');
+  currentConfig.ticketMaxPerUser = parseInt(getVal('cfg_ticketMaxPerUser')) || 3;
+  currentConfig.ticketTranscript = getCheck('cfg_ticketTranscript');
+  currentConfig.ticketCloseMessage = getVal('cfg_ticketCloseMessage');
+  
+  currentConfig.levelEnabled = getCheck('cfg_levelEnabled');
+  currentConfig.xpPerMessage = parseInt(getVal('cfg_xpPerMessage')) || 15;
+  currentConfig.xpCooldown = parseInt(getVal('cfg_xpCooldown')) || 60;
+  currentConfig.levelUpChannel = getVal('cfg_levelUpChannel') || null;
+  currentConfig.levelUpMessage = getVal('cfg_levelUpMessage');
+  currentConfig.ignoredChannels = getVal('cfg_ignoredChannels').split(',').map(s => s.trim()).filter(Boolean);
+  
+  currentConfig.musicEnabled = getCheck('cfg_musicEnabled');
+  currentConfig.musicVolume = parseInt(getVal('cfg_musicVolume')) || 80;
+  currentConfig.musicAutoPlay = getCheck('cfg_musicAutoPlay');
+  currentConfig.musicLoop = getCheck('cfg_musicLoop');
+  
+  currentConfig.autoRole = getVal('cfg_autoRole') || null;
+  currentConfig.autoRoleDelay = parseInt(getVal('cfg_autoRoleDelay')) || 0;
+  currentConfig.autoroleVerify = getCheck('cfg_autoroleVerify');
+  
+  currentConfig.logChannel = getVal('cfg_logChannel') || null;
+  currentConfig.logsMessages = getCheck('cfg_logsMessages');
+  currentConfig.logsMembers = getCheck('cfg_logsMembers');
+  currentConfig.logsModeration = getCheck('cfg_logsModeration');
+  currentConfig.logsVoice = getCheck('cfg_logsVoice');
+  currentConfig.logsServer = getCheck('cfg_logsServer');
+  
+  currentConfig.starboardChannel = getVal('cfg_starboardChannel') || null;
+  currentConfig.starboardThreshold = parseInt(getVal('cfg_starboardThreshold')) || 5;
+  
+  currentConfig.reactionRoleMessage = getVal('cfg_reactionRoleMessage') || null;
+  currentConfig.customCommands = customCommands;
+  
+  // Envoyer au serveur
+  try {
+    const res = await fetch(`${API}/api/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentConfig)
+    });
+    const data = await res.json();
+    if (data.success) {
+      notif('Configuration sauvegardée !');
+    } else {
+      notif('Erreur: ' + data.message, 'error');
+    }
+  } catch (e) {
+    // Sauvegarder en local
+    localStorage.setItem('kycksConfig', JSON.stringify(currentConfig));
+    notif('Sauvegardé localement');
+  }
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+function getCheck(id) {
+  const el = document.getElementById(id);
+  return el ? el.checked : false;
+}
+
+// ===================== MOD ACTIONS =====================
+async function modAction(action) {
+  const ids = { ban: ['mBanId', 'mBanReason'], kick: ['mKickId', 'mKickReason'], mute: ['mMuteId', 'mMuteDur'], clear: ['mClearN'] };
+  const [idField, reasonField] = ids[action];
+  const userId = document.getElementById(idField)?.value;
+  const reason = reasonField ? document.getElementById(reasonField)?.value : null;
+  
+  if (!userId) return notif('Remplis le champ ID', 'error');
+  
+  try {
+    let url = `${API}/api/${action}`;
+    let body = { userId };
+    if (action === 'ban' || action === 'kick') body.reason = reason;
+    if (action === 'mute') body.duration = parseInt(reason) || 10;
+    if (action === 'clear') { url = `${API}/api/clear`; body.amount = parseInt(userId); }
+    
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) {
+      notif(data.message);
+    } else {
+      notif('Erreur: ' + data.message, 'error');
+    }
+  } catch (e) {
+    notif('Erreur de connexion', 'error');
+  }
+  
+  if (idField) document.getElementById(idField).value = '';
+  if (reasonField) document.getElementById(reasonField).value = '';
+}
+
+// ===================== BACKUP =====================
+async function createBackup() {
+  const name = document.getElementById('backupName')?.value || undefined;
+  try {
+    const res = await fetch(`${API}/api/backup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    const data = await res.json();
+    if (data.success) {
+      notif(`Sauvegarde créée: ${data.backup.name}`);
+      loadBackups();
+    } else {
+      notif('Erreur: ' + data.message, 'error');
+    }
+  } catch (e) {
+    notif('Erreur de connexion', 'error');
+  }
+}
+
+async function loadBackups() {
+  try {
+    const res = await fetch(`${API}/api/backups`);
+    const data = await res.json();
+    const list = document.getElementById('backupList');
+    
+    if (!data.backups || data.backups.length === 0) {
+      list.innerHTML = '<div class="empty-state">Aucune sauvegarde</div>';
+      return;
+    }
+    
+    list.innerHTML = data.backups.map(b => `
+      <div class="backup-item">
+        <div class="backup-info">
+          <span class="backup-name">📁 ${b.name}</span>
+          <span class="backup-date">${b.createdAt ? new Date(b.createdAt).toLocaleDateString('fr-FR') : ''}</span>
+        </div>
+        <button onclick="restoreBackup('${b.name}')" class="dash-btn blue">Restaurer</button>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('backupList').innerHTML = '<div class="empty-state">Erreur de chargement</div>';
+  }
+}
+
+async function restoreBackup(name) {
+  if (!confirm(`Restaurer la sauvegarde "${name}" ? Les salons actuels seront supprimés.`)) return;
+  
+  try {
+    const res = await fetch(`${API}/api/restore`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    const data = await res.json();
+    if (data.success) {
+      notif('Serveur restauré !');
+    } else {
+      notif('Erreur: ' + data.message, 'error');
+    }
+  } catch (e) {
+    notif('Erreur de connexion', 'error');
+  }
+}
+
+async function loadTranscripts() {
+  try {
+    const res = await fetch(`${API}/api/transcripts`);
+    const data = await res.json();
+    const list = document.getElementById('transcriptList');
+    
+    if (!data.transcripts || data.transcripts.length === 0) {
+      list.innerHTML = '<div class="empty-state">Aucun transcript</div>';
+      return;
+    }
+    
+    list.innerHTML = data.transcripts.map(t => `
+      <div class="backup-item">
+        <div class="backup-info">
+          <span class="backup-name">📝 ${t.name}</span>
+          <span class="backup-date">${(t.size / 1024).toFixed(1)} KB</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('transcriptList').innerHTML = '<div class="empty-state">Erreur</div>';
+  }
+}
+
+// ===================== NUKE =====================
+async function nukeServer() {
+  if (!confirm('⚠️ ATTENTION ⚠️\n\nCette action va SUPPRIMER TOUS LES SALONS du serveur !\nUne sauvegarde sera créée automatiquement.\n\nÊtes-vous VRAIMENT sûr ?')) return;
+  if (!confirm('DERNIÈRE CHANCE ! Voulez-vous vraiment nuke le serveur ?')) return;
+  
+  try {
+    const res = await fetch(`${API}/api/nuke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.success) {
+      notif(`Serveur nuké ! Backup: ${data.backup}`);
+    } else {
+      notif('Erreur: ' + data.message, 'error');
+    }
+  } catch (e) {
+    notif('Erreur de connexion', 'error');
+  }
+}
+
+// ===================== CUSTOM COMMANDS =====================
 function addCustomCmd() {
   const name = document.getElementById('customCmdName').value.trim();
   const response = document.getElementById('customCmdResponse').value.trim();
   if (!name || !response) return notif('Remplis les deux champs', 'error');
   
   customCommands.push({ name, response });
-  localStorage.setItem('kycksCustomCmds', JSON.stringify(customCommands));
   document.getElementById('customCmdName').value = '';
   document.getElementById('customCmdResponse').value = '';
   renderCustomCmds();
+  saveConfig();
   notif('Commande !' + name + ' créée !');
 }
 
 function deleteCustomCmd(index) {
   customCommands.splice(index, 1);
-  localStorage.setItem('kycksCustomCmds', JSON.stringify(customCommands));
   renderCustomCmds();
+  saveConfig();
   notif('Commande supprimée');
 }
 
@@ -439,15 +866,41 @@ function renderCustomCmds() {
   }
 }
 
-window.onload = function() {
-  const keys = ['prefix','status','lang','welcomeMsg','goodbyeMsg','welcomeChan','welcomeImg','ticketCat','ticketSup','ticketMsg','ticketMax','logChan','autoRole','autoRoleDelay','badwords','maxlen','modRole','sXpAmount','sXpCooldown','levelChan','roleRewards','ignoredChannels','musicVol'];
-  keys.forEach(k => {
-    const saved = localStorage.getItem('kycks_' + k);
-    const el = document.getElementById('s' + k.charAt(0).toUpperCase() + k.slice(1));
-    if (saved && el) el.value = saved;
-  });
-  renderCustomCmds();
-};
+// ===================== STATS =====================
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/api/stats`);
+    const data = await res.json();
+    document.getElementById('dashServers').textContent = data.servers || 0;
+    document.getElementById('dashUsers').textContent = data.users || 0;
+  } catch (e) {}
+}
+
+// ===================== TABS =====================
+function showTab(tab) {
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.dash-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+  
+  const titles = {
+    accueil: 'Panel de Contrôle', general: '⚙️ Général', welcome: '👋 Bienvenue',
+    automod: '🤖 Automod', moderation: '🛡️ Modération', tickets: '🎫 Tickets',
+    levels: '📈 Niveaux', music: '🎵 Musique', autorole: '🎭 Autorole',
+    logs: '📋 Logs', custom: '✨ Commandes Custom', starboard: '⭐ Starboard',
+    reactionrole: '🎭 Reaction Role', backup: '💾 Backup & Nuke'
+  };
+  document.getElementById('panelTitle').textContent = titles[tab] || 'Panel de Contrôle';
+}
+
+// ===================== NOTIFICATION =====================
+function notif(msg, type='success') {
+  const n = document.getElementById('notif');
+  document.getElementById('notifText').textContent = msg;
+  n.className = 'notification ' + type;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
 </script>
 
 </body>

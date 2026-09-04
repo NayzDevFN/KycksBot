@@ -1,12 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Importer le bot
 const bot = require('./bot');
 
 const GUILD_ID = process.env.GUILD_ID;
@@ -22,12 +23,30 @@ app.get('/api/stats', async (req, res) => {
     res.json({ 
       servers: guilds, 
       users: totalUsers, 
-      commands: 18,
-      status: bot.getCurrentStatus(),
+      commands: 70,
+      status: bot.config.status,
       online: client.isReady()
     });
   } catch (error) {
     res.json({ servers: 0, users: 0, commands: 0, status: 'Hors ligne', online: false });
+  }
+});
+
+// ===================== CONFIG GET =====================
+app.get('/api/config', (req, res) => {
+  res.json(bot.config);
+});
+
+// ===================== CONFIG SET (GENENERAL) =====================
+app.post('/api/config', (req, res) => {
+  try {
+    const updates = req.body;
+    Object.assign(bot.config, updates);
+    bot.saveConfig(bot.config);
+    bot.client.user.setActivity(bot.config.status);
+    res.json({ success: true, message: 'Configuration mise à jour' });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
   }
 });
 
@@ -65,7 +84,7 @@ app.post('/api/mute', async (req, res) => {
     const guild = await client.guilds.fetch(GUILD_ID);
     const member = await guild.members.fetch(userId);
     await member.timeout((duration || 10) * 60 * 1000);
-    res.json({ success: true, message: `${member.user.username} a été mute pendant ${duration || 10} minutes` });
+    res.json({ success: true, message: `${member.user.username} mute pendant ${duration || 10} minutes` });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -84,75 +103,64 @@ app.post('/api/unmute', async (req, res) => {
   }
 });
 
-// ===================== CONFIGURATION DU BOT =====================
-
-// Obtenir la config actuelle
-app.get('/api/config', (req, res) => {
-  res.json({
-    status: bot.getCurrentStatus(),
-    prefix: bot.getPrefix(),
-    welcomeMessage: bot.getWelcomeMessage(),
-    goodbyeMessage: bot.getGoodbyeMessage(),
-    logChannel: bot.getLogChannel()
-  });
-});
-
-// Changer le status du bot
-app.post('/api/config/status', (req, res) => {
+// ===================== BACKUP =====================
+app.post('/api/backup', async (req, res) => {
   try {
-    const { status } = req.body;
-    bot.setCurrentStatus(status);
-    res.json({ success: true, message: `Status changé en: ${status}` });
+    const { name } = req.body;
+    const client = bot.client;
+    const guild = await client.guilds.fetch(GUILD_ID);
+    const backup = await bot.createBackup(guild, name);
+    res.json({ success: true, backup });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 });
 
-// Changer le prefix
-app.post('/api/config/prefix', (req, res) => {
+app.post('/api/restore', async (req, res) => {
   try {
-    const { prefix } = req.body;
-    bot.setPrefix(prefix);
-    res.json({ success: true, message: `Prefix changé en: ${prefix}` });
+    const { name } = req.body;
+    const client = bot.client;
+    const guild = await client.guilds.fetch(GUILD_ID);
+    await bot.restoreBackup(guild, name);
+    res.json({ success: true, message: `Serveur restauré depuis ${name}` });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 });
 
-// Changer le message d'accueil
-app.post('/api/config/welcome', (req, res) => {
+app.get('/api/backups', (req, res) => {
   try {
-    const { message } = req.body;
-    bot.setWelcomeMessage(message);
-    res.json({ success: true, message: 'Message d\'accueil mis à jour' });
+    const BACKUPS_PATH = path.join(__dirname, 'backups');
+    if (!fs.existsSync(BACKUPS_PATH)) return res.json({ backups: [] });
+    
+    const files = fs.readdirSync(BACKUPS_PATH).filter(f => f.endsWith('.json'));
+    const backups = files.map(f => {
+      try {
+        const data = JSON.parse(fs.readFileSync(path.join(BACKUPS_PATH, f), 'utf8'));
+        return { name: data.name, createdAt: data.createdAt, guildName: data.guildName };
+      } catch (e) {
+        return { name: f.replace('.json', '') };
+      }
+    });
+    res.json({ backups });
+  } catch (error) {
+    res.json({ backups: [] });
+  }
+});
+
+// ===================== NUKE =====================
+app.post('/api/nuke', async (req, res) => {
+  try {
+    const client = bot.client;
+    const guild = await client.guilds.fetch(GUILD_ID);
+    const result = await bot.nukeGuild(guild, true);
+    res.json({ success: true, backup: result.backup });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
 });
 
-// Changer le message d'au revoir
-app.post('/api/config/goodbye', (req, res) => {
-  try {
-    const { message } = req.body;
-    bot.setGoodbyeMessage(message);
-    res.json({ success: true, message: 'Message d\'au revoir mis à jour' });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-});
-
-// Changer le salon de logs
-app.post('/api/config/logchannel', (req, res) => {
-  try {
-    const { channelId } = req.body;
-    bot.setLogChannel(channelId);
-    res.json({ success: true, message: `Salon de logs changé: ${channelId}` });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-});
-
-// ===================== INFO SERVEUR =====================
+// ===================== SERVER INFO =====================
 app.get('/api/server', async (req, res) => {
   try {
     const client = bot.client;
@@ -182,16 +190,16 @@ app.get('/api/server', async (req, res) => {
       id: guild.id,
       icon: guild.iconURL(),
       memberCount: guild.memberCount,
-      channels: channels,
-      roles: roles,
-      members: members.slice(0, 100) // Limiter à 100 membres
+      channels,
+      roles,
+      members: members.slice(0, 100)
     });
   } catch (error) {
     res.json({ error: error.message });
   }
 });
 
-// ===================== ENVOYER UN MESSAGE =====================
+// ===================== SEND MESSAGE =====================
 app.post('/api/send', async (req, res) => {
   try {
     const { channelId, message } = req.body;
@@ -201,6 +209,50 @@ app.post('/api/send', async (req, res) => {
     res.json({ success: true, message: 'Message envoyé !' });
   } catch (error) {
     res.json({ success: false, message: error.message });
+  }
+});
+
+// ===================== CHANNELS/ROLES LIST =====================
+app.get('/api/channels', async (req, res) => {
+  try {
+    const client = bot.client;
+    const guild = await client.guilds.fetch(GUILD_ID);
+    const channels = guild.channels.cache
+      .filter(c => c.type === 0 || c.type === 2 || c.type === 4)
+      .map(c => ({ id: c.id, name: c.name, type: c.type }));
+    res.json({ channels });
+  } catch (error) {
+    res.json({ channels: [] });
+  }
+});
+
+app.get('/api/roles', async (req, res) => {
+  try {
+    const client = bot.client;
+    const guild = await client.guilds.fetch(GUILD_ID);
+    const roles = guild.roles.cache
+      .filter(r => r.name !== '@everyone' && !r.managed)
+      .map(r => ({ id: r.id, name: r.name, color: r.hexColor }));
+    res.json({ roles });
+  } catch (error) {
+    res.json({ roles: [] });
+  }
+});
+
+// ===================== TRANSCRIPTS =====================
+app.get('/api/transcripts', (req, res) => {
+  try {
+    const BACKUPS_PATH = path.join(__dirname, 'backups');
+    if (!fs.existsSync(BACKUPS_PATH)) return res.json({ transcripts: [] });
+    
+    const files = fs.readdirSync(BACKUPS_PATH).filter(f => f.startsWith('transcript_'));
+    const transcripts = files.map(f => ({
+      name: f.replace('.txt', ''),
+      size: fs.statSync(path.join(BACKUPS_PATH, f)).size
+    }));
+    res.json({ transcripts });
+  } catch (error) {
+    res.json({ transcripts: [] });
   }
 });
 

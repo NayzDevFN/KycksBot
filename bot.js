@@ -130,6 +130,9 @@ const BACKUPS_PATH = path.join(__dirname, 'backups');
 if (!fs.existsSync(BACKUPS_PATH)) fs.mkdirSync(BACKUPS_PATH, { recursive: true });
 
 async function createBackup(guild, name) {
+  await guild.channels.fetch();
+  await guild.roles.fetch();
+  
   const backup = {
     name: name || `backup_${Date.now()}`,
     createdAt: new Date().toISOString(),
@@ -143,11 +146,12 @@ async function createBackup(guild, name) {
 
   // Sauvegarder les catégories
   guild.channels.cache.filter(c => c.type === ChannelType.GuildCategory).forEach(cat => {
+    const overwrites = cat.permissionOverwrites ? cat.permissionOverwrites.cache : [];
     backup.categories.push({
       id: cat.id,
       name: cat.name,
       position: cat.position,
-      permissionOverwrites: cat.permissionOverwrites.cache.map(p => ({
+      permissionOverwrites: overwrites.map(p => ({
         id: p.id,
         type: p.type,
         allow: p.allow.toString(),
@@ -160,6 +164,7 @@ async function createBackup(guild, name) {
   const textChannels = guild.channels.cache.filter(c => c.type === ChannelType.GuildText);
   
   for (const ch of textChannels) {
+    const overwrites = ch.permissionOverwrites ? ch.permissionOverwrites.cache : [];
     const channelData = {
       id: ch.id,
       name: ch.name,
@@ -168,7 +173,7 @@ async function createBackup(guild, name) {
       position: ch.position,
       nsfw: ch.nsfw,
       parent: ch.parent?.id || null,
-      permissionOverwrites: ch.permissionOverwrites.cache.map(p => ({
+      permissionOverwrites: overwrites.map(p => ({
         id: p.id,
         type: p.type,
         allow: p.allow.toString(),
@@ -218,6 +223,7 @@ async function createBackup(guild, name) {
 
   // Sauvegarder les autres types de salons (vocaux, etc)
   guild.channels.cache.filter(c => c.type !== ChannelType.GuildCategory && c.type !== ChannelType.GuildText).forEach(ch => {
+    const overwrites = ch.permissionOverwrites ? ch.permissionOverwrites.cache : [];
     backup.channels.push({
       id: ch.id,
       name: ch.name,
@@ -226,7 +232,7 @@ async function createBackup(guild, name) {
       bitrate: ch.bitrate,
       userLimit: ch.userLimit,
       parent: ch.parent?.id || null,
-      permissionOverwrites: ch.permissionOverwrites.cache.map(p => ({
+      permissionOverwrites: overwrites.map(p => ({
         id: p.id,
         type: p.type,
         allow: p.allow.toString(),
@@ -376,8 +382,8 @@ async function nukeGuild(guild, confirm = true) {
     const backup = await createBackup(guild, `pre_nuke_${Date.now()}`);
     
     // Supprimer tous les salons
-    const channels = [...guild.channels.cache.values()];
-    for (const channel of channels) {
+    const channelsList = [...guild.channels.cache.values()];
+    for (const channel of channelsList) {
       try {
         await channel.delete('Nuke');
       } catch (e) {}

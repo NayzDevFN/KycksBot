@@ -466,12 +466,53 @@
   <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
 </footer>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
-const API = 'http://localhost:3000';
+const API = window.location.origin;
+const socket = io(API);
 const BOT_CLIENT_ID = '1544851212187340881';
 let currentConfig = {};
 let customCommands = [];
 let selectors = { textChannels: [], voiceChannels: [], categories: [], roles: [], members: [] };
+
+// ===================== SOCKET.IO LIVE EVENTS =====================
+socket.on('botStatus', (data) => {
+  const statusEl = document.getElementById('dashServers');
+  const usersEl = document.getElementById('dashUsers');
+  const nameEl = document.getElementById('serverName');
+  if (data.online) {
+    if (statusEl) statusEl.textContent = data.servers || 0;
+    if (usersEl) usersEl.textContent = data.users || 0;
+    if (nameEl && nameEl.textContent === 'Hors ligne') nameEl.textContent = 'Kycks Bot';
+  } else {
+    if (statusEl) statusEl.textContent = '0';
+    if (usersEl) usersEl.textContent = '0';
+    if (nameEl) nameEl.textContent = 'Hors ligne';
+  }
+});
+
+socket.on('modAction', (data) => {
+  notif(`${data.action.toUpperCase()}: ${data.user}`);
+});
+
+socket.on('backupCreated', (data) => {
+  notif(`Backup créée: ${data.name}`);
+  loadBackups();
+});
+
+socket.on('serverNuked', (data) => {
+  notif(`Nuke fait ! Backup: ${data.backup}`);
+  loadBackups();
+});
+
+socket.on('configUpdated', () => {
+  loadConfig();
+});
+
+socket.on('avatarUpdated', (data) => {
+  const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon, #currentAvatar');
+  imgs.forEach(el => el.src = data.path + '?' + Date.now());
+});
 
 // ===================== INIT =====================
 window.onload = async function() {

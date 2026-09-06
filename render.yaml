@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     buildCommand: npm install
-    startCommand: node api.js
+    startCommand: node --max-old-space-size=280 api.js
     envVars:
       - key: DISCORD_TOKEN
         sync: false

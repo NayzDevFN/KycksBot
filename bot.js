@@ -140,7 +140,11 @@ const client = new Client({
   sweepers: {
     ...Options.DefaultSweeperSettings,
     clients: { interval: 300, lifetime: 600 },
-    guildMembers: { interval: 300, lifetime: 600 },
+    guildMembers: {
+      interval: 300,
+      lifetime: 600,
+      filter: () => (member) => member.id !== member.client.user?.id,
+    },
     messages: { interval: 300, lifetime: 180 },
   },
 });

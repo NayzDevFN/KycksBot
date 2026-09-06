@@ -11,4 +11,4 @@ fi
 
 # Lancer le bot
 echo "🤖 Démarrage de Kycks Bot..."
-exec node api.js
+exec node --max-old-space-size=280 api.js

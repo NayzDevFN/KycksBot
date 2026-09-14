@@ -643,7 +643,11 @@ function isGitHubPages() {
   return window.location.hostname.includes('github.io');
 }
 
-let API = isGitHubPages() ? getApiUrl() : window.location.origin;
+let API = isGitHubPages() ? (getApiUrl() || 'http://localhost:3000') : window.location.origin;
+
+if (isGitHubPages() && !localStorage.getItem('botApiUrl')) {
+  localStorage.setItem('botApiUrl', 'http://localhost:3000');
+}
 let socket = null;
 
 function connectSocket() {
@@ -695,7 +699,7 @@ window.onload = async function() {
   API = getApiUrl() || window.location.origin;
 
   if (isGitHubPages() && !getApiUrl()) {
-    const url = prompt('🔗 Entrez l\'URL de l\'API du bot\n\nExemples :\n- https://xxxx.ngrok-free.app\n- http://85.12.34.56:3000');
+    const url = prompt('🔗 Entrez l\'URL de l\'API du bot\n\nExemples :\n- https://xxxx.ngrok-free.app\n- http://localhost:3000');
     if (url) {
       setApiUrl(url);
       API = url;

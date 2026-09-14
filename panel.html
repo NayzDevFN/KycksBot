@@ -1352,6 +1352,14 @@ function showTab(tab) {
   document.getElementById('panelTitle').textContent = titles[tab] || 'Panel de Contrôle';
 }
 
+// ===================== AUTO-SAVE =====================
+document.addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.id && (el.id.startsWith('cfg_') || el.id.startsWith('mBan') || el.id.startsWith('mKick') || el.id.startsWith('mMute') || el.id.startsWith('mClear'))) {
+    saveConfig();
+  }
+});
+
 // ===================== NOTIFICATION =====================
 function notif(msg, type='success') {
   const n = document.getElementById('notif');

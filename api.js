@@ -62,7 +62,8 @@ function sendLiveStats(target) {
     const guilds = client.guilds.cache.size;
     let totalUsers = 0;
     client.guilds.cache.forEach(g => totalUsers += g.memberCount);
-    target.emit('botStatus', { online: true, servers: guilds, users: totalUsers, commands: 70, status: bot.config.status });
+    const defaultCfg = bot.getDefaultConfig();
+    target.emit('botStatus', { online: true, servers: guilds, users: totalUsers, commands: 70, status: defaultCfg.status });
   } catch (e) {
     target.emit('botStatus', { online: false });
   }
@@ -79,20 +80,34 @@ app.get('/api/stats', async (req, res) => {
     const guilds = client.guilds.cache.size;
     let totalUsers = 0;
     client.guilds.cache.forEach(g => totalUsers += g.memberCount);
-    res.json({ servers: guilds, users: totalUsers, commands: 70, status: bot.config.status, online: true });
+    const defaultCfg = bot.getDefaultConfig();
+    res.json({ servers: guilds, users: totalUsers, commands: 70, status: defaultCfg.status, online: true });
   } catch (error) {
     res.json({ servers: 0, users: 0, commands: 0, status: 'Hors ligne', online: false });
   }
 });
 
 // ===================== CONFIG =====================
-app.get('/api/config', (req, res) => res.json(bot.config));
+app.get('/api/config', (req, res) => {
+  const guildId = req.query.guildId || GUILD_ID;
+  if (guildId) {
+    res.json(bot.getGuildCfg(guildId));
+  } else {
+    res.json(bot.getAllGuildConfigs());
+  }
+});
+
+app.get('/api/configs', (req, res) => res.json(bot.getAllGuildConfigs()));
 
 app.post('/api/config', (req, res) => {
   try {
-    Object.assign(bot.config, req.body);
-    bot.saveConfig(bot.config);
-    bot.client.user.setActivity(bot.config.status);
+    const guildId = req.body.guildId || GUILD_ID;
+    if (!guildId) return res.json({ success: false, message: 'guildId requis' });
+    const existing = bot.getGuildCfg(guildId);
+    const updated = { ...existing, ...req.body };
+    delete updated.guildId;
+    bot.setGuildCfg(guildId, updated);
+    bot.client.user.setActivity(updated.status || 'En ligne 🟢');
     io.emit('configUpdated');
     res.json({ success: true, message: 'Configuration mise à jour' });
   } catch (error) {
@@ -266,7 +281,7 @@ app.get('/api/recordings/status', (req, res) => {
         duration: recorder.isRecording ? Math.floor((Date.now() - recorder.startTime) / 1000) : 0
       });
     }
-    res.json({ recordings, enabled: bot.config.voiceRecordEnabled });
+    res.json({ recordings, enabled: bot.getDefaultConfig().voiceRecordEnabled });
   } catch (error) {
     res.json({ recordings: [], enabled: false });
   }
@@ -320,10 +335,6 @@ server.listen(PORT, () => {
 // ===================== GRACEFUL SHUTDOWN =====================
 function gracefulShutdown(signal) {
   console.log(`\n🛑 Signal ${signal} reçu. Arrêt en cours...`);
-  try {
-    bot.saveConfig(bot.config);
-    console.log('💾 Configuration sauvegardée.');
-  } catch (e) {}
   try {
     bot.client.destroy();
     console.log('👋 Bot déconnecté.');

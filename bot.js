@@ -516,10 +516,11 @@ function addXp(userId, guildId) {
   const key = `${guildId}_${userId}`;
   if (!xpData[key]) xpData[key] = { xp: 0, level: 0, lastXp: 0 };
   
+  const gCfg = loadGuildConfig(guildId);
   const now = Date.now();
-  if (now - xpData[key].lastXp < config.xpCooldown * 1000) return null;
+  if (now - xpData[key].lastXp < gCfg.xpCooldown * 1000) return null;
   
-  xpData[key].xp += config.xpPerMessage;
+  xpData[key].xp += gCfg.xpPerMessage;
   xpData[key].lastXp = now;
   
   const newLevel = Math.floor(0.1 * Math.sqrt(xpData[key].xp));
@@ -567,12 +568,13 @@ function checkSpam(userId, guildId) {
   const key = `${guildId}_${userId}`;
   if (!spamTracker.has(key)) spamTracker.set(key, []);
   
+  const gCfg = loadGuildConfig(guildId);
   const now = Date.now();
-  const messages = spamTracker.get(key).filter(t => now - t < config.automodSpamTime * 1000);
+  const messages = spamTracker.get(key).filter(t => now - t < gCfg.automodSpamTime * 1000);
   messages.push(now);
   spamTracker.set(key, messages);
   
-  return messages.length > config.automodSpamLimit;
+  return messages.length > gCfg.automodSpamLimit;
 }
 
 // ===================== VOICE RECORDING =====================
@@ -1684,7 +1686,7 @@ client.on('interactionCreate', async (interaction) => {
     const list = files.map(f => f.replace('.json', '')).join('\n') || 'Aucune sauvegarde.';
     
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('📁 Sauvegardes')
       .setDescription(list)
       .setTimestamp();
@@ -1698,7 +1700,7 @@ client.on('interactionCreate', async (interaction) => {
     const member = await interaction.guild.members.fetch(user.id);
     
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle(`👤 Info: ${user.username}`)
       .setThumbnail(user.displayAvatarURL())
       .addFields(
@@ -1717,7 +1719,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'serverinfo') {
     const guild = interaction.guild;
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle(`🏰 ${guild.name}`)
       .setThumbnail(guild.iconURL())
       .addFields(
@@ -1736,7 +1738,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'avatar') {
     const user = interaction.options.getUser('utilisateur') || interaction.user;
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle(`🖼️ Avatar de ${user.username}`)
       .setImage(user.displayAvatarURL({ size: 1024 }))
       .setTimestamp();
@@ -1770,7 +1772,7 @@ client.on('interactionCreate', async (interaction) => {
       .join('\n');
     
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('🏷️ Rôles du serveur')
       .setDescription(roles || 'Aucun rôle')
       .setTimestamp();
@@ -1786,7 +1788,7 @@ client.on('interactionCreate', async (interaction) => {
       .join('\n');
     
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('👥 Membres par rôle')
       .setDescription(roles || 'Aucun')
       .setTimestamp();
@@ -1812,7 +1814,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'emojis') {
     const emojis = interaction.guild.emojis.cache.map(e => `${e} \`:${e.name}:\``).join(' ') || 'Aucun emoji.';
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('😀 Emojis')
       .setDescription(emojis)
       .setTimestamp();
@@ -1824,7 +1826,7 @@ client.on('interactionCreate', async (interaction) => {
     const invites = await interaction.guild.invites.fetch();
     const total = invites.reduce((acc, inv) => acc + inv.uses, 0);
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('📨 Invitations')
       .setDescription(`Total: **${total}** invitations\nSalons: **${invites.size}** liens actifs`)
       .setTimestamp();
@@ -1858,7 +1860,7 @@ client.on('interactionCreate', async (interaction) => {
     const optionsStr = interaction.options.getString('options');
     
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle(`📊 ${question}`)
       .setTimestamp();
     
@@ -1910,7 +1912,7 @@ client.on('interactionCreate', async (interaction) => {
     const response = responses[Math.floor(Math.random() * responses.length)];
     
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('🎱 Magic 8-Ball')
       .addFields(
         { name: 'Question', value: question, inline: false },
@@ -1927,7 +1929,7 @@ client.on('interactionCreate', async (interaction) => {
       'https://i.imgur.com/0zWvJ0X.jpg'
     ];
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('😂 Mème aléatoire')
       .setImage(memes[Math.floor(Math.random() * memes.length)])
       .setTimestamp();
@@ -2104,7 +2106,7 @@ client.on('interactionCreate', async (interaction) => {
   // RELOADCONFIG
   if (commandName === 'reloadconfig') {
     config = getDefaultConfig();
-    await interaction.reply('✅ Configuration rechargée !');
+    await interaction.reply('✅ Configuration rechargée ! Les configs serveur sont relues à chaque action.');
   }
   
   // SETWELCOMECHANNEL
@@ -2257,11 +2259,12 @@ client.on('interactionCreate', async (interaction) => {
     const ticket = tickets.get(interaction.channel.id);
     if (!ticket || !ticket.open) return;
     
+    const gCfg = cfg(interaction.guild.id);
     ticket.open = false;
     saveTickets();
     await interaction.reply(`🔒 Ticket fermé.`);
     
-    if (config.ticketTranscript) {
+    if (gCfg.ticketTranscript) {
       const messages = await interaction.channel.messages.fetch();
       const transcript = messages.reverse().map(m => `[${m.author.username}] ${m.content}`).join('\n');
       fs.writeFileSync(path.join(BACKUPS_PATH, `transcript_${interaction.channel.id}.txt`), transcript);
@@ -2295,7 +2298,6 @@ function gracefulShutdown(signal) {
     saveJsonFile(XP_DATA_PATH, xpData);
     saveJsonFile(WARNS_DATA_PATH, warns);
     saveTickets();
-    saveConfig(config);
     console.log('💾 Données sauvegardées.');
   } catch (e) {
     console.error('❌ Erreur sauvegarde:', e);

@@ -271,6 +271,14 @@
           <div class="setting-header"><span class="setting-icon">🗑️</span><div><span class="setting-name">Clear</span><span class="setting-desc">Supprimer des messages</span></div></div>
           <div class="setting-input multi"><select id="mClearN" class="dash-input small"><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="75">75</option><option value="100">100</option></select><button onclick="modAction('clear')" class="dash-btn purple">Supprimer</button></div>
         </div>
+        <div class="setting-card" style="border-color: #e74c3c;">
+          <div class="setting-header"><span class="setting-icon">🧹</span><div><span class="setting-name">Supprimer tous les messages d'un utilisateur</span><span class="setting-desc">Supprime tous les messages d'un membre dans tous les salons (par ID)</span></div></div>
+          <div class="setting-input multi">
+            <input type="text" id="mDeleteUserId" class="dash-input" placeholder="ID de l'utilisateur">
+            <button onclick="deleteUserMessages()" class="dash-btn red">🧹 Tout supprimer</button>
+          </div>
+          <span class="setting-hint" style="color:#e74c3c;">⚠️ Cette action est irréversible. Seuls les messages de moins de 14 jours peuvent être supprimés en bulk.</span>
+        </div>
       </div>
       
       <!-- TICKETS -->
@@ -1094,6 +1102,28 @@ async function modAction(action) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) notif(data.message);
+    else notif('Erreur: ' + data.message, 'error');
+  } catch (e) {
+    notif('Bot non connecté ! Lance node api.js', 'error');
+  }
+}
+
+// ===================== DELETE USER MESSAGES =====================
+async function deleteUserMessages() {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
+  const userId = getVal('mDeleteUserId').trim();
+  if (!userId) return notif('Entre un ID utilisateur', 'error');
+  if (!confirm(`Supprimer TOUS les messages de l'utilisateur ${userId} dans tous les salons ?`)) return;
+  if (!confirm('Dernière chance. Confirmer ?')) return;
+
+  try {
+    const res = await fetch(`${API}/api/deleteusermessages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, guildId: selectedGuildId })
     });
     const data = await res.json();
     if (data.success) notif(data.message);

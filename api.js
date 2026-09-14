@@ -295,6 +295,66 @@ app.get('/api/selectors', async (req, res) => {
   }
 });
 
+// ===================== DELETE USER MESSAGES =====================
+app.post('/api/deleteusermessages', async (req, res) => {
+  try {
+    const { userId, guildId } = req.body;
+    const gid = guildId || GUILD_ID;
+    if (!userId) return res.json({ success: false, message: 'userId requis' });
+
+    const guild = await bot.client.guilds.fetch(gid);
+    await guild.channels.fetch();
+
+    const textChannels = guild.channels.cache.filter(c => c.type === 0);
+    let totalDeleted = 0;
+
+    for (const [, channel] of textChannels) {
+      try {
+        const perms = channel.permissionsFor(bot.client.user);
+        if (!perms || !perms.has('VIEW_CHANNEL') || !perms.has('READ_MESSAGE_HISTORY') || !perms.has('MANAGE_MESSAGES')) continue;
+
+        let lastId = null;
+        let keepFetching = true;
+
+        while (keepFetching) {
+          const options = { limit: 100 };
+          if (lastId) options.before = lastId;
+
+          const messages = await channel.messages.fetch(options);
+          if (messages.size === 0) break;
+
+          const userMessages = messages.filter(m => m.author.id === userId);
+          lastId = messages.last()?.id;
+
+          if (userMessages.size > 0) {
+            const bulkDeletable = userMessages.filter(m => Date.now() - m.createdTimestamp < 14 * 24 * 60 * 60 * 1000);
+            const tooOld = userMessages.filter(m => Date.now() - m.createdTimestamp >= 14 * 24 * 60 * 60 * 1000);
+
+            if (bulkDeletable.size > 0) {
+              const deleted = await channel.bulkDelete(bulkDeletable, true);
+              totalDeleted += deleted.size;
+            }
+
+            for (const [, msg] of tooOld) {
+              try {
+                await msg.delete();
+                totalDeleted++;
+              } catch {}
+            }
+          }
+
+          if (messages.size < 100) keepFetching = false;
+        }
+      } catch {}
+    }
+
+    io.emit('modAction', { action: 'deleteMessages', user: userId, count: totalDeleted });
+    res.json({ success: true, message: `${totalDeleted} message(s) de l'utilisateur ${userId} supprimé(s)` });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+});
+
 // ===================== SEND MESSAGE =====================
 app.post('/api/send', async (req, res) => {
   try {

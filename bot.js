@@ -1050,6 +1050,30 @@ client.on('ready', async () => {
   console.log(`🤖 ${client.user.tag} est en ligne !`);
   client.user.setActivity('En ligne 🟢');
   await registerCommands();
+
+  // Auto-create config for each guild the bot is already in
+  client.guilds.cache.forEach(g => {
+    const p = getGuildConfigPath(g.id);
+    if (!fs.existsSync(p)) {
+      saveGuildConfig(g.id, getDefaultConfig());
+      console.log(`📁 Config auto-créée pour ${g.name} (${g.id})`);
+    }
+  });
+});
+
+// ===================== GUILD CREATE (auto-config) =====================
+client.on('guildCreate', (guild) => {
+  console.log(`🆕 Bot ajouté au serveur: ${guild.name} (${guild.id})`);
+  const p = getGuildConfigPath(guild.id);
+  if (!fs.existsSync(p)) {
+    saveGuildConfig(guild.id, getDefaultConfig());
+    console.log(`📁 Config auto-créée pour ${guild.name} (${guild.id})`);
+  }
+});
+
+// ===================== GUILD DELETE (cleanup) =====================
+client.on('guildDelete', (guild) => {
+  console.log(`🗑️ Bot retiré du serveur: ${guild.name} (${guild.id})`);
 });
 
 // WELCOME

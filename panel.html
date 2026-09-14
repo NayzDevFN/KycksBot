@@ -530,6 +530,10 @@
   </div>
   
   <div class="notification" id="notif"><span id="notifText">Sauvegardé !</span></div>
+  <div class="save-bar" id="saveBar">
+    <span id="saveBarIcon">✅</span>
+    <span id="saveBarText">Enregistré</span>
+  </div>
 </section>
 
 <footer>
@@ -624,6 +628,32 @@
   cursor: pointer;
 }
 .guild-back-btn:hover { opacity: 0.85; }
+
+.save-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-bg, #1e1e2e);
+  border-top: 2px solid #2ecc71;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.1em;
+  color: #2ecc71;
+  z-index: 1000;
+  transition: all 0.3s;
+}
+.save-bar.unsaved {
+  border-top-color: #e74c3c;
+  color: #e74c3c;
+}
+.save-bar.saving {
+  border-top-color: #f39c12;
+  color: #f39c12;
+}
 </style>
 
 <script>
@@ -1336,6 +1366,10 @@ setInterval(checkRecordingStatus, 5000);
 
 // ===================== TABS =====================
 function showTab(tab) {
+  if (hasUnsaved) {
+    if (!confirm('⚠️ Tu as des modifications non enregistrées.\nQuitter quand même ?')) return;
+    markSaved();
+  }
   document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.dash-item').forEach(i => i.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
@@ -1353,10 +1387,55 @@ function showTab(tab) {
 }
 
 // ===================== AUTO-SAVE =====================
+let hasUnsaved = false;
+let saveTimeout = null;
+
+window.addEventListener('beforeunload', (e) => {
+  if (hasUnsaved) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+function markUnsaved() {
+  hasUnsaved = true;
+  const bar = document.getElementById('saveBar');
+  const icon = document.getElementById('saveBarIcon');
+  const text = document.getElementById('saveBarText');
+  bar.className = 'save-bar unsaved';
+  icon.textContent = '⚠️';
+  text.textContent = 'Non enregistré — modifications en attente...';
+}
+
+function markSaving() {
+  const bar = document.getElementById('saveBar');
+  const icon = document.getElementById('saveBarIcon');
+  const text = document.getElementById('saveBarText');
+  bar.className = 'save-bar saving';
+  icon.textContent = '⏳';
+  text.textContent = 'Enregistrement en cours...';
+}
+
+function markSaved() {
+  hasUnsaved = false;
+  const bar = document.getElementById('saveBar');
+  const icon = document.getElementById('saveBarIcon');
+  const text = document.getElementById('saveBarText');
+  bar.className = 'save-bar';
+  icon.textContent = '✅';
+  text.textContent = 'Enregistré';
+}
+
 document.addEventListener('change', (e) => {
   const el = e.target;
-  if (el.id && (el.id.startsWith('cfg_') || el.id.startsWith('mBan') || el.id.startsWith('mKick') || el.id.startsWith('mMute') || el.id.startsWith('mClear'))) {
-    saveConfig();
+  if (el.id && el.id.startsWith('cfg_')) {
+    markUnsaved();
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(async () => {
+      markSaving();
+      await saveConfig();
+      markSaved();
+    }, 500);
   }
 });
 

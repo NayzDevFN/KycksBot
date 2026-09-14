@@ -43,6 +43,12 @@
       <div class="guild-list" id="guildList">
         <div class="guild-loading">Chargement des serveurs...</div>
       </div>
+      <div id="guildError" style="display:none;margin-top:20px;">
+        <p id="guildErrorText" style="color:#e74c3c;font-family:'Patrick Hand',cursive;margin-bottom:12px;"></p>
+        <input type="text" id="apiUrlInput" class="dash-input" placeholder="http://localhost:3000" style="margin-bottom:8px;width:80%;text-align:center;">
+        <br>
+        <button class="dash-btn" onclick="manualConnect()">🔗 Connecter</button>
+      </div>
     </div>
   </div>
 
@@ -642,45 +648,39 @@ let socket = null;
 
 function connectSocket() {
   if (!API) return;
+  if (typeof io === 'undefined') {
+    console.warn('Socket.IO non chargé, mode HTTP uniquement');
+    return;
+  }
   
-  const tryConnect = () => {
-    try {
-      socket = io(API, { transports: ['websocket', 'polling'] });
-      socket.on('connect', () => console.log('Socket connecté'));
-      socket.on('botStatus', (data) => {
-        const statusEl = document.getElementById('dashServers');
-        const usersEl = document.getElementById('dashUsers');
-        const nameEl = document.getElementById('serverName');
-        if (data.online) {
-          if (statusEl) statusEl.textContent = data.servers || 0;
-          if (usersEl) usersEl.textContent = data.users || 0;
-          if (nameEl && nameEl.textContent === 'Hors ligne') nameEl.textContent = 'Kycks Bot';
-        } else {
-          if (statusEl) statusEl.textContent = '0';
-          if (usersEl) usersEl.textContent = '0';
-          if (nameEl) nameEl.textContent = 'Hors ligne';
-        }
-      });
-      socket.on('modAction', (data) => notif(`${data.action.toUpperCase()}: ${data.user}`));
-      socket.on('backupCreated', (data) => { notif(`Backup créée: ${data.name}`); loadBackups(); });
-      socket.on('serverNuked', (data) => { notif(`Nuke fait ! Backup: ${data.backup}`); loadBackups(); });
-      socket.on('configUpdated', () => loadConfig());
-      socket.on('avatarUpdated', (data) => {
-        const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon, #currentAvatar');
-        imgs.forEach(el => el.src = data.path + '?' + Date.now());
-      });
-      socket.on('recordingUpdate', (data) => updateRecordingStatus(data));
-    } catch (e) {
-      console.warn('Socket pas disponible');
-    }
-  };
-
-  if (isGitHubPages() && typeof io === 'undefined') {
-    loadScript(`${API}/socket.io/socket.io.js`).then(tryConnect).catch(() => {
-      console.warn('Socket.io non disponible, mode HTTP uniquement');
+  try {
+    socket = io(API, { transports: ['websocket', 'polling'] });
+    socket.on('connect', () => console.log('Socket connecté'));
+    socket.on('botStatus', (data) => {
+      const statusEl = document.getElementById('dashServers');
+      const usersEl = document.getElementById('dashUsers');
+      const nameEl = document.getElementById('serverName');
+      if (data.online) {
+        if (statusEl) statusEl.textContent = data.servers || 0;
+        if (usersEl) usersEl.textContent = data.users || 0;
+        if (nameEl && nameEl.textContent === 'Hors ligne') nameEl.textContent = 'Kycks Bot';
+      } else {
+        if (statusEl) statusEl.textContent = '0';
+        if (usersEl) usersEl.textContent = '0';
+        if (nameEl) nameEl.textContent = 'Hors ligne';
+      }
     });
-  } else {
-    tryConnect();
+    socket.on('modAction', (data) => notif(`${data.action.toUpperCase()}: ${data.user}`));
+    socket.on('backupCreated', (data) => { notif(`Backup créée: ${data.name}`); loadBackups(); });
+    socket.on('serverNuked', (data) => { notif(`Nuke fait ! Backup: ${data.backup}`); loadBackups(); });
+    socket.on('configUpdated', () => loadConfig());
+    socket.on('avatarUpdated', (data) => {
+      const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon, #currentAvatar');
+      imgs.forEach(el => el.src = data.path + '?' + Date.now());
+    });
+    socket.on('recordingUpdate', (data) => updateRecordingStatus(data));
+  } catch (e) {
+    console.warn('Socket pas disponible:', e.message);
   }
 }
 
@@ -692,20 +692,53 @@ let selectedGuildId = localStorage.getItem('selectedGuildId') || null;
 
 // ===================== INIT =====================
 window.onload = async function() {
+  API = getApiUrl() || window.location.origin;
+
   if (isGitHubPages() && !getApiUrl()) {
     const url = prompt('🔗 Entrez l\'URL de l\'API du bot\n\nExemples :\n- https://xxxx.ngrok-free.app\n- http://85.12.34.56:3000');
     if (url) {
       setApiUrl(url);
       API = url;
     } else {
-      document.getElementById('guildList').innerHTML = '<div class="guild-loading">❌ URL requise pour se connecter au bot.<br><button class="dash-btn" onclick="changeApiUrl()" style="margin-top:12px">Configurer l\'URL</button></div>';
+      document.getElementById('guildList').innerHTML = '';
+      document.getElementById('guildError').style.display = 'block';
+      document.getElementById('guildErrorText').textContent = '❌ URL requise pour se connecter au bot.';
       return;
     }
   }
-  API = getApiUrl() || window.location.origin;
+
+  await loadSocketIO();
   connectSocket();
   await loadGuilds();
 };
+
+async function loadSocketIO() {
+  if (typeof io !== 'undefined') return;
+  const urls = [
+    `${API}/socket.io/socket.io.js`,
+    'https://cdn.socket.io/4.7.5/socket.io.min.js'
+  ];
+  for (const url of urls) {
+    try {
+      await loadScript(url);
+      if (typeof io !== 'undefined') return;
+    } catch {}
+  }
+  console.warn('Socket.IO non disponible, mode HTTP uniquement');
+}
+
+function manualConnect() {
+  const url = document.getElementById('apiUrlInput').value.trim();
+  if (!url) return;
+  setApiUrl(url);
+  API = url;
+  document.getElementById('guildError').style.display = 'none';
+  document.getElementById('guildList').innerHTML = '<div class="guild-loading">Connexion...</div>';
+  loadSocketIO().then(() => {
+    connectSocket();
+    loadGuilds();
+  });
+}
 
 function changeApiUrl() {
   const url = prompt('🔗 URL de l\'API du bot :');
@@ -717,16 +750,24 @@ function changeApiUrl() {
 
 async function loadGuilds(retryCount) {
   retryCount = retryCount || 0;
+  const list = document.getElementById('guildList');
+  const errorDiv = document.getElementById('guildError');
+  const errorText = document.getElementById('guildErrorText');
+  if (errorDiv) errorDiv.style.display = 'none';
+
   try {
     const res = await fetch(`${API}/api/guilds`);
     const data = await res.json();
-    const list = document.getElementById('guildList');
     if (data.ready === false || !data.guilds || data.guilds.length === 0) {
       if (retryCount < 20) {
-        setTimeout(() => loadGuilds(retryCount + 1), 5000);
+        setTimeout(() => loadGuilds(retryCount + 1), 3000);
         list.innerHTML = '<div class="guild-loading">⏳ Bot en cours de connexion... (' + (retryCount + 1) + ')</div>';
       } else {
-        list.innerHTML = '<div class="guild-loading">Bot non connecté.<br><button class="dash-btn" onclick="loadGuilds()" style="margin-top:12px">🔄 Réessayer</button></div>';
+        list.innerHTML = '';
+        if (errorDiv) {
+          errorDiv.style.display = 'block';
+          errorText.textContent = '❌ Bot non connecté ou pas de serveurs. Vérifie que le bot tourne et que l\'URL est correcte.';
+        }
       }
       return;
     }
@@ -742,12 +783,11 @@ async function loadGuilds(retryCount) {
       selectGuild(selectedGuildId);
     }
   } catch (e) {
-    const list = document.getElementById('guildList');
-    if (retryCount < 20) {
-      setTimeout(() => loadGuilds(retryCount + 1), 5000);
-      list.innerHTML = '<div class="guild-loading">⏳ Connexion au serveur... (' + (retryCount + 1) + ')</div>';
-    } else {
-      list.innerHTML = '<div class="guild-loading">Impossible de joindre le bot.<br><button class="dash-btn" onclick="loadGuilds()" style="margin-top:12px">🔄 Réessayer</button></div>';
+    console.error('loadGuilds error:', e);
+    list.innerHTML = '';
+    if (errorDiv) {
+      errorDiv.style.display = 'block';
+      errorText.textContent = '❌ Impossible de joindre le bot (' + e.message + '). Vérifie que node api.js est lancé.';
     }
   }
 }

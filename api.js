@@ -76,7 +76,9 @@ setInterval(() => sendLiveStats(io), 10000);
 app.get('/api/guilds', async (req, res) => {
   try {
     const client = bot.client;
-    if (!client.isReady()) return res.json({ guilds: [] });
+    const ready = client.isReady();
+    console.log(`[API] /api/guilds - ready: ${ready}, guilds: ${client.guilds.cache.size}`);
+    if (!ready) return res.json({ guilds: [] });
     const guilds = client.guilds.cache.map(g => ({
       id: g.id,
       name: g.name,
@@ -84,8 +86,10 @@ app.get('/api/guilds', async (req, res) => {
       memberCount: g.memberCount,
       owner: g.ownerId
     }));
+    console.log(`[API] Returning ${guilds.length} guilds:`, guilds.map(g => g.name));
     res.json({ guilds });
   } catch (error) {
+    console.error('[API] /api/guilds error:', error.message);
     res.json({ guilds: [] });
   }
 });

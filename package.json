@@ -14,11 +14,14 @@
     "install-deps": "npm install --production"
   },
   "dependencies": {
+    "@discordjs/voice": "^0.19.2",
     "cors": "^2.8.5",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "socket.io": "^4.8.3"
+    "opusscript": "^0.0.8",
+    "socket.io": "^4.8.3",
+    "tweetnacl": "^1.0.3"
   },
   "keywords": [
     "discord-bot",

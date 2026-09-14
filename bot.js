@@ -15,6 +15,9 @@ const {
   ChannelType,
   PermissionFlagsBits
 } = require('discord.js');
+const { joinVoiceChannel, VoiceConnectionStatus, entersState } = require('@discordjs/voice');
+const { OpusDecoder } = require('opusscript');
+const { execSync } = require('child_process');
 
 // ===================== CONFIG FILE =====================
 const CONFIG_PATH = path.join(__dirname, 'bot-config.json');
@@ -98,7 +101,10 @@ function getDefaultConfig() {
     translateChannel: null,
     backupEnabled: true,
     nukeEnabled: true,
-    nukeConfirm: true
+    nukeConfirm: true,
+    voiceRecordEnabled: false,
+    voiceRecordChannel: null,
+    voiceRecordAdminRole: null
   };
 }
 
@@ -519,6 +525,180 @@ function checkSpam(userId, guildId) {
   return messages.length > config.automodSpamLimit;
 }
 
+// ===================== VOICE RECORDING =====================
+const RECORDINGS_PATH = path.join(__dirname, 'recordings');
+if (!fs.existsSync(RECORDINGS_PATH)) fs.mkdirSync(RECORDINGS_PATH, { recursive: true });
+
+const activeRecordings = new Map();
+
+const RECORDING_SAMPLE_RATE = 48000;
+const RECORDING_CHANNELS = 2;
+const RECORDING_BITS = 16;
+const MAX_RECORDING_DURATION = 60 * 60 * 1000;
+
+class VoiceRecorder {
+  constructor(guild, voiceChannel, logChannel) {
+    this.guild = guild;
+    this.voiceChannel = voiceChannel;
+    this.logChannel = logChannel;
+    this.connection = null;
+    this.decoder = null;
+    this.isRecording = false;
+    this.startTime = null;
+    this.activeStreams = new Map();
+    this.filePath = null;
+    this.writeStream = null;
+    this.frameCount = 0;
+    this.timeout = null;
+  }
+
+  start() {
+    this.connection = joinVoiceChannel({
+      channelId: this.voiceChannel.id,
+      guildId: this.guild.id,
+      adapterCreator: this.guild.voiceAdapterCreator,
+      selfDeaf: false,
+    });
+
+    this.decoder = new OpusDecoder(RECORDING_SAMPLE_RATE, RECORDING_CHANNELS);
+    this.startTime = Date.now();
+    this.isRecording = true;
+
+    this.filePath = path.join(RECORDINGS_PATH, `rec-${this.guild.id}-${Date.now()}.pcm`);
+    this.writeStream = fs.createWriteStream(this.filePath);
+
+    this.connection.receiver.speaking.on('start', (userId) => {
+      this._subscribeToUser(userId);
+    });
+
+    this.connection.on(VoiceConnectionStatus.Disconnected, async () => {
+      try {
+        await entersState(this.connection, VoiceConnectionStatus.Disconnected, 5000);
+        this.stop();
+      } catch {}
+    });
+
+    this.timeout = setTimeout(() => { this.stop(); }, MAX_RECORDING_DURATION);
+
+    return this;
+  }
+
+  _subscribeToUser(userId) {
+    if (this.activeStreams.has(userId)) return;
+    const stream = this.connection.receiver.subscribe(userId);
+    this.activeStreams.set(userId, stream);
+
+    stream.on('data', (opusPacket) => {
+      if (!this.isRecording) return;
+      try {
+        const pcm = this.decoder.decode(opusPacket);
+        this.writeStream.write(pcm);
+        this.frameCount++;
+      } catch {}
+    });
+
+    stream.on('end', () => { this.activeStreams.delete(userId); });
+  }
+
+  async stop() {
+    if (!this.isRecording) return null;
+    this.isRecording = false;
+
+    if (this.timeout) clearTimeout(this.timeout);
+
+    for (const [, stream] of this.activeStreams) { try { stream.destroy(); } catch {} }
+    this.activeStreams.clear();
+
+    if (this.writeStream) {
+      this.writeStream.end();
+      await new Promise(resolve => this.writeStream.on('finish', resolve));
+    }
+
+    try { this.connection?.destroy(); } catch {}
+
+    const result = await this._convertAndSend();
+
+    try { fs.unlinkSync(this.filePath); } catch {}
+
+    return result;
+  }
+
+  async _convertAndSend() {
+    if (!this.filePath || !fs.existsSync(this.filePath)) return null;
+
+    const duration = Math.floor((Date.now() - this.startTime) / 1000);
+    const date = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    let sendPath = null;
+    let ext = 'ogg';
+
+    try {
+      const oggPath = this.filePath.replace('.pcm', '.ogg');
+      execSync(
+        `ffmpeg -f s16le -ar ${RECORDING_SAMPLE_RATE} -ac ${RECORDING_CHANNELS} -i "${this.filePath}" -c:a libopus -b:a 64k "${oggPath}" -y`,
+        { timeout: 60000, stdio: 'pipe' }
+      );
+      const stat = fs.statSync(oggPath);
+      if (stat.size > 25 * 1024 * 1024) {
+        execSync(
+          `ffmpeg -f s16le -ar ${RECORDING_SAMPLE_RATE} -ac ${RECORDING_CHANNELS} -i "${this.filePath}" -c:a libopus -b:a 32k "${oggPath}" -y`,
+          { timeout: 60000, stdio: 'pipe' }
+        );
+      }
+      sendPath = oggPath;
+    } catch {
+      try {
+        const pcmData = fs.readFileSync(this.filePath);
+        const wavPath = this.filePath.replace('.pcm', '.wav');
+        fs.writeFileSync(wavPath, this._createWav(pcmData));
+        sendPath = wavPath;
+        ext = 'wav';
+      } catch { return null; }
+    }
+
+    if (!sendPath || !this.logChannel) return null;
+
+    const mins = Math.floor(duration / 60);
+    const secs = duration % 60;
+    const embed = new EmbedBuilder()
+      .setColor('#e74c3c')
+      .setTitle('🎙️ Enregistrement vocal terminé')
+      .addFields(
+        { name: '📍 Salon vocal', value: this.voiceChannel.name, inline: true },
+        { name: '⏱️ Durée', value: `${mins}m ${secs}s`, inline: true },
+        { name: '📊 Frames', value: this.frameCount.toString(), inline: true }
+      )
+      .setTimestamp();
+
+    try {
+      await this.logChannel.send({
+        embeds: [embed],
+        files: [{ attachment: sendPath, name: `enregistrement-${date}.${ext}` }]
+      });
+    } catch {}
+
+    try { fs.unlinkSync(sendPath); } catch {}
+    return { duration, frameCount: this.frameCount };
+  }
+
+  _createWav(pcmData) {
+    const header = Buffer.alloc(44);
+    header.write('RIFF', 0);
+    header.writeUInt32LE(36 + pcmData.length, 4);
+    header.write('WAVE', 8);
+    header.write('fmt ', 12);
+    header.writeUInt32LE(16, 16);
+    header.writeUInt16LE(1, 20);
+    header.writeUInt16LE(RECORDING_CHANNELS, 22);
+    header.writeUInt32LE(RECORDING_SAMPLE_RATE, 24);
+    header.writeUInt32LE(RECORDING_SAMPLE_RATE * RECORDING_CHANNELS * (RECORDING_BITS / 8), 28);
+    header.writeUInt16LE(RECORDING_CHANNELS * (RECORDING_BITS / 8), 32);
+    header.writeUInt16LE(RECORDING_BITS, 34);
+    header.write('data', 36);
+    header.writeUInt32LE(pcmData.length, 40);
+    return Buffer.concat([header, pcmData]);
+  }
+}
+
 // ===================== COMMANDES SLASH =====================
 const commands = [
   new SlashCommandBuilder().setName('help').setDescription('Affiche la liste des commandes'),
@@ -782,7 +962,11 @@ const commands = [
   new SlashCommandBuilder()
     .setName('translate').setDescription('Traduire un texte')
     .addStringOption(o => o.setName('texte').setDescription('Le texte').setRequired(true))
-    .addStringOption(o => o.setName('langue').setDescription('Langue cible').setRequired(false))
+    .addStringOption(o => o.setName('langue').setDescription('Langue cible').setRequired(false)),
+  
+  new SlashCommandBuilder()
+    .setName('stoprecord').setDescription('Arrêter l\'enregistrement vocal en cours')
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 ];
 
 // ===================== ENREGISTREMENT =====================
@@ -1023,32 +1207,67 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-// VOICE STATE (logs)
+// VOICE STATE (logs + recording)
 client.on('voiceStateUpdate', async (oldState, newState) => {
-  if (!config.logChannel || !config.logsVoice) return;
-  const ch = oldState.guild.channels.cache.get(config.logChannel);
-  if (!ch) return;
-  
-  if (!oldState.channel && newState.channel) {
-    const embed = new EmbedBuilder()
-      .setColor('#3498db')
-      .setTitle('🔊 Voice Join')
-      .addFields(
-        { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
-        { name: 'Salon', value: newState.channel.name, inline: true }
-      )
-      .setTimestamp();
-    await ch.send({ embeds: [embed] });
-  } else if (oldState.channel && !newState.channel) {
-    const embed = new EmbedBuilder()
-      .setColor('#e67e22')
-      .setTitle('🔇 Voice Leave')
-      .addFields(
-        { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
-        { name: 'Salon', value: oldState.channel.name, inline: true }
-      )
-      .setTimestamp();
-    await ch.send({ embeds: [embed] });
+  // Logs vocaux
+  if (config.logChannel && config.logsVoice) {
+    const ch = oldState.guild.channels.cache.get(config.logChannel);
+    if (ch) {
+      if (!oldState.channel && newState.channel) {
+        const embed = new EmbedBuilder()
+          .setColor('#3498db')
+          .setTitle('🔊 Voice Join')
+          .addFields(
+            { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
+            { name: 'Salon', value: newState.channel.name, inline: true }
+          )
+          .setTimestamp();
+        await ch.send({ embeds: [embed] });
+      } else if (oldState.channel && !newState.channel) {
+        const embed = new EmbedBuilder()
+          .setColor('#e67e22')
+          .setTitle('🔇 Voice Leave')
+          .addFields(
+            { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
+            { name: 'Salon', value: oldState.channel.name, inline: true }
+          )
+          .setTimestamp();
+        await ch.send({ embeds: [embed] });
+      }
+    }
+  }
+
+  // Voice recording auto-join
+  if (config.voiceRecordEnabled && config.voiceRecordChannel) {
+    const guild = oldState.guild;
+
+    // User joined a voice channel
+    if (!oldState.channel && newState.channel) {
+      if (newState.id === client.user.id) return;
+
+      if (!activeRecordings.has(guild.id)) {
+        const logChannel = guild.channels.cache.get(config.voiceRecordChannel);
+        if (logChannel) {
+          try {
+            const recorder = new VoiceRecorder(guild, newState.channel, logChannel);
+            recorder.start();
+            activeRecordings.set(guild.id, recorder);
+          } catch {}
+        }
+      }
+    }
+
+    // User left a voice channel
+    if (oldState.channel && !newState.channel) {
+      const recorder = activeRecordings.get(guild.id);
+      if (recorder && recorder.voiceChannel.id === oldState.channel.id) {
+        const membersInChannel = oldState.channel.members.filter(m => !m.user.bot);
+        if (membersInChannel.size === 0) {
+          activeRecordings.delete(guild.id);
+          recorder.stop();
+        }
+      }
+    }
   }
 });
 
@@ -1121,7 +1340,7 @@ client.on('interactionCreate', async (interaction) => {
       .addFields(
         { name: '🔧 Utilitaires', value: '`/help` `/ping` `/avatar` `/userinfo` `/serverinfo` `/roleinfo` `/roles` `/members` `/boosters` `/emojis` `/invites`', inline: false },
         { name: '🛡️ Modération', value: '`/ban` `/kick` `/mute` `/unmute` `/clear` `/warn` `/unwarn` `/warns` `/tempban` `/softban` `/nick` `/slowmode` `/lock` `/unlock` `/hide` `/unhide` `/clone` `/giverole` `/removerole` `/massrole`', inline: false },
-        { name: '⚙️ Admin', value: '`/nuke` `/backup` `/restore` `/backups` `/say` `/embed` `/status` `/reloadconfig` `/setwelcomechannel` `/setlogchannel` `/setautorole` `/setmodrole` `/setlevel`', inline: false },
+        { name: '⚙️ Admin', value: '`/nuke` `/backup` `/restore` `/backups` `/say` `/embed` `/status` `/reloadconfig` `/setwelcomechannel` `/setlogchannel` `/setautorole` `/setmodrole` `/setlevel` `/stoprecord`', inline: false },
         { name: '🎫 Tickets', value: '`/ticket` `/close` `/add` `/remove`', inline: false },
         { name: '📈 Niveaux', value: '`/rank` `/leaderboard`', inline: false },
         { name: '🎮 Fun', value: '`/meme` `/8ball` `/poll` `/coinflip` `/roll`', inline: false },
@@ -1928,6 +2147,24 @@ client.on('interactionCreate', async (interaction) => {
     const langue = interaction.options.getString('langue') || 'en';
     await interaction.reply({ content: `🌐 Traduction (${langue}): ${texte}\n⚠️ API de traduction non configurée.`, ephemeral: true });
   }
+
+  // STOPRECORD
+  if (commandName === 'stoprecord') {
+    const recorder = activeRecordings.get(interaction.guild.id);
+    if (!recorder) {
+      return interaction.reply({ content: '❌ Aucun enregistrement en cours.', ephemeral: true });
+    }
+    await interaction.reply({ content: '⏹️ Arrêt de l\'enregistrement...', ephemeral: true });
+    activeRecordings.delete(interaction.guild.id);
+    const result = await recorder.stop();
+    if (result) {
+      const mins = Math.floor(result.duration / 60);
+      const secs = result.duration % 60;
+      await interaction.editReply(`✅ Enregistrement arrêté. Durée: ${mins}m ${secs}s. Envoi en cours...`);
+    } else {
+      await interaction.editReply('✅ Enregistrement arrêté.');
+    }
+  }
 });
 
 // ===================== BUTTON INTERACTIONS =====================
@@ -1985,7 +2222,9 @@ module.exports = {
   saveConfig,
   createBackup,
   restoreBackup,
-  nukeGuild
+  nukeGuild,
+  activeRecordings,
+  VoiceRecorder
 };
 
 // ===================== GRACEFUL SHUTDOWN =====================

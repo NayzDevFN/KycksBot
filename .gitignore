@@ -19,4 +19,5 @@ Thumbs.db
 bot.db
 settings.json
 backups/
+recordings/
 nuke-error.log

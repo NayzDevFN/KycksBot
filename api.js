@@ -240,6 +240,39 @@ app.post('/api/send', async (req, res) => {
   } catch (error) { res.json({ success: false, message: error.message }); }
 });
 
+// ===================== VOICE RECORDING STATUS =====================
+app.get('/api/recordings/status', (req, res) => {
+  try {
+    const recordings = [];
+    for (const [guildId, recorder] of bot.activeRecordings) {
+      recordings.push({
+        guildId,
+        voiceChannel: recorder.voiceChannel?.name || 'Inconnu',
+        startTime: recorder.startTime,
+        isRecording: recorder.isRecording,
+        frameCount: recorder.frameCount,
+        duration: recorder.isRecording ? Math.floor((Date.now() - recorder.startTime) / 1000) : 0
+      });
+    }
+    res.json({ recordings, enabled: bot.config.voiceRecordEnabled });
+  } catch (error) {
+    res.json({ recordings: [], enabled: false });
+  }
+});
+
+app.post('/api/recordings/stop', async (req, res) => {
+  try {
+    const { guildId } = req.body;
+    const recorder = bot.activeRecordings.get(guildId);
+    if (!recorder) return res.json({ success: false, message: 'Aucun enregistrement en cours' });
+    bot.activeRecordings.delete(guildId);
+    await recorder.stop();
+    res.json({ success: true, message: 'Enregistrement arrêté' });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+});
+
 // ===================== AVATAR =====================
 app.get('/api/avatar', (req, res) => res.json({ avatar: getSetting('botAvatar') }));
 

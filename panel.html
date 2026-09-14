@@ -56,6 +56,7 @@
         <a class="dash-item" onclick="showTab('custom')"><span class="dash-icon">✨</span> Commandes Custom</a>
         <a class="dash-item" onclick="showTab('starboard')"><span class="dash-icon">⭐</span> Starboard</a>
         <a class="dash-item" onclick="showTab('reactionrole')"><span class="dash-icon">🎭</span> Reaction Role</a>
+        <a class="dash-item" onclick="showTab('voicerecord')"><span class="dash-icon">🎙️</span> Enregistrement Vocal</a>
         <a class="dash-item" onclick="showTab('backup')"><span class="dash-icon">💾</span> Backup & Nuke</a>
       </div>
       <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="dash-invite-btn" target="_blank">+ Inviter le Bot</a>
@@ -433,6 +434,41 @@
         </div>
       </div>
       
+      <!-- ENREGISTREMENT VOCAL -->
+      <div class="dash-tab" id="tab-voicerecord">
+        <h3>🎙️ Enregistrement Vocal Automatique</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🎙️</span><div><span class="setting-name">Enregistrement Activé</span><span class="setting-desc">Rejoint automatiquement les salons vocaux et enregistre</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_voiceRecordEnabled"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Salon d'envoi des enregistrements</span><span class="setting-desc">Salon où les enregistrements sont envoyés (admin only)</span></div></div>
+          <div class="setting-input"><select id="cfg_voiceRecordChannel" class="dash-input"><option value="">Aucun salon</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🛡️</span><div><span class="setting-name">Rôle Admin Enregistrements</span><span class="setting-desc">Rôle qui peut voir les enregistrements (configurez les permissions du salon)</span></div></div>
+          <div class="setting-input"><select id="cfg_voiceRecordAdminRole" class="dash-input"><option value="">Aucun rôle</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card" style="border-color: #f39c12;">
+          <div class="setting-header"><span class="setting-icon">ℹ️</span><div><span class="setting-name">Comment ça marche</span></div></div>
+          <div style="font-family:'Patrick Hand',cursive; color: var(--text); line-height: 1.8;">
+            <p>1. Active l'enregistrement ci-dessus</p>
+            <p>2. Configure le salon d'envoi des enregistrements</p>
+            <p>3. Le bot rejoint automatiquement quand quelqu'un rejoint un salon vocal</p>
+            <p>4. L'enregistrement s'arrête quand tout le monde quitte le salon</p>
+            <p>5. Le fichier audio est envoyé dans le salon configuré</p>
+            <p style="color: #e74c3c; margin-top: 10px;">⚠️ N'oublie pas de configurer les permissions du salon pour que seuls les admins puissent voir les enregistrements !</p>
+            <p style="color: #3498db;">💡 Commande /stoprecord pour arrêter manuellement un enregistrement</p>
+          </div>
+        </div>
+        <div class="setting-card" id="recordingStatusCard" style="border-color: #2ecc71; display:none;">
+          <div class="setting-header"><span class="setting-icon">🔴</span><div><span class="setting-name">Enregistrement en cours</span></div></div>
+          <div style="font-family:'Patrick Hand',cursive;">
+            <p id="recordingStatus">Aucun enregistrement actif</p>
+          </div>
+        </div>
+      </div>
+      
       <!-- BACKUP & NUKE -->
       <div class="dash-tab" id="tab-backup">
         <h3>💾 Backup & Nuke</h3>
@@ -514,6 +550,10 @@ socket.on('avatarUpdated', (data) => {
   imgs.forEach(el => el.src = data.path + '?' + Date.now());
 });
 
+socket.on('recordingUpdate', (data) => {
+  updateRecordingStatus(data);
+});
+
 // ===================== INIT =====================
 window.onload = async function() {
   await loadSelectors();
@@ -521,6 +561,7 @@ window.onload = async function() {
   await loadBackups();
   loadStats();
   renderCustomCmds();
+  checkRecordingStatus();
 };
 
 // ===================== LOAD SELECTORS =====================
@@ -570,6 +611,8 @@ function populateSelectors() {
   setSelectOptions('cfg_autoRole', nullRole + roleOptions);
   setSelectOptions('cfg_logChannel', nullChannel + channelOptions);
   setSelectOptions('cfg_starboardChannel', nullChannel + channelOptions);
+  setSelectOptions('cfg_voiceRecordChannel', nullChannel + channelOptions);
+  setSelectOptions('cfg_voiceRecordAdminRole', nullRole + roleOptions);
 }
 
 function setSelectOptions(id, html) {
@@ -654,6 +697,10 @@ function applyConfig() {
   setVal('cfg_starboardThreshold', currentConfig.starboardThreshold);
   
   setVal('cfg_reactionRoleMessage', currentConfig.reactionRoleMessage);
+  
+  setCheck('cfg_voiceRecordEnabled', currentConfig.voiceRecordEnabled);
+  setSelectVal('cfg_voiceRecordChannel', currentConfig.voiceRecordChannel);
+  setSelectVal('cfg_voiceRecordAdminRole', currentConfig.voiceRecordAdminRole);
   
   customCommands = currentConfig.customCommands || [];
 }
@@ -747,6 +794,10 @@ async function saveConfig() {
   
   currentConfig.reactionRoleMessage = getVal('cfg_reactionRoleMessage') || null;
   currentConfig.customCommands = customCommands;
+  
+  currentConfig.voiceRecordEnabled = getCheck('cfg_voiceRecordEnabled');
+  currentConfig.voiceRecordChannel = getVal('cfg_voiceRecordChannel') || null;
+  currentConfig.voiceRecordAdminRole = getVal('cfg_voiceRecordAdminRole') || null;
   
   try {
     const res = await fetch(`${API}/api/config`, {
@@ -960,6 +1011,33 @@ async function loadStats() {
   }
 }
 
+// ===================== RECORDING STATUS =====================
+async function checkRecordingStatus() {
+  try {
+    const res = await fetch(`${API}/api/recordings/status`);
+    const data = await res.json();
+    updateRecordingStatus(data);
+  } catch {}
+}
+
+function updateRecordingStatus(data) {
+  const card = document.getElementById('recordingStatusCard');
+  const status = document.getElementById('recordingStatus');
+  if (!card || !status) return;
+
+  if (data.recordings && data.recordings.length > 0) {
+    card.style.display = 'block';
+    const r = data.recordings[0];
+    const mins = Math.floor(r.duration / 60);
+    const secs = r.duration % 60;
+    status.innerHTML = `🔴 <strong>Enregistrement actif</strong><br>📍 Salon: ${r.voiceChannel}<br>⏱️ Durée: ${mins}m ${secs}s<br>📊 Frames: ${r.frameCount}`;
+  } else {
+    card.style.display = 'none';
+  }
+}
+
+setInterval(checkRecordingStatus, 5000);
+
 // ===================== TABS =====================
 function showTab(tab) {
   document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
@@ -972,7 +1050,8 @@ function showTab(tab) {
     automod: '🤖 Automod', moderation: '🛡️ Modération', tickets: '🎫 Tickets',
     levels: '📈 Niveaux', music: '🎵 Musique', autorole: '🎭 Autorole',
     logs: '📋 Logs', custom: '✨ Commandes Custom', starboard: '⭐ Starboard',
-    reactionrole: '🎭 Reaction Role', backup: '💾 Backup & Nuke'
+    reactionrole: '🎭 Reaction Role', voicerecord: '🎙️ Enregistrement Vocal',
+    backup: '💾 Backup & Nuke'
   };
   document.getElementById('panelTitle').textContent = titles[tab] || 'Panel de Contrôle';
 }

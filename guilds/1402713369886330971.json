@@ -1,6 +1,6 @@
 {
   "status": "En ligne 🟢",
-  "prefix": "/",
+  "prefix": "!",
   "welcomeMessage": "Bienvenue {user} sur {server} !",
   "goodbyeMessage": "{user} a quitté le serveur.",
   "welcomeChannel": null,

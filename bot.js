@@ -1030,6 +1030,10 @@ const commands = [
   
   new SlashCommandBuilder()
     .setName('stoprecord').setDescription('Arrêter l\'enregistrement vocal en cours')
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+  
+  new SlashCommandBuilder()
+    .setName('panel').setDescription('Ouvrir le panel de contrôle du bot')
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 ];
 
@@ -1434,6 +1438,35 @@ client.on('interactionCreate', async (interaction) => {
   
   const { commandName } = interaction;
   const gCfg = interaction.guild ? cfg(interaction.guild.id) : getDefaultConfig();
+  
+  // PANEL
+  if (commandName === 'panel') {
+    const panelUrl = process.env.PANEL_URL || `http://localhost:${process.env.PORT || 3000}/panel`;
+    const embed = new EmbedBuilder()
+      .setColor(gCfg.embedColor)
+      .setTitle('📋 Panel de Contrôle')
+      .setDescription('Gère ton serveur directement depuis le panel web.')
+      .addFields(
+        { name: '🌐 Accès au panel', value: `[Clique ici pour ouvrir le panel](${panelUrl})`, inline: false },
+        { name: '⚙️ Fonctionnalités', value: '• Configuration générale\n• Automodération\n• Modération\n• Tickets\n• Niveaux\n• Musique\n• Logs\n• Backup & Nuke', inline: false }
+      )
+      .setThumbnail(interaction.client.user.displayAvatarURL())
+      .setTimestamp();
+    
+    const row = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+          .setLabel('📋 Ouvrir le Panel')
+          .setURL(panelUrl)
+          .setStyle(ButtonStyle.Link),
+        new ButtonBuilder()
+          .setLabel('➕ Inviter le Bot')
+          .setURL('https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot+applications.commands&permissions=8')
+          .setStyle(ButtonStyle.Link)
+      );
+    
+    await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+  }
   
   // HELP
   if (commandName === 'help') {

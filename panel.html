@@ -643,11 +643,7 @@ function isGitHubPages() {
   return window.location.hostname.includes('github.io');
 }
 
-let API = isGitHubPages() ? (getApiUrl() || 'http://localhost:3000') : window.location.origin;
-
-if (isGitHubPages() && !localStorage.getItem('botApiUrl')) {
-  localStorage.setItem('botApiUrl', 'http://localhost:3000');
-}
+let API = isGitHubPages() ? (getApiUrl() || '') : window.location.origin;
 let socket = null;
 
 function connectSocket() {

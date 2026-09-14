@@ -667,12 +667,12 @@ async function loadGuilds(retryCount) {
     const res = await fetch(`${API}/api/guilds`);
     const data = await res.json();
     const list = document.getElementById('guildList');
-    if (!data.guilds || data.guilds.length === 0) {
-      if (retryCount < 10) {
-        setTimeout(() => loadGuilds(retryCount + 1), 3000);
-        list.innerHTML = '<div class="guild-loading">⏳ Bot en cours de démarrage... (' + (retryCount + 1) + '/10)</div>';
+    if (data.ready === false || !data.guilds || data.guilds.length === 0) {
+      if (retryCount < 20) {
+        setTimeout(() => loadGuilds(retryCount + 1), 5000);
+        list.innerHTML = '<div class="guild-loading">⏳ Bot en cours de connexion... (' + (retryCount + 1) + ')</div>';
       } else {
-        list.innerHTML = '<div class="guild-loading">Aucun serveur trouvé. Ajoute le bot à un serveur !</div>';
+        list.innerHTML = '<div class="guild-loading">Bot non connecté.<br><button class="dash-btn" onclick="loadGuilds()" style="margin-top:12px">🔄 Réessayer</button></div>';
       }
       return;
     }
@@ -689,11 +689,11 @@ async function loadGuilds(retryCount) {
     }
   } catch (e) {
     const list = document.getElementById('guildList');
-    if (retryCount < 10) {
-      setTimeout(() => loadGuilds(retryCount + 1), 3000);
-      list.innerHTML = '<div class="guild-loading">⏳ Connexion au bot... (' + (retryCount + 1) + '/10)</div>';
+    if (retryCount < 20) {
+      setTimeout(() => loadGuilds(retryCount + 1), 5000);
+      list.innerHTML = '<div class="guild-loading">⏳ Connexion au serveur... (' + (retryCount + 1) + ')</div>';
     } else {
-      list.innerHTML = '<div class="guild-loading">Bot non connecté. Lance node api.js</div>';
+      list.innerHTML = '<div class="guild-loading">Impossible de joindre le bot.<br><button class="dash-btn" onclick="loadGuilds()" style="margin-top:12px">🔄 Réessayer</button></div>';
     }
   }
 }

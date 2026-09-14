@@ -78,19 +78,26 @@ app.get('/api/guilds', async (req, res) => {
     const client = bot.client;
     const ready = client.isReady();
     console.log(`[API] /api/guilds - ready: ${ready}, guilds: ${client.guilds.cache.size}`);
-    if (!ready) return res.json({ guilds: [] });
-    const guilds = client.guilds.cache.map(g => ({
-      id: g.id,
-      name: g.name,
-      icon: g.iconURL(),
-      memberCount: g.memberCount,
-      owner: g.ownerId
-    }));
-    console.log(`[API] Returning ${guilds.length} guilds:`, guilds.map(g => g.name));
-    res.json({ guilds });
+    if (!ready) return res.json({ guilds: [], ready: false });
+    const guilds = [];
+    client.guilds.cache.forEach(g => {
+      try {
+        guilds.push({
+          id: g.id,
+          name: g.name,
+          icon: g.icon ? g.iconURL({ size: 128 }) : null,
+          memberCount: g.memberCount,
+          owner: g.ownerId
+        });
+      } catch (e) {
+        console.error(`[API] Guild error ${g.id}:`, e.message);
+      }
+    });
+    console.log(`[API] Returning ${guilds.length} guilds`);
+    res.json({ guilds, ready: true });
   } catch (error) {
     console.error('[API] /api/guilds error:', error.message);
-    res.json({ guilds: [] });
+    res.json({ guilds: [], ready: false });
   }
 });
 

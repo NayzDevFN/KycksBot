@@ -72,6 +72,24 @@ function sendLiveStats(target) {
 // Broadcast live stats every 10 seconds
 setInterval(() => sendLiveStats(io), 10000);
 
+// ===================== GUILDS LIST =====================
+app.get('/api/guilds', async (req, res) => {
+  try {
+    const client = bot.client;
+    if (!client.isReady()) return res.json({ guilds: [] });
+    const guilds = client.guilds.cache.map(g => ({
+      id: g.id,
+      name: g.name,
+      icon: g.iconURL(),
+      memberCount: g.memberCount,
+      owner: g.ownerId
+    }));
+    res.json({ guilds });
+  } catch (error) {
+    res.json({ guilds: [] });
+  }
+});
+
 // ===================== STATS =====================
 app.get('/api/stats', async (req, res) => {
   try {
@@ -118,8 +136,9 @@ app.post('/api/config', (req, res) => {
 // ===================== MODERATION =====================
 app.post('/api/ban', async (req, res) => {
   try {
-    const { userId, reason } = req.body;
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const { userId, reason, guildId } = req.body;
+    const gid = guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     const member = await guild.members.fetch(userId);
     await member.ban({ reason: reason || 'Banni depuis le panel web' });
     io.emit('modAction', { action: 'ban', user: member.user.username });
@@ -129,8 +148,9 @@ app.post('/api/ban', async (req, res) => {
 
 app.post('/api/kick', async (req, res) => {
   try {
-    const { userId, reason } = req.body;
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const { userId, reason, guildId } = req.body;
+    const gid = guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     const member = await guild.members.fetch(userId);
     await member.kick(reason || 'Expulsé depuis le panel web');
     io.emit('modAction', { action: 'kick', user: member.user.username });
@@ -140,8 +160,9 @@ app.post('/api/kick', async (req, res) => {
 
 app.post('/api/mute', async (req, res) => {
   try {
-    const { userId, duration } = req.body;
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const { userId, duration, guildId } = req.body;
+    const gid = guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     const member = await guild.members.fetch(userId);
     await member.timeout((duration || 10) * 60 * 1000);
     io.emit('modAction', { action: 'mute', user: member.user.username });
@@ -151,8 +172,9 @@ app.post('/api/mute', async (req, res) => {
 
 app.post('/api/unmute', async (req, res) => {
   try {
-    const { userId } = req.body;
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const { userId, guildId } = req.body;
+    const gid = guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     const member = await guild.members.fetch(userId);
     await member.timeout(null);
     res.json({ success: true, message: `${member.user.username} a été unmute` });
@@ -162,8 +184,9 @@ app.post('/api/unmute', async (req, res) => {
 // ===================== BACKUP =====================
 app.post('/api/backup', async (req, res) => {
   try {
-    const { name } = req.body;
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const { name, guildId } = req.body;
+    const gid = guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     const backup = await bot.createBackup(guild, name);
     io.emit('backupCreated', backup);
     res.json({ success: true, backup });
@@ -172,8 +195,9 @@ app.post('/api/backup', async (req, res) => {
 
 app.post('/api/restore', async (req, res) => {
   try {
-    const { name } = req.body;
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const { name, guildId } = req.body;
+    const gid = guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     await bot.restoreBackup(guild, name);
     io.emit('serverRestored', { name });
     res.json({ success: true, message: `Serveur restauré depuis ${name}` });
@@ -201,7 +225,8 @@ app.post('/api/nuke', async (req, res) => {
   try {
     const client = bot.client;
     if (!client.isReady()) return res.json({ success: false, message: 'Bot pas encore prêt' });
-    const guild = await client.guilds.fetch(GUILD_ID);
+    const gid = req.body.guildId || GUILD_ID;
+    const guild = await client.guilds.fetch(gid);
     await guild.channels.fetch();
     await guild.members.fetch();
     const result = await bot.nukeGuild(guild, true);
@@ -216,7 +241,8 @@ app.post('/api/nuke', async (req, res) => {
 // ===================== SERVER INFO =====================
 app.get('/api/server', async (req, res) => {
   try {
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const gid = req.query.guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     await guild.channels.fetch();
     await guild.roles.fetch();
     await guild.members.fetch();
@@ -230,7 +256,8 @@ app.get('/api/server', async (req, res) => {
 // ===================== CHANNELS/ROLES =====================
 app.get('/api/selectors', async (req, res) => {
   try {
-    const guild = await bot.client.guilds.fetch(GUILD_ID);
+    const gid = req.query.guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
     await guild.channels.fetch();
     await guild.roles.fetch();
     

@@ -35,7 +35,18 @@
 <section id="panel" style="padding-top: 80px;">
   <h2 class="section-title" id="panelTitle">Panel de Contrôle</h2>
   
-  <div class="dashboard">
+  <!-- SERVER SELECTOR OVERLAY -->
+  <div class="guild-selector-overlay" id="guildSelector">
+    <div class="guild-selector-box">
+      <h3>🌐 Sélectionner un Serveur</h3>
+      <p>Choisis le serveur que tu veux gérer :</p>
+      <div class="guild-list" id="guildList">
+        <div class="guild-loading">Chargement des serveurs...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard" id="dashboard" style="display:none;">
     <!-- SIDEBAR -->
     <div class="dash-sidebar">
       <div class="dash-server">
@@ -60,6 +71,7 @@
         <a class="dash-item" onclick="showTab('backup')"><span class="dash-icon">💾</span> Backup & Nuke</a>
       </div>
       <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="dash-invite-btn" target="_blank">+ Inviter le Bot</a>
+      <button class="dash-invite-btn" style="background:var(--accent);margin-top:8px;" onclick="changeGuild()">🔄 Changer de serveur</button>
     </div>
     
     <!-- CONTENT -->
@@ -502,6 +514,95 @@
   <p class="copyright">© 2026 Kycks Bot • Tous droits réservés</p>
 </footer>
 
+<style>
+.guild-selector-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+.guild-selector-box {
+  background: var(--card-bg, #1e1e2e);
+  border: 2px solid var(--accent, #7289da);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 700px;
+  width: 100%;
+  text-align: center;
+}
+.guild-selector-box h3 {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 1.8em;
+  color: var(--accent, #7289da);
+  margin-bottom: 8px;
+}
+.guild-selector-box > p {
+  font-family: 'Patrick Hand', cursive;
+  color: var(--text, #ddd);
+  margin-bottom: 24px;
+  font-size: 1.1em;
+}
+.guild-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.guild-card {
+  background: var(--bg, #12121a);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.guild-card:hover {
+  border-color: var(--accent, #7289da);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(114,137,218,0.3);
+}
+.guild-card img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid var(--accent, #7289da);
+}
+.guild-card .guild-name {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.1em;
+  color: var(--text, #ddd);
+  font-weight: 600;
+}
+.guild-card .guild-count {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 0.9em;
+  color: var(--text-muted, #888);
+}
+.guild-loading {
+  grid-column: 1 / -1;
+  font-family: 'Patrick Hand', cursive;
+  color: var(--text-muted, #888);
+  font-size: 1.2em;
+  padding: 20px;
+}
+.guild-back-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: var(--accent, #7289da);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1em;
+  cursor: pointer;
+}
+.guild-back-btn:hover { opacity: 0.85; }
+</style>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const API = window.location.origin;
@@ -510,6 +611,7 @@ const BOT_CLIENT_ID = '1544851212187340881';
 let currentConfig = {};
 let customCommands = [];
 let selectors = { textChannels: [], voiceChannels: [], categories: [], roles: [], members: [] };
+let selectedGuildId = localStorage.getItem('selectedGuildId') || null;
 
 // ===================== SOCKET.IO LIVE EVENTS =====================
 socket.on('botStatus', (data) => {
@@ -556,18 +658,61 @@ socket.on('recordingUpdate', (data) => {
 
 // ===================== INIT =====================
 window.onload = async function() {
+  await loadGuilds();
+};
+
+async function loadGuilds() {
+  try {
+    const res = await fetch(`${API}/api/guilds`);
+    const data = await res.json();
+    const list = document.getElementById('guildList');
+    if (!data.guilds || data.guilds.length === 0) {
+      list.innerHTML = '<div class="guild-loading">Aucun serveur trouvé. Ajoute le bot à un serveur !</div>';
+      return;
+    }
+    list.innerHTML = data.guilds.map(g => `
+      <div class="guild-card" onclick="selectGuild('${g.id}')">
+        <img src="${g.icon || 'assets/avatar/KycksBot-pdp.png'}" alt="${g.name}" onerror="this.src='assets/avatar/KycksBot-pdp.png'">
+        <div class="guild-name">${g.name}</div>
+        <div class="guild-count">👥 ${g.memberCount} membres</div>
+      </div>
+    `).join('');
+    
+    if (selectedGuildId && data.guilds.find(g => g.id === selectedGuildId)) {
+      selectGuild(selectedGuildId);
+    }
+  } catch (e) {
+    document.getElementById('guildList').innerHTML = '<div class="guild-loading">Bot non connecté. Lance node api.js</div>';
+  }
+}
+
+async function selectGuild(guildId) {
+  selectedGuildId = guildId;
+  localStorage.setItem('selectedGuildId', guildId);
+  document.getElementById('guildSelector').style.display = 'none';
+  document.getElementById('dashboard').style.display = '';
+  document.getElementById('dashboard').className = 'dashboard';
   await loadSelectors();
   await loadConfig();
   await loadBackups();
   loadStats();
   renderCustomCmds();
   checkRecordingStatus();
-};
+}
+
+function changeGuild() {
+  document.getElementById('guildSelector').style.display = '';
+  document.getElementById('dashboard').style.display = 'none';
+  selectedGuildId = null;
+  localStorage.removeItem('selectedGuildId');
+  loadGuilds();
+}
 
 // ===================== LOAD SELECTORS =====================
 async function loadSelectors() {
+  if (!selectedGuildId) return;
   try {
-    const res = await fetch(`${API}/api/selectors`);
+    const res = await fetch(`${API}/api/selectors?guildId=${selectedGuildId}`);
     if (!res.ok) throw new Error('API non disponible');
     selectors = await res.json();
     populateSelectors();
@@ -622,8 +767,9 @@ function setSelectOptions(id, html) {
 
 // ===================== LOAD CONFIG =====================
 async function loadConfig() {
+  if (!selectedGuildId) return;
   try {
-    const res = await fetch(`${API}/api/config`);
+    const res = await fetch(`${API}/api/config?guildId=${selectedGuildId}`);
     if (!res.ok) throw new Error('API non disponible');
     currentConfig = await res.json();
     applyConfig();
@@ -798,6 +944,7 @@ async function saveConfig() {
   currentConfig.voiceRecordEnabled = getCheck('cfg_voiceRecordEnabled');
   currentConfig.voiceRecordChannel = getVal('cfg_voiceRecordChannel') || null;
   currentConfig.voiceRecordAdminRole = getVal('cfg_voiceRecordAdminRole') || null;
+  currentConfig.guildId = selectedGuildId;
   
   try {
     const res = await fetch(`${API}/api/config`, {
@@ -827,6 +974,7 @@ function getSelectValues(id) {
 
 // ===================== MOD ACTIONS =====================
 async function modAction(action) {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
   const userFields = { ban: 'mBanUser', kick: 'mKickUser', mute: 'mMuteUser' };
   const reasonFields = { ban: 'mBanReason', kick: 'mKickReason', mute: 'mMuteDur' };
   
@@ -836,7 +984,7 @@ async function modAction(action) {
   if (!userId) return notif('Choisis un membre', 'error');
   
   try {
-    let body = { userId };
+    let body = { userId, guildId: selectedGuildId };
     if (action === 'ban' || action === 'kick') body.reason = reason || 'Modération depuis le panel';
     if (action === 'mute') body.duration = parseInt(reason) || 10;
     if (action === 'clear') { body.amount = parseInt(getVal('mClearN')); if (!body.amount) return notif('Nombre requis', 'error'); }
@@ -856,12 +1004,13 @@ async function modAction(action) {
 
 // ===================== BACKUP =====================
 async function createBackup() {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
   const name = getVal('backupName') || undefined;
   try {
     const res = await fetch(`${API}/api/backup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ name, guildId: selectedGuildId })
     });
     const data = await res.json();
     if (data.success) { notif(`Backup créée: ${data.backup.name}`); loadBackups(); }
@@ -893,12 +1042,13 @@ async function loadBackups() {
 }
 
 async function restoreBackup(name) {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
   if (!confirm(`Restaurer "${name}" ? Les salons actuels seront supprimés.`)) return;
   try {
     const res = await fetch(`${API}/api/restore`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ name, guildId: selectedGuildId })
     });
     const data = await res.json();
     if (data.success) notif('Serveur restauré !');
@@ -907,10 +1057,15 @@ async function restoreBackup(name) {
 }
 
 async function nukeServer() {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
   if (!confirm('⚠️ ATTENTION ⚠️\nSupprimer TOUS les salons ?')) return;
   if (!confirm('DERNIÈRE CHANCE. Nuke le serveur ?')) return;
   try {
-    const res = await fetch(`${API}/api/nuke`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    const res = await fetch(`${API}/api/nuke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guildId: selectedGuildId })
+    });
     const data = await res.json();
     if (data.success) notif(`Nuke fait ! Backup: ${data.backup}`);
     else notif('Erreur: ' + data.message, 'error');
@@ -993,8 +1148,9 @@ async function loadStats() {
     document.getElementById('dashUsers').textContent = '0';
   }
   
+  if (!selectedGuildId) return;
   try {
-    const res = await fetch(`${API}/api/server`);
+    const res = await fetch(`${API}/api/server?guildId=${selectedGuildId}`);
     if (!res.ok) throw new Error('API offline');
     const data = await res.json();
     if (data.name) {

@@ -266,34 +266,31 @@ async function createBackup(guild, name) {
     };
     backup.channels.push(channelData);
     
-    // Sauvegarder les messages (1000 derniers par salon)
+    // Sauvegarder les messages (TOUS les messages du salon)
     try {
       let allMessages = [];
       let lastId = null;
-      const maxMessages = 1000;
       
-      while (allMessages.length < maxMessages) {
-        const fetchOptions = { limit: Math.min(maxMessages - allMessages.length, 100) };
+      while (true) {
+        const fetchOptions = { limit: 100 };
         if (lastId) fetchOptions.before = lastId;
         
         const messages = await ch.messages.fetch(fetchOptions);
         if (messages.size === 0) break;
         
         for (const [id, msg] of messages) {
-          if (!msg.author.bot) {
-            allMessages.push({
-              id: msg.id,
-              author: msg.author.username,
-              authorId: msg.author.id,
-              avatar: msg.author.displayAvatarURL({ extension: 'png', size: 128 }),
-              content: msg.content || '',
-              timestamp: msg.createdTimestamp,
-              editedTimestamp: msg.editedTimestamp,
-              attachments: msg.attachments.map(a => ({ url: a.url, name: a.name, size: a.size })),
-              embeds: msg.embeds.length > 0 ? msg.embeds.map(e => ({ title: e.title, description: e.description, url: e.url })) : [],
-              replyTo: msg.reference?.messageId || null
-            });
-          }
+          allMessages.push({
+            id: msg.id,
+            author: msg.author.username,
+            authorId: msg.author.id,
+            avatar: msg.author.displayAvatarURL({ extension: 'png', size: 128 }),
+            content: msg.content || '',
+            timestamp: msg.createdTimestamp,
+            editedTimestamp: msg.editedTimestamp,
+            attachments: msg.attachments.map(a => ({ url: a.url, name: a.name, size: a.size })),
+            embeds: msg.embeds.length > 0 ? msg.embeds.map(e => ({ title: e.title, description: e.description, url: e.url })) : [],
+            replyTo: msg.reference?.messageId || null
+          });
         }
         
         lastId = messages.last()?.id;
@@ -1683,6 +1680,10 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.reply('❌ La commande nuke est désactivée.');
     }
     
+    if (interaction.user.id !== interaction.guild.ownerId) {
+      return interaction.reply('❌ Seul le propriétaire du serveur (👑) peut nuker.');
+    }
+    
     const confirmRow = new ActionRowBuilder()
       .addComponents(
         new ButtonBuilder()
@@ -2279,8 +2280,8 @@ client.on('interactionCreate', async (interaction) => {
   
   // NUKE CONFIRM
   if (interaction.customId === 'nuke_confirm') {
-    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
-      return interaction.reply({ content: '❌ Admin seulement.', ephemeral: true });
+    if (interaction.user.id !== interaction.guild.ownerId) {
+      return interaction.reply({ content: '❌ Seul le propriétaire du serveur (👑) peut nuker.', ephemeral: true });
     }
     
     await interaction.reply({ content: '⏳ Nuke en cours...', ephemeral: true });

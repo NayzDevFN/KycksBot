@@ -237,7 +237,11 @@ app.post('/api/nuke', async (req, res) => {
     const client = bot.client;
     if (!client.isReady()) return res.json({ success: false, message: 'Bot pas encore prêt' });
     const gid = req.body.guildId || GUILD_ID;
+    const userId = req.body.userId;
     const guild = await client.guilds.fetch(gid);
+    if (userId && userId !== guild.ownerId) {
+      return res.json({ success: false, message: 'Seul le propriétaire du serveur peut nuker.' });
+    }
     await guild.channels.fetch();
     await guild.members.fetch();
     const result = await bot.nukeGuild(guild, true);

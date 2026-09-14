@@ -72,6 +72,7 @@
       </div>
       <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot&permissions=8" class="dash-invite-btn" target="_blank">+ Inviter le Bot</a>
       <button class="dash-invite-btn" style="background:var(--accent);margin-top:8px;" onclick="changeGuild()">🔄 Changer de serveur</button>
+      <button class="dash-invite-btn" style="background:#e74c3c;margin-top:8px;" onclick="changeApiUrl()">🔗 Changer l'URL de l'API</button>
     </div>
     
     <!-- CONTENT -->
@@ -603,10 +604,78 @@
 .guild-back-btn:hover { opacity: 0.85; }
 </style>
 
-<script src="/socket.io/socket.io.js"></script>
 <script>
-const API = window.location.origin;
-const socket = io(API);
+function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+</script>
+<script>
+// ===================== API URL CONFIG =====================
+function getApiUrl() {
+  return localStorage.getItem('botApiUrl') || '';
+}
+
+function setApiUrl(url) {
+  localStorage.setItem('botApiUrl', url.replace(/\/$/, ''));
+}
+
+function isGitHubPages() {
+  return window.location.hostname.includes('github.io');
+}
+
+let API = isGitHubPages() ? getApiUrl() : window.location.origin;
+let socket = null;
+
+function connectSocket() {
+  if (!API) return;
+  
+  const tryConnect = () => {
+    try {
+      socket = io(API, { transports: ['websocket', 'polling'] });
+      socket.on('connect', () => console.log('Socket connecté'));
+      socket.on('botStatus', (data) => {
+        const statusEl = document.getElementById('dashServers');
+        const usersEl = document.getElementById('dashUsers');
+        const nameEl = document.getElementById('serverName');
+        if (data.online) {
+          if (statusEl) statusEl.textContent = data.servers || 0;
+          if (usersEl) usersEl.textContent = data.users || 0;
+          if (nameEl && nameEl.textContent === 'Hors ligne') nameEl.textContent = 'Kycks Bot';
+        } else {
+          if (statusEl) statusEl.textContent = '0';
+          if (usersEl) usersEl.textContent = '0';
+          if (nameEl) nameEl.textContent = 'Hors ligne';
+        }
+      });
+      socket.on('modAction', (data) => notif(`${data.action.toUpperCase()}: ${data.user}`));
+      socket.on('backupCreated', (data) => { notif(`Backup créée: ${data.name}`); loadBackups(); });
+      socket.on('serverNuked', (data) => { notif(`Nuke fait ! Backup: ${data.backup}`); loadBackups(); });
+      socket.on('configUpdated', () => loadConfig());
+      socket.on('avatarUpdated', (data) => {
+        const imgs = document.querySelectorAll('.nav-logo-img, .nav-avatar, .welcome-avatar, .dash-server-icon, #currentAvatar');
+        imgs.forEach(el => el.src = data.path + '?' + Date.now());
+      });
+      socket.on('recordingUpdate', (data) => updateRecordingStatus(data));
+    } catch (e) {
+      console.warn('Socket pas disponible');
+    }
+  };
+
+  if (isGitHubPages() && typeof io === 'undefined') {
+    loadScript(`${API}/socket.io/socket.io.js`).then(tryConnect).catch(() => {
+      console.warn('Socket.io non disponible, mode HTTP uniquement');
+    });
+  } else {
+    tryConnect();
+  }
+}
+
 const BOT_CLIENT_ID = '1544851212187340881';
 let currentConfig = {};
 let customCommands = [];
@@ -658,8 +727,28 @@ socket.on('recordingUpdate', (data) => {
 
 // ===================== INIT =====================
 window.onload = async function() {
+  if (isGitHubPages() && !getApiUrl()) {
+    const url = prompt('🔗 Entrez l\'URL de l\'API du bot\n\nExemples :\n- https://xxxx.ngrok-free.app\n- http://85.12.34.56:3000');
+    if (url) {
+      setApiUrl(url);
+      API = url;
+    } else {
+      document.getElementById('guildList').innerHTML = '<div class="guild-loading">❌ URL requise pour se connecter au bot.<br><button class="dash-btn" onclick="changeApiUrl()" style="margin-top:12px">Configurer l\'URL</button></div>';
+      return;
+    }
+  }
+  API = getApiUrl() || window.location.origin;
+  connectSocket();
   await loadGuilds();
 };
+
+function changeApiUrl() {
+  const url = prompt('🔗 URL de l\'API du bot :');
+  if (url) {
+    setApiUrl(url);
+    location.reload();
+  }
+}
 
 async function loadGuilds(retryCount) {
   retryCount = retryCount || 0;

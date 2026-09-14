@@ -763,6 +763,12 @@ const commands = [
     .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers),
   
   new SlashCommandBuilder()
+    .setName('banid').setDescription('Bannir un membre via son ID')
+    .addStringOption(o => o.setName('userid').setDescription('L\'ID Discord de l\'utilisateur').setRequired(true))
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers),
+
+  new SlashCommandBuilder()
     .setName('kick').setDescription('Expulser un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
     .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
@@ -1401,7 +1407,7 @@ client.on('interactionCreate', async (interaction) => {
       .setDescription('Voici toutes les commandes disponibles :')
       .addFields(
         { name: '🔧 Utilitaires', value: '`/help` `/ping` `/avatar` `/userinfo` `/serverinfo` `/roleinfo` `/roles` `/members` `/boosters` `/emojis` `/invites`', inline: false },
-        { name: '🛡️ Modération', value: '`/ban` `/kick` `/mute` `/unmute` `/clear` `/warn` `/unwarn` `/warns` `/tempban` `/softban` `/nick` `/slowmode` `/lock` `/unlock` `/hide` `/unhide` `/clone` `/giverole` `/removerole` `/massrole`', inline: false },
+        { name: '🛡️ Modération', value: '`/ban` `/banid` `/kick` `/mute` `/unmute` `/clear` `/warn` `/unwarn` `/warns` `/tempban` `/softban` `/nick` `/slowmode` `/lock` `/unlock` `/hide` `/unhide` `/clone` `/giverole` `/removerole` `/massrole`', inline: false },
         { name: '⚙️ Admin', value: '`/nuke` `/backup` `/restore` `/backups` `/say` `/embed` `/status` `/reloadconfig` `/setwelcomechannel` `/setlogchannel` `/setautorole` `/setmodrole` `/setlevel` `/stoprecord`', inline: false },
         { name: '🎫 Tickets', value: '`/ticket` `/close` `/add` `/remove`', inline: false },
         { name: '📈 Niveaux', value: '`/rank` `/leaderboard`', inline: false },
@@ -1428,6 +1434,21 @@ client.on('interactionCreate', async (interaction) => {
       await interaction.reply(`🔨 **${user.username}** a été banni. Raison: ${reason}`);
     } catch (error) {
       await interaction.reply(`❌ Je ne peux pas bannir cet utilisateur.`);
+    }
+  }
+  
+  // BANID
+  if (commandName === 'banid') {
+    const userId = interaction.options.getString('userid');
+    const reason = interaction.options.getString('raison') || 'Banni depuis Kycks';
+    if (!/^\d{17,20}$/.test(userId)) {
+      return interaction.reply('❌ ID invalide. Doit être un ID Discord valide (17-20 chiffres).');
+    }
+    try {
+      await interaction.guild.members.ban(userId, { reason });
+      await interaction.reply(`🔨 L'utilisateur avec l'ID **${userId}** a été banni. Raison: ${reason}`);
+    } catch (error) {
+      await interaction.reply(`❌ Impossible de bannir cet utilisateur. Vérifie l'ID et tes permissions.`);
     }
   }
   

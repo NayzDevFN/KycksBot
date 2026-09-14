@@ -97,11 +97,11 @@
         <h3>⚙️ Paramètres Généraux</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">💬</span><div><span class="setting-name">Préfixe</span><span class="setting-desc">Préfixe pour les commandes texte</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_prefix" placeholder="!" class="dash-input small"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_prefix" class="dash-input"><option value="!">! (Exclamation)</option><option value=".">. (Point)</option><option value="?">? (Point d'interrogation)</option><option value="/">/ (Slash)</option><option value="#"># (Hashtag)</option><option value="-">- (Tiret)</option><option value="~">~ (Tilde)</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🟢</span><div><span class="setting-name">Status du Bot</span><span class="setting-desc">Activité affichée</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_status" placeholder="En ligne 🟢" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_status" class="dash-input"><option value="En ligne 🟢">En ligne 🟢</option><option value="Ne pas déranger 🔴">Ne pas déranger 🔴</option><option value="En jeu 🎮">En jeu 🎮</option><option value="En écoute 🎵">En écoute 🎵</option><option value="En direct 📺">En direct 📺</option><option value="Hors ligne ⚫">Hors ligne ⚫</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🌍</span><div><span class="setting-name">Langue</span><span class="setting-desc">Langue du bot</span></div></div>
@@ -135,7 +135,7 @@
         <h3>👋 Messages de Bienvenue</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">👋</span><div><span class="setting-name">Message de bienvenue</span><span class="setting-desc">Envoyé quand un membre rejoint</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_welcomeMessage" placeholder="Bienvenue {user} sur {server} !" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_welcomeMessage" class="dash-input"><option value="Bienvenue {user} sur {server} !">Bienvenue {user} sur {server} !</option><option value="Bienvenue {user} ! Profite bien de {server} 🎉">Bienvenue {user} ! Profite bien de {server} 🎉</option><option value="Hey {user} ! Content de te voir sur {server} 👋">Hey {user} ! Content de te voir sur {server} 👋</option><option value="{user} a rejoint {server} ! On est maintenant {count} 🥳">{user} a rejoint {server} ! On est maintenant {count} 🥳</option><option value="Welcome {user} to {server} ! 🎉">Welcome {user} to {server} ! 🎉</option><option value="Hey {user}, bienvenue sur {server} ! Amuse-toi bien 😄">Hey {user}, bienvenue sur {server} ! Amuse-toi bien 😄</option><option value="{user} vient de rejoindre {server} ! Bienvenue à lui/elle !">"{user} vient de rejoindre {server} ! Bienvenue à lui/elle !</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
           <span class="setting-hint">{user} = membre, {server} = serveur, {count} = nombre de membres</span>
         </div>
         <div class="setting-card">
@@ -144,7 +144,7 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🖼️</span><div><span class="setting-name">Image de bienvenue</span><span class="setting-desc">URL de l'image d'accueil</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_welcomeImage" placeholder="https://..." class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_welcomeImage" class="dash-input"><option value="">Aucune image</option><option value="https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif">GIF Confetti</option><option value="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif">GIF Célébration</option><option value="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif">GIF Bienvenue</option><option value="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif">GIF Wave</option><option value="https://i.imgur.com/yourimage.png">Image Perso 1</option><option value="https://i.imgur.com/yourimage2.png">Image Perso 2</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">👋</span><div><span class="setting-name">DM de bienvenue</span><span class="setting-desc">Envoyer un MP aux nouveaux membres</span></div></div>
@@ -152,11 +152,11 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">✉️</span><div><span class="setting-name">Message DM</span><span class="setting-desc">Message envoyé en MP</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_welcomeDMMessage" placeholder="Bienvenue sur {server} !" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_welcomeDMMessage" class="dash-input"><option value="Bienvenue sur {server} !">Bienvenue sur {server} !</option><option value="Hey {user} ! Bienvenue sur {server}, amuse-toi bien 👋">Hey {user} ! Bienvenue sur {server}, amuse-toi bien 👋</option><option value="Content de te voir sur {server} ! N'hésite pas à lire les règles 📜">Content de te voir sur {server} ! N'hésite pas à lire les règles 📜</option><option value="Welcome to {server} ! Enjoy your stay 🎉">Welcome to {server} ! Enjoy your stay 🎉</option><option value="Salut {user} ! Bienvenue dans la communauté {server} 😄">Salut {user} ! Bienvenue dans la communauté {server} 😄</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">😢</span><div><span class="setting-name">Message d'au revoir</span><span class="setting-desc">Envoyé quand un membre quitte</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_goodbyeMessage" placeholder="{user} a quitté le serveur." class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_goodbyeMessage" class="dash-input"><option value="{user} a quitté le serveur.">{user} a quitté le serveur.</option><option value="Au revoir {user} ! On te souhaite le meilleur 👋">Au revoir {user} ! On te souhaite le meilleur 👋</option><option value="{user} nous a quitté... 😢">{user} nous a quitté... 😢</option><option value="Adieu {user}, reviens vite ! 💔">Adieu {user}, reviens vite ! 💔</option><option value="{user} a quitté {server}. On est maintenant {count}.">{user} a quitté {server}. On est maintenant {count}.</option><option value="Bye {user} ! 😢">Bye {user} ! 😢</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Salon d'au revoir</span><span class="setting-desc">Salon pour les départs</span></div></div>
@@ -178,10 +178,10 @@
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔢</span><div><span class="setting-name">Limite Anti-Spam</span><span class="setting-desc">Messages max en X secondes</span></div></div>
           <div class="setting-input">
-            <input type="number" id="cfg_automodSpamLimit" placeholder="5" class="dash-input small" value="5">
+            <select id="cfg_automodSpamLimit" class="dash-input small"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="7">7</option><option value="10">10</option><option value="15">15</option></select>
             <span>messages en</span>
-            <input type="number" id="cfg_automodSpamTime" placeholder="5" class="dash-input small" value="5">
-            <span>secondes</span>
+            <select id="cfg_automodSpamTime" class="dash-input small"><option value="3">3 sec</option><option value="5">5 sec</option><option value="7">7 sec</option><option value="10">10 sec</option><option value="15">15 sec</option><option value="30">30 sec</option></select>
+            <span></span>
             <button onclick="saveConfig()" class="dash-btn">Sauvegarder</button>
           </div>
         </div>
@@ -191,15 +191,15 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">✅</span><div><span class="setting-name">Whitelist Liens</span><span class="setting-desc">Domaines autorisés (séparés par ,)</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_automodLinkWhitelist" placeholder="youtube.com, twitter.com" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_automodLinkWhitelist" class="dash-input"><option value="youtube.com, twitter.com, twitch.tv, tiktok.com">Réseaux sociaux</option><option value="youtube.com, twitch.tv">YouTube + Twitch</option><option value="google.com, github.com, stackoverflow.com">Dev/Info</option><option value="youtube.com, twitter.com, instagram.com, tiktok.com, twitch.tv, reddit.com">Tous les réseaux</option><option value="spotify.com, soundcloud.com, youtube.com">Musique/Streams</option><option value="">Aucune whitelist</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🤐</span><div><span class="setting-name">Mots Interdits</span><span class="setting-desc">Mots supprimés automatiquement (séparés par ,)</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_badWords" placeholder="mot1, mot2, mot3" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_badWords" class="dash-input"><option value="">Aucun mot interdit</option><option value="insulte1, insulte2, insulte3">Liste basique</option><option value="merde, con, putain, fdp, enculé">Français vulgaire</option><option value="n-word, f-word, s-word">Anglais basique</option><option value="spam, scam, hack, virus, free nitro">Anti-scam/spam</option><option value="discord.gg/, advertisement, promo">Anti-pub</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📏</span><div><span class="setting-name">Limite Caractères</span><span class="setting-desc">Longueur max d'un message</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_maxMessageLength" placeholder="2000" class="dash-input small" value="2000"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_maxMessageLength" class="dash-input small"><option value="500">500</option><option value="1000">1000</option><option value="1500">1500</option><option value="2000" selected>2000</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔒</span><div><span class="setting-name">Anti-Raid</span><span class="setting-desc">Protection contre les raids</span></div></div>
@@ -211,7 +211,7 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⚡</span><div><span class="setting-name">Limite Warns</span><span class="setting-desc">Nombre de warns avant action</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_warnLimit" placeholder="3" class="dash-input small" value="3"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_warnLimit" class="dash-input small"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="7">7</option><option value="10">10</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔨</span><div><span class="setting-name">Action Warn</span><span class="setting-desc">Action après X warns</span></div></div>
@@ -233,7 +233,7 @@
           <div class="setting-header"><span class="setting-icon">🔨</span><div><span class="setting-name">Bannir</span><span class="setting-desc">Bannir un membre du serveur</span></div></div>
           <div class="setting-input multi">
             <select id="mBanUser" class="dash-input"><option value="">Choisir un membre</option></select>
-            <input type="text" id="mBanReason" placeholder="Raison" class="dash-input">
+            <select id="mBanReason" class="dash-input"><option value="Spam">Spam</option><option value="Racisme">Racisme</option><option value="Harcelement">Harcelement</option><option value="Contenu NSFW">Contenu NSFW</option><option value="Pub non autorisée">Pub non autorisée</option><option value="Comportement toxique">Comportement toxique</option><option value="Multicompte">Multicompte</option><option value="Non-respect des règles">Non-respect des règles</option><option value="Raid/Attacks">Raid/Attacks</option></select>
             <button onclick="modAction('ban')" class="dash-btn red">Bannir</button>
           </div>
         </div>
@@ -241,7 +241,7 @@
           <div class="setting-header"><span class="setting-icon">👢</span><div><span class="setting-name">Expulser</span><span class="setting-desc">Expulser un membre</span></div></div>
           <div class="setting-input multi">
             <select id="mKickUser" class="dash-input"><option value="">Choisir un membre</option></select>
-            <input type="text" id="mKickReason" placeholder="Raison" class="dash-input">
+            <select id="mKickReason" class="dash-input"><option value="Avertissement">Avertissement</option><option value="Spam">Spam</option><option value="Comportement toxique">Comportement toxique</option><option value="Non-respect des règles">Non-respect des règles</option><option value="Mauvaise utilisation">Mauvaise utilisation</option><option value="Hors-sujet">Hors-sujet</option><option value="Raid/Attacks">Raid/Attacks</option></select>
             <button onclick="modAction('kick')" class="dash-btn orange">Expulser</button>
           </div>
         </div>
@@ -249,13 +249,13 @@
           <div class="setting-header"><span class="setting-icon">🔇</span><div><span class="setting-name">Mute</span><span class="setting-desc">Mute temporaire</span></div></div>
           <div class="setting-input multi">
             <select id="mMuteUser" class="dash-input"><option value="">Choisir un membre</option></select>
-            <input type="number" id="mMuteDur" placeholder="Min" class="dash-input small">
+            <select id="mMuteDur" class="dash-input small"><option value="1">1 min</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 heure</option><option value="120">2 heures</option><option value="1440">24 heures</option></select>
             <button onclick="modAction('mute')" class="dash-btn blue">Mute</button>
           </div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🗑️</span><div><span class="setting-name">Clear</span><span class="setting-desc">Supprimer des messages</span></div></div>
-          <div class="setting-input multi"><input type="number" id="mClearN" placeholder="1-100" class="dash-input small"><button onclick="modAction('clear')" class="dash-btn purple">Supprimer</button></div>
+          <div class="setting-input multi"><select id="mClearN" class="dash-input small"><option value="5">5</option><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="75">75</option><option value="100">100</option></select><button onclick="modAction('clear')" class="dash-btn purple">Supprimer</button></div>
         </div>
       </div>
       
@@ -276,11 +276,11 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📝</span><div><span class="setting-name">Message d'ouverture</span><span class="setting-desc">Message quand un ticket est ouvert</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_ticketMessage" placeholder="Un staff va vous répondre." class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_ticketMessage" class="dash-input"><option value="Un staff va vous répondre.">Un staff va vous répondre.</option><option value="Décris ton problème, un membre du staff t'aidera.">Décris ton problème, un membre du staff t'aidera.</option><option value="Bienvenue dans le support ! Explique-nous ton souci.">Bienvenue dans le support ! Explique-nous ton souci.</option><option value="Merci d'ouvrir un ticket. Un staff sera bientôt disponible.">Merci d'ouvrir un ticket. Un staff sera bientôt disponible.</option><option value="Support - Explique ton problème en détail.">Support - Explique ton problème en détail.</option><option value="Hello ! How can we help you today ?">Hello ! How can we help you today ?</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎫</span><div><span class="setting-name">Max Tickets par utilisateur</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_ticketMaxPerUser" placeholder="3" class="dash-input small" value="3"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_ticketMaxPerUser" class="dash-input small"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="7">7</option><option value="10">10</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📋</span><div><span class="setting-name">Transcript</span><span class="setting-desc">Sauvegarder les conversations</span></div></div>
@@ -297,11 +297,11 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎯</span><div><span class="setting-name">XP par message</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_xpPerMessage" placeholder="15" class="dash-input small" value="15"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_xpPerMessage" class="dash-input small"><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="50">50</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⏱️</span><div><span class="setting-name">Cooldown XP (secondes)</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_xpCooldown" placeholder="60" class="dash-input small" value="60"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_xpCooldown" class="dash-input small"><option value="15">15 sec</option><option value="30">30 sec</option><option value="60">60 sec</option><option value="120">120 sec</option><option value="300">300 sec</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">📢</span><div><span class="setting-name">Salon de level up</span></div></div>
@@ -309,7 +309,7 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎉</span><div><span class="setting-name">Message de level up</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_levelUpMessage" placeholder="{user} a atteint le niveau {level} !" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_levelUpMessage" class="dash-input"><option value="{user} a atteint le niveau {level} !">{user} a atteint le niveau {level} !</option><option value="GG {user} ! Tu passes niveau {level} 🎉">GG {user} ! Tu passes niveau {level} 🎉</option><option value="Bravo {user} ! Niveau {level} atteint ! 🏆">Bravo {user} ! Niveau {level} atteint ! 🏆</option><option value="{user} vient de monter au niveau {level} ! 🔥">{user} vient de monter au niveau {level} ! 🔥</option><option value="Level Up ! {user} est maintenant niveau {level} ⬆️">Level Up ! {user} est maintenant niveau {level} ⬆️</option><option value="{user} → Niveau {level} ! Continue comme ça 💪">{user} → Niveau {level} ! Continue comme ça 💪</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
           <span class="setting-hint">{user} = membre, {level} = niveau</span>
         </div>
         <div class="setting-card">
@@ -328,7 +328,7 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🔊</span><div><span class="setting-name">Volume par défaut</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_musicVolume" placeholder="80" class="dash-input small" value="80"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_musicVolume" class="dash-input small"><option value="10">10%</option><option value="25">25%</option><option value="50">50%</option><option value="75">75%</option><option value="80">80%</option><option value="100">100%</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⏭️</span><div><span class="setting-name">Auto-Play</span></div></div>
@@ -353,7 +353,7 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⏰</span><div><span class="setting-name">Délai (secondes)</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_autoRoleDelay" placeholder="0" class="dash-input small" value="0"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_autoRoleDelay" class="dash-input small"><option value="0">0 sec</option><option value="5">5 sec</option><option value="10">10 sec</option><option value="15">15 sec</option><option value="30">30 sec</option><option value="60">60 sec</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">✅</span><div><span class="setting-name">Vérification requise</span></div></div>
@@ -396,8 +396,8 @@
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">➕</span><div><span class="setting-name">Ajouter une commande</span></div></div>
           <div class="setting-input multi">
-            <input type="text" id="customCmdName" placeholder="Nom (!hello)" class="dash-input small">
-            <input type="text" id="customCmdResponse" placeholder="Réponse du bot" class="dash-input">
+            <select id="customCmdName" class="dash-input small"><option value="hello">hello</option><option value="salut">salut</option><option value="bonjour">bonjour</option><option value="bye">bye</option><option value="aide">aide</option><option value="merci">merci</option><option value="coucou">coucou</option><option value="site">site</option></select>
+            <select id="customCmdResponse" class="dash-input"><option value="Salut ! 👋">Salut ! 👋</option><option value="Bonjour ! Comment ça va ?">Bonjour ! Comment ça va ?</option><option value="Au revoir ! 👋">Au revoir ! 👋</option><option value="Voici le site : https://example.com">Voici le site : https://example.com</option><option value="Merci à toi ! 😄">Merci à toi ! 😄</option><option value="Comment puis-je t'aider ?">Comment puis-je t'aider ?</option><option value="C'est génial ! 🎉">C'est génial ! 🎉</option></select>
             <button onclick="addCustomCmd()" class="dash-btn">Ajouter</button>
           </div>
         </div>
@@ -416,7 +416,7 @@
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">⭐</span><div><span class="setting-name">Seuil d'étoiles</span></div></div>
-          <div class="setting-input"><input type="number" id="cfg_starboardThreshold" placeholder="5" class="dash-input small" value="5"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_starboardThreshold" class="dash-input small"><option value="3">3 ⭐</option><option value="5">5 ⭐</option><option value="7">7 ⭐</option><option value="10">10 ⭐</option><option value="15">15 ⭐</option><option value="20">20 ⭐</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
       </div>
       
@@ -425,11 +425,11 @@
         <h3>🎭 Reaction Role</h3>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">💬</span><div><span class="setting-name">Message Reaction Role</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_reactionRoleMessage" placeholder="ID du message" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_reactionRoleMessage" class="dash-input"><option value="">Aucun message</option><option value="roles">Sélection de rôles</option><option value="regles">Règles du serveur</option><option value="annonces">Annonces</option><option value="bienvenue">Message de bienvenue</option><option value="custom">Message custom</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
         <div class="setting-card">
           <div class="setting-header"><span class="setting-icon">🎭</span><div><span class="setting-name">Reaction Roles</span><span class="setting-desc">Format: emoji:roleID</span></div></div>
-          <div class="setting-input"><input type="text" id="cfg_reactionRoles" placeholder="👍:123456789" class="dash-input"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+          <div class="setting-input"><select id="cfg_reactionRoles" class="dash-input"><option value="">Aucun reaction role</option><option value="🔴:roleID1, 🔵:roleID2, 🟢:roleID3">Couleurs (RGB)</option><option value="🎮:gamerID, 🎵:musicID, 🎬:movieID">Centres d'intérêt</option><option value="🔔:notifID, 📢:annonceID">Notifications</option><option value="👍:roleID1, 👎:roleID2">Oui/Non</option><option value="♂️:maleID, ♀️:femaleID">Genre</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
         </div>
       </div>
       
@@ -439,7 +439,7 @@
         <div class="setting-card" style="border-color: #2ecc71;">
           <div class="setting-header"><span class="setting-icon">💾</span><div><span class="setting-name">Sauvegarde</span><span class="setting-desc">Sauvegarder salons + rôles</span></div></div>
           <div class="setting-input multi">
-            <input type="text" id="backupName" placeholder="Nom (optionnel)" class="dash-input">
+            <select id="backupName" class="dash-input"><option value="">Nom par défaut</option><option value="Avant-modif">Avant-modif</option><option value="Avant-nuke">Avant-nuke</option><option value="Stable">Stable</option><option value="Test">Test</option><option value="Complet">Complet</option></select>
             <button onclick="createBackup()" class="dash-btn green">💾 Créer</button>
           </div>
         </div>

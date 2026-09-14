@@ -217,13 +217,25 @@ app.get('/api/selectors', async (req, res) => {
   try {
     const guild = await bot.client.guilds.fetch(GUILD_ID);
     await guild.channels.fetch();
-    await guild.members.fetch();
     await guild.roles.fetch();
+    
+    // Fetch ALL members (paginated)
+    let allMembers = [];
+    let lastMemberId = null;
+    while (true) {
+      const fetchOptions = { limit: 1000 };
+      if (lastMemberId) fetchOptions.after = lastMemberId;
+      const batch = await guild.members.fetch(fetchOptions);
+      allMembers = allMembers.concat(Array.from(batch.values()));
+      if (batch.size < 1000) break;
+      lastMemberId = batch.last()?.id;
+    }
+    
     const textChannels = guild.channels.cache.filter(c => c.type === 0).sort((a, b) => a.position - b.position).map(c => ({ id: c.id, name: c.name, category: c.parent?.name || null }));
     const voiceChannels = guild.channels.cache.filter(c => c.type === 2).sort((a, b) => a.position - b.position).map(c => ({ id: c.id, name: c.name, category: c.parent?.name || null }));
     const categories = guild.channels.cache.filter(c => c.type === 4).sort((a, b) => a.position - b.position).map(c => ({ id: c.id, name: c.name }));
-    const roles = guild.roles.cache.filter(r => r.name !== '@everyone' && !r.managed).sort((a, b) => b.position - a.position).map(r => ({ id: r.id, name: r.name, color: r.hexColor }));
-    const members = guild.members.cache.filter(m => !m.user.bot).sort((a, b) => a.user.username.localeCompare(b.user.username)).map(m => ({ id: m.id, username: m.user.username, displayName: m.displayName }));
+    const roles = guild.roles.cache.filter(r => r.name !== '@everyone').sort((a, b) => b.position - a.position).map(r => ({ id: r.id, name: r.name, color: r.hexColor, managed: r.managed }));
+    const members = allMembers.filter(m => !m.user.bot).sort((a, b) => a.user.username.localeCompare(b.user.username)).map(m => ({ id: m.id, username: m.user.username, displayName: m.displayName }));
     res.json({ textChannels, voiceChannels, categories, roles, members });
   } catch (error) {
     res.json({ textChannels: [], voiceChannels: [], categories: [], roles: [], members: [] });

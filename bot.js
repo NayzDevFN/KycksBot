@@ -19,17 +19,10 @@ const { joinVoiceChannel, VoiceConnectionStatus, entersState } = require('@disco
 const { OpusDecoder } = require('opusscript');
 const { execSync } = require('child_process');
 
-// ===================== CONFIG FILE =====================
+// ===================== CONFIG FILE (PER-GUILD) =====================
 const CONFIG_PATH = path.join(__dirname, 'bot-config.json');
-
-function loadConfig() {
-  try {
-    if (fs.existsSync(CONFIG_PATH)) {
-      return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
-    }
-  } catch (e) {}
-  return getDefaultConfig();
-}
+const GUILDS_DIR = path.join(__dirname, 'guilds');
+if (!fs.existsSync(GUILDS_DIR)) fs.mkdirSync(GUILDS_DIR, { recursive: true });
 
 function getDefaultConfig() {
   return {
@@ -108,11 +101,68 @@ function getDefaultConfig() {
   };
 }
 
-function saveConfig(config) {
-  fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+function getGuildConfigPath(guildId) {
+  return path.join(GUILDS_DIR, `${guildId}.json`);
 }
 
-let config = loadConfig();
+function loadGuildConfig(guildId) {
+  try {
+    const p = getGuildConfigPath(guildId);
+    if (fs.existsSync(p)) {
+      const saved = JSON.parse(fs.readFileSync(p, 'utf8'));
+      return { ...getDefaultConfig(), ...saved };
+    }
+  } catch (e) {}
+  return getDefaultConfig();
+}
+
+function saveGuildConfig(guildId, config) {
+  fs.writeFileSync(getGuildConfigPath(guildId), JSON.stringify(config, null, 2));
+}
+
+function getAllGuildConfigs() {
+  const configs = {};
+  try {
+    const files = fs.readdirSync(GUILDS_DIR).filter(f => f.endsWith('.json'));
+    for (const f of files) {
+      const guildId = f.replace('.json', '');
+      configs[guildId] = loadGuildConfig(guildId);
+    }
+  } catch (e) {}
+  return configs;
+}
+
+// Legacy: load old bot-config.json for first guild migration
+function migrateOldConfig() {
+  try {
+    if (fs.existsSync(CONFIG_PATH)) {
+      const old = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      if (old && typeof old === 'object') {
+        const files = fs.readdirSync(GUILDS_DIR).filter(f => f.endsWith('.json'));
+        if (files.length === 0) {
+          console.log('📦 Migration de l\'ancien config vers le système multi-serveurs...');
+        }
+      }
+    }
+  } catch (e) {}
+}
+
+// Default config for legacy references
+let config = getDefaultConfig();
+
+function getGuildCfg(guildId) {
+  return loadGuildConfig(guildId);
+}
+
+function setGuildCfg(guildId, newCfg) {
+  saveGuildConfig(guildId, newCfg);
+}
+
+// For backwards compatibility in bot events
+function cfg(guildId) {
+  if (guildId) return getGuildCfg(guildId);
+  return config;
+}
 
 // ===================== CLIENT (OPTIMISE 315MB) =====================
 const { Options, Collection } = require('discord.js');
@@ -990,28 +1040,29 @@ async function registerCommands() {
 // ===================== EVENTS =====================
 client.on('ready', async () => {
   console.log(`🤖 ${client.user.tag} est en ligne !`);
-  client.user.setActivity(config.status);
+  client.user.setActivity('En ligne 🟢');
   await registerCommands();
 });
 
 // WELCOME
 client.on('guildMemberAdd', async (member) => {
   try {
+    const gCfg = cfg(member.guild.id);
     // Welcome message
-    if (config.welcomeChannel) {
-      const ch = member.guild.channels.cache.get(config.welcomeChannel);
+    if (gCfg.welcomeChannel) {
+      const ch = member.guild.channels.cache.get(gCfg.welcomeChannel);
       if (ch) {
-        let msg = config.welcomeMessage
+        let msg = gCfg.welcomeMessage
           .replace('{user}', member.toString())
           .replace('{server}', member.guild.name)
           .replace('{count}', member.guild.memberCount.toString());
         
-        if (config.welcomeImage) {
+        if (gCfg.welcomeImage) {
           const embed = new EmbedBuilder()
             .setColor('#2ecc71')
             .setTitle(`Bienvenue ${member.user.username} !`)
             .setDescription(msg)
-            .setImage(config.welcomeImage)
+            .setImage(gCfg.welcomeImage)
             .setThumbnail(member.user.displayAvatarURL())
             .setTimestamp();
           await ch.send({ embeds: [embed] });
@@ -1022,9 +1073,9 @@ client.on('guildMemberAdd', async (member) => {
     }
     
     // Welcome DM
-    if (config.welcomeDM) {
+    if (gCfg.welcomeDM) {
       try {
-        let dmMsg = config.welcomeDMMessage
+        let dmMsg = gCfg.welcomeDMMessage
           .replace('{user}', member.user.username)
           .replace('{server}', member.guild.name);
         await member.send(dmMsg);
@@ -1032,24 +1083,24 @@ client.on('guildMemberAdd', async (member) => {
     }
     
     // Auto role
-    if (config.autoRole) {
+    if (gCfg.autoRole) {
       setTimeout(async () => {
         try {
-          const role = member.guild.roles.cache.get(config.autoRole);
-          if (role && !config.autoroleVerify) {
+          const role = member.guild.roles.cache.get(gCfg.autoRole);
+          if (role && !gCfg.autoroleVerify) {
             await member.roles.add(role);
-          } else if (role && config.autoroleVerify && member.guild.members.me.permissions.has(PermissionFlagsBits.ManageGuild)) {
+          } else if (role && gCfg.autoroleVerify && member.guild.members.me.permissions.has(PermissionFlagsBits.ManageGuild)) {
             if (member.pending === false) {
               await member.roles.add(role);
             }
           }
         } catch (e) {}
-      }, (config.autoRoleDelay || 0) * 1000);
+      }, (gCfg.autoRoleDelay || 0) * 1000);
     }
     
     // Log
-    if (config.logChannel && config.logsMembers) {
-      const ch = member.guild.channels.cache.get(config.logChannel);
+    if (gCfg.logChannel && gCfg.logsMembers) {
+      const ch = member.guild.channels.cache.get(gCfg.logChannel);
       if (ch) {
         const embed = new EmbedBuilder()
           .setColor('#2ecc71')
@@ -1070,10 +1121,11 @@ client.on('guildMemberAdd', async (member) => {
 // GOODBYE
 client.on('guildMemberRemove', async (member) => {
   try {
-    if (config.goodbyeChannel) {
-      const ch = member.guild.channels.cache.get(config.goodbyeChannel);
+    const gCfg = cfg(member.guild.id);
+    if (gCfg.goodbyeChannel) {
+      const ch = member.guild.channels.cache.get(gCfg.goodbyeChannel);
       if (ch) {
-        const msg = config.goodbyeMessage
+        const msg = gCfg.goodbyeMessage
           .replace('{user}', member.user.username)
           .replace('{server}', member.guild.name)
           .replace('{count}', member.guild.memberCount.toString());
@@ -1081,8 +1133,8 @@ client.on('guildMemberRemove', async (member) => {
       }
     }
     
-    if (config.logChannel && config.logsMembers) {
-      const ch = member.guild.channels.cache.get(config.logChannel);
+    if (gCfg.logChannel && gCfg.logsMembers) {
+      const ch = member.guild.channels.cache.get(gCfg.logChannel);
       if (ch) {
         const embed = new EmbedBuilder()
           .setColor('#e74c3c')
@@ -1104,18 +1156,20 @@ client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
   if (!message.guild) return;
   
+  const gCfg = cfg(message.guild.id);
+  
   // Automod
-  if (config.automodEnabled) {
+  if (gCfg.automodEnabled) {
     const member = message.member;
     if (!member) return;
     if (member.permissions.has(PermissionFlagsBits.Administrator)) return;
     
     // Anti-spam
-    if (config.antiSpam && checkSpam(message.author.id, message.guild.id)) {
+    if (gCfg.antiSpam && checkSpam(message.author.id, message.guild.id)) {
       try {
         await message.delete();
         await message.member.timeout(60000, 'Anti-spam');
-        const ch = message.guild.channels.cache.get(config.logChannel);
+        const ch = message.guild.channels.cache.get(gCfg.logChannel);
         if (ch) {
           await ch.send(`🔇 **${message.author.username}** muté (anti-spam)`);
         }
@@ -1124,13 +1178,13 @@ client.on('messageCreate', async (message) => {
     }
     
     // Anti-link
-    if (config.antiLink) {
+    if (gCfg.antiLink) {
       const linkRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gi;
       if (linkRegex.test(message.content)) {
-        if (!config.automodLinkWhitelist.some(domain => message.content.includes(domain))) {
+        if (!gCfg.automodLinkWhitelist.some(domain => message.content.includes(domain))) {
           try {
             await message.delete();
-            const ch = message.guild.channels.cache.get(config.logChannel);
+            const ch = message.guild.channels.cache.get(gCfg.logChannel);
             if (ch) {
               await ch.send(`🔗 **${message.author.username}** - Lien supprimé`);
             }
@@ -1141,12 +1195,12 @@ client.on('messageCreate', async (message) => {
     }
     
     // Bad words
-    if (config.automodWordFilter && config.badWords.length > 0) {
+    if (gCfg.automodWordFilter && gCfg.badWords.length > 0) {
       const lower = message.content.toLowerCase();
-      if (config.badWords.some(word => lower.includes(word.toLowerCase()))) {
+      if (gCfg.badWords.some(word => lower.includes(word.toLowerCase()))) {
         try {
           await message.delete();
-          const ch = message.guild.channels.cache.get(config.logChannel);
+          const ch = message.guild.channels.cache.get(gCfg.logChannel);
           if (ch) {
             await ch.send(`🤐 **${message.author.username}** - Mot interdit supprimé`);
           }
@@ -1156,10 +1210,10 @@ client.on('messageCreate', async (message) => {
     }
     
     // Caps filter
-    if (config.automodCapsFilter) {
+    if (gCfg.automodCapsFilter) {
       const upper = message.content.replace(/[^A-Z]/g, '').length;
       const total = message.content.replace(/[^a-zA-Z]/g, '').length;
-      if (total > 10 && (upper / total * 100) > config.automodCapsLimit) {
+      if (total > 10 && (upper / total * 100) > gCfg.automodCapsLimit) {
         try {
           await message.delete();
           return;
@@ -1168,7 +1222,7 @@ client.on('messageCreate', async (message) => {
     }
     
     // Max length
-    if (message.content.length > config.maxMessageLength) {
+    if (message.content.length > gCfg.maxMessageLength) {
       try {
         await message.delete();
         return;
@@ -1177,21 +1231,21 @@ client.on('messageCreate', async (message) => {
   }
   
   // XP
-  if (config.levelEnabled && !config.ignoredChannels.includes(message.channel.id)) {
+  if (gCfg.levelEnabled && !gCfg.ignoredChannels.includes(message.channel.id)) {
     const levelUp = addXp(message.author.id, message.guild.id);
-    if (levelUp && config.levelUpChannel) {
-      const ch = message.guild.channels.cache.get(config.levelUpChannel);
+    if (levelUp && gCfg.levelUpChannel) {
+      const ch = message.guild.channels.cache.get(gCfg.levelUpChannel);
       if (ch) {
-        const msg = config.levelUpMessage
+        const msg = gCfg.levelUpMessage
           .replace('{user}', message.author.toString())
           .replace('{level}', levelUp.toString());
         await ch.send(msg);
       }
       
       // Role rewards
-      if (config.roleRewards[levelUp]) {
+      if (gCfg.roleRewards[levelUp]) {
         try {
-          const role = message.guild.roles.cache.get(config.roleRewards[levelUp]);
+          const role = message.guild.roles.cache.get(gCfg.roleRewards[levelUp]);
           if (role) await message.member.roles.add(role);
         } catch (e) {}
       }
@@ -1199,8 +1253,8 @@ client.on('messageCreate', async (message) => {
   }
   
   // Custom commands
-  if (config.customCommands) {
-    const customCmd = config.customCommands.find(c => message.content.toLowerCase() === `${config.prefix}${c.name.toLowerCase()}`);
+  if (gCfg.customCommands) {
+    const customCmd = gCfg.customCommands.find(c => message.content.toLowerCase() === `${gCfg.prefix}${c.name.toLowerCase()}`);
     if (customCmd) {
       await message.channel.send(customCmd.response);
     }
@@ -1209,9 +1263,11 @@ client.on('messageCreate', async (message) => {
 
 // VOICE STATE (logs + recording)
 client.on('voiceStateUpdate', async (oldState, newState) => {
+  const gCfg = cfg(oldState.guild.id);
+
   // Logs vocaux
-  if (config.logChannel && config.logsVoice) {
-    const ch = oldState.guild.channels.cache.get(config.logChannel);
+  if (gCfg.logChannel && gCfg.logsVoice) {
+    const ch = oldState.guild.channels.cache.get(gCfg.logChannel);
     if (ch) {
       if (!oldState.channel && newState.channel) {
         const embed = new EmbedBuilder()
@@ -1238,7 +1294,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
   }
 
   // Voice recording auto-join
-  if (config.voiceRecordEnabled && config.voiceRecordChannel) {
+  if (gCfg.voiceRecordEnabled && gCfg.voiceRecordChannel) {
     const guild = oldState.guild;
 
     // User joined a voice channel
@@ -1246,7 +1302,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
       if (newState.id === client.user.id) return;
 
       if (!activeRecordings.has(guild.id)) {
-        const logChannel = guild.channels.cache.get(config.voiceRecordChannel);
+        const logChannel = guild.channels.cache.get(gCfg.voiceRecordChannel);
         if (logChannel) {
           try {
             const recorder = new VoiceRecorder(guild, newState.channel, logChannel);
@@ -1273,8 +1329,9 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 
 // CHANNEL DELETE (logs)
 client.on('channelDelete', async (channel) => {
-  if (!config.logChannel || !config.logsServer) return;
-  const ch = channel.guild.channels.cache.get(config.logChannel);
+  const gCfg = cfg(channel.guild.id);
+  if (!gCfg.logChannel || !gCfg.logsServer) return;
+  const ch = channel.guild.channels.cache.get(gCfg.logChannel);
   if (!ch) return;
   
   const embed = new EmbedBuilder()
@@ -1290,8 +1347,9 @@ client.on('channelDelete', async (channel) => {
 
 // CHANNEL CREATE (logs)
 client.on('channelCreate', async (channel) => {
-  if (!config.logChannel || !config.logsServer) return;
-  const ch = channel.guild.channels.cache.get(config.logChannel);
+  const gCfg = cfg(channel.guild.id);
+  if (!gCfg.logChannel || !gCfg.logsServer) return;
+  const ch = channel.guild.channels.cache.get(gCfg.logChannel);
   if (!ch) return;
   
   const embed = new EmbedBuilder()
@@ -1308,9 +1366,10 @@ client.on('channelCreate', async (channel) => {
 // MESSAGE DELETE (logs)
 client.on('messageDelete', async (message) => {
   if (!message.guild) return;
-  if (!config.logChannel || !config.logsMessages) return;
+  const gCfg = cfg(message.guild.id);
+  if (!gCfg.logChannel || !gCfg.logsMessages) return;
   if (message.author?.bot) return;
-  const ch = message.guild.channels.cache.get(config.logChannel);
+  const ch = message.guild.channels.cache.get(gCfg.logChannel);
   if (!ch) return;
   
   const embed = new EmbedBuilder()
@@ -1330,11 +1389,12 @@ client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
   
   const { commandName } = interaction;
+  const gCfg = interaction.guild ? cfg(interaction.guild.id) : getDefaultConfig();
   
   // HELP
   if (commandName === 'help') {
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('📖 Liste des commandes')
       .setDescription('Voici toutes les commandes disponibles :')
       .addFields(
@@ -1425,17 +1485,17 @@ client.on('interactionCreate', async (interaction) => {
     const reason = interaction.options.getString('raison') || 'Aucune raison';
     const count = addWarn(user.id, interaction.guild.id, reason, interaction.user.username);
     
-    await interaction.reply(`⚠️ **${user.username}** a été warn. (${count}/${config.warnLimit} warns)`);
+    await interaction.reply(`⚠️ **${user.username}** a été warn. (${count}/${gCfg.warnLimit} warns)`);
     
-    if (count >= config.warnLimit) {
+    if (count >= gCfg.warnLimit) {
       try {
         const member = await interaction.guild.members.fetch(user.id);
-        if (config.warnAction === 'ban') {
-          await member.ban({ reason: `${config.warnLimit} warns atteints` });
-          await interaction.followUp(`🔨 **${user.username}** a été banni (${config.warnLimit} warns)`);
-        } else if (config.warnAction === 'kick') {
-          await member.kick(`${config.warnLimit} warns atteints`);
-          await interaction.followUp(`👢 **${user.username}** a été expulsé (${config.warnLimit} warns)`);
+        if (gCfg.warnAction === 'ban') {
+          await member.ban({ reason: `${gCfg.warnLimit} warns atteints` });
+          await interaction.followUp(`🔨 **${user.username}** a été banni (${gCfg.warnLimit} warns)`);
+        } else if (gCfg.warnAction === 'kick') {
+          await member.kick(`${gCfg.warnLimit} warns atteints`);
+          await interaction.followUp(`👢 **${user.username}** a été expulsé (${gCfg.warnLimit} warns)`);
         }
         clearWarns(user.id, interaction.guild.id);
       } catch (e) {}
@@ -1572,7 +1632,7 @@ client.on('interactionCreate', async (interaction) => {
   
   // NUKE
   if (commandName === 'nuke') {
-    if (!config.nukeEnabled) {
+    if (!gCfg.nukeEnabled) {
       return interaction.reply('❌ La commande nuke est désactivée.');
     }
     
@@ -1782,7 +1842,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'embed') {
     const titre = interaction.options.getString('titre');
     const message = interaction.options.getString('message');
-    const couleur = interaction.options.getString('couleur') || config.embedColor;
+    const couleur = interaction.options.getString('couleur') || gCfg.embedColor;
     
     const embed = new EmbedBuilder()
       .setColor(couleur)
@@ -1891,7 +1951,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'rank') {
     const userData = getXp(interaction.user.id, interaction.guild.id);
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle(`📈 Niveau de ${interaction.user.username}`)
       .addFields(
         { name: 'Niveau', value: userData.level.toString(), inline: true },
@@ -1917,7 +1977,7 @@ client.on('interactionCreate', async (interaction) => {
     ).join('\n') || 'Aucune donnée.';
     
     const embed = new EmbedBuilder()
-      .setColor(config.embedColor)
+      .setColor(gCfg.embedColor)
       .setTitle('🏆 Classement')
       .setDescription(description)
       .setTimestamp();
@@ -1937,7 +1997,7 @@ client.on('interactionCreate', async (interaction) => {
   
   // TICKET
   if (commandName === 'ticket') {
-    if (!config.ticketEnabled) {
+    if (!gCfg.ticketEnabled) {
       return interaction.reply({ content: '❌ Tickets désactivés.', ephemeral: true });
     }
     
@@ -1945,15 +2005,15 @@ client.on('interactionCreate', async (interaction) => {
       t => t.userId === interaction.user.id && t.guildId === interaction.guild.id && t.open
     ).length;
     
-    if (userTickets >= config.ticketMaxPerUser) {
-      return interaction.reply({ content: `❌ Tu as déjà ${config.ticketMaxPerUser} ticket(s) ouvert(s).`, ephemeral: true });
+    if (userTickets >= gCfg.ticketMaxPerUser) {
+      return interaction.reply({ content: `❌ Tu as déjà ${gCfg.ticketMaxPerUser} ticket(s) ouvert(s).`, ephemeral: true });
     }
     
     try {
       const ticketChannel = await interaction.guild.channels.create({
         name: `ticket-${interaction.user.username}`,
         type: ChannelType.GuildText,
-        parent: config.ticketCategory || null,
+        parent: gCfg.ticketCategory || null,
         permissionOverwrites: [
           { id: interaction.guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel] },
           { id: interaction.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
@@ -1979,7 +2039,7 @@ client.on('interactionCreate', async (interaction) => {
         );
       
       await ticketChannel.send({
-        content: `${interaction.user.toString()} ${config.ticketMessage}`,
+        content: `${interaction.user.toString()} ${gCfg.ticketMessage}`,
         components: [closeRow]
       });
       
@@ -2000,7 +2060,7 @@ client.on('interactionCreate', async (interaction) => {
     saveTickets();
     await interaction.reply(`🔒 Ticket fermé par ${interaction.user.username}.`);
     
-    if (config.ticketTranscript) {
+    if (gCfg.ticketTranscript) {
       const messages = await interaction.channel.messages.fetch();
       const transcript = messages.reverse().map(m => `[${m.author.username}] ${m.content}`).join('\n');
       const transcriptPath = path.join(BACKUPS_PATH, `transcript_${interaction.channel.id}.txt`);
@@ -2035,48 +2095,47 @@ client.on('interactionCreate', async (interaction) => {
   // STATUS
   if (commandName === 'status') {
     const newStatus = interaction.options.getString('statut');
-    config.status = newStatus;
-    saveConfig(config);
+    gCfg.status = newStatus;
+    setGuildCfg(interaction.guild.id, gCfg);
     client.user.setActivity(newStatus);
     await interaction.reply(`✅ Status: **${newStatus}**`);
   }
   
   // RELOADCONFIG
   if (commandName === 'reloadconfig') {
-    config = loadConfig();
-    client.user.setActivity(config.status);
+    config = getDefaultConfig();
     await interaction.reply('✅ Configuration rechargée !');
   }
   
   // SETWELCOMECHANNEL
   if (commandName === 'setwelcomechannel') {
     const channel = interaction.options.getChannel('salon');
-    config.welcomeChannel = channel.id;
-    saveConfig(config);
+    gCfg.welcomeChannel = channel.id;
+    setGuildCfg(interaction.guild.id, gCfg);
     await interaction.reply(`✅ Salon de bienvenue: ${channel}`);
   }
   
   // SETLOGCHANNEL
   if (commandName === 'setlogchannel') {
     const channel = interaction.options.getChannel('salon');
-    config.logChannel = channel.id;
-    saveConfig(config);
+    gCfg.logChannel = channel.id;
+    setGuildCfg(interaction.guild.id, gCfg);
     await interaction.reply(`✅ Salon de logs: ${channel}`);
   }
   
   // SETAUTOROLE
   if (commandName === 'setautorole') {
     const role = interaction.options.getRole('role');
-    config.autoRole = role.id;
-    saveConfig(config);
+    gCfg.autoRole = role.id;
+    setGuildCfg(interaction.guild.id, gCfg);
     await interaction.reply(`✅ Auto-rôle: ${role}`);
   }
   
   // SETMODROLE
   if (commandName === 'setmodrole') {
     const role = interaction.options.getRole('role');
-    config.modRole = role.id;
-    saveConfig(config);
+    gCfg.modRole = role.id;
+    setGuildCfg(interaction.guild.id, gCfg);
     await interaction.reply(`✅ Rôle modérateur: ${role}`);
   }
   
@@ -2218,8 +2277,10 @@ client.on('interactionCreate', async (interaction) => {
 module.exports = { 
   client, 
   config,
-  loadConfig,
-  saveConfig,
+  getDefaultConfig,
+  getGuildCfg,
+  setGuildCfg,
+  getAllGuildConfigs,
   createBackup,
   restoreBackup,
   nukeGuild,

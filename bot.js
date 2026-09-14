@@ -268,6 +268,12 @@ async function createBackup(guild, name) {
     
     // Sauvegarder les messages (TOUS les messages du salon)
     try {
+      const perms = guild.members.me.permissionsIn(ch);
+      if (!perms || !perms.has('ViewChannel') || !perms.has('ReadMessageHistory')) {
+        console.log(`⏭️ [Backup] Skip ${ch.name}: permissions insuffisantes`);
+        continue;
+      }
+
       let allMessages = [];
       let lastId = null;
       
@@ -278,7 +284,7 @@ async function createBackup(guild, name) {
         const messages = await ch.messages.fetch(fetchOptions);
         if (messages.size === 0) break;
         
-        for (const [id, msg] of messages) {
+        for (const [, msg] of messages) {
           allMessages.push({
             id: msg.id,
             author: msg.author.username,
@@ -298,8 +304,11 @@ async function createBackup(guild, name) {
       
       if (allMessages.length > 0) {
         backup.messages[ch.id] = allMessages.reverse();
+        console.log(`💬 [Backup] ${ch.name}: ${allMessages.length} message(s) sauvegardé(s)`);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(`❌ [Backup] Erreur messages ${ch.name}:`, e.message);
+    }
   }
 
   // Sauvegarder les autres types de salons (vocaux, etc)
@@ -1031,14 +1040,20 @@ async function registerCommands() {
   try {
     console.log('📝 Enregistrement des slash commands...');
     if (GUILD_ID) {
-      await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
-      console.log('✅ Commandes enregistrées pour le serveur de test');
+      try {
+        await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
+        console.log('✅ Commandes enregistrées pour le serveur de test');
+      } catch (guildErr) {
+        console.warn('⚠️ Échec guild, enregistrement global...', guildErr.message);
+        await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
+        console.log('✅ Commandes enregistrées globalement');
+      }
     } else {
       await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
       console.log('✅ Commandes enregistrées globalement');
     }
   } catch (error) {
-    console.error('❌ Erreur enregistrement:', error);
+    console.error('❌ Erreur enregistrement:', error.message);
   }
 }
 

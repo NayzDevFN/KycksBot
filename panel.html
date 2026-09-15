@@ -523,11 +523,10 @@
           <div class="setting-header"><span class="setting-icon">💥</span><div><span class="setting-name">Nuke</span><span class="setting-desc">⚠️ SUPPRIME TOUS LES SALONS ⚠️</span></div></div>
           <p style="font-family:'Patrick Hand',cursive; color:#e74c3c;">Une sauvegarde est créée automatiquement.</p>
           <div class="setting-input multi">
-            <input id="nukeOwnerId" class="dash-input" placeholder="ID Discord du propriétaire (👑)" style="flex:1;">
-            <button onclick="saveConfig()" class="dash-btn">💾 Sauvegarder l'ID</button>
-            <button onclick="nukeServer()" class="dash-btn red">💥 Nuke</button>
+            <input id="nukeOwnerId" class="dash-input" placeholder="ID Discord du propriétaire (👑)" style="flex:1;" oninput="saveNukeOwnerId()">
           </div>
-          <p style="font-family:'Patrick Hand',cursive; color:#f39c12;">🔒 Seul l'ID configuré peut nuker. Sauvegarde l'ID avant de nuker.</p>
+          <p style="font-family:'Patrick Hand',cursive; color:#f39c12;">🔒 Seul l'ID configuré peut nuker. L'ID est sauvegardé automatiquement.</p>
+          <button onclick="nukeServer()" class="dash-btn red" style="margin-top:10px;">💥 Nuke le serveur</button>
         </div>
       </div>
       
@@ -1232,6 +1231,19 @@ async function restoreBackup(name) {
     if (data.success) notif('Serveur restauré !');
     else notif('Erreur: ' + data.message, 'error');
   } catch (e) { notif('Bot non connecté', 'error'); }
+}
+
+async function saveNukeOwnerId() {
+  if (!selectedGuildId) return;
+  const val = document.getElementById('nukeOwnerId')?.value?.trim() || null;
+  currentConfig.nukeOwnerId = val;
+  try {
+    await fetch(`${API}/api/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guildId: selectedGuildId, nukeOwnerId: val })
+    });
+  } catch (e) {}
 }
 
 async function nukeServer() {

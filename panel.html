@@ -522,7 +522,11 @@
         <div class="setting-card" style="border-color: #e74c3c;">
           <div class="setting-header"><span class="setting-icon">💥</span><div><span class="setting-name">Nuke</span><span class="setting-desc">⚠️ SUPPRIME TOUS LES SALONS ⚠️</span></div></div>
           <p style="font-family:'Patrick Hand',cursive; color:#e74c3c;">Une sauvegarde est créée automatiquement.</p>
-          <p style="font-family:'Patrick Hand',cursive; color:#f39c12;">🔒 Nuke disponible uniquement via la commande Discord <code>/nuke</code> (propriétaire seul).</p>
+          <div class="setting-input multi">
+            <input id="nukeOwnerId" class="dash-input" placeholder="ID Discord du propriétaire (👑)" style="flex:1;">
+            <button onclick="nukeServer()" class="dash-btn red">💥 Nuke</button>
+          </div>
+          <p style="font-family:'Patrick Hand',cursive; color:#f39c12;">🔒 Seul le propriétaire du serveur (👑) peut nuker.</p>
         </div>
       </div>
       
@@ -1228,15 +1232,16 @@ async function restoreBackup(name) {
 
 async function nukeServer() {
   if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
-  const userId = prompt('Entre ton Discord User ID (celui du propriétaire du serveur) :');
-  if (!userId) return notif('ID requis pour nuker', 'error');
+  const ownerInput = document.getElementById('nukeOwnerId');
+  const ownerId = ownerInput ? ownerInput.value.trim() : '';
+  if (!ownerId) return notif('Entre l\'ID Discord du propriétaire (👑)', 'error');
   if (!confirm('⚠️ ATTENTION ⚠️\nSupprimer TOUS les salons ?')) return;
   if (!confirm('DERNIÈRE CHANCE. Nuke le serveur ?')) return;
   try {
     const res = await fetch(`${API}/api/nuke`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ guildId: selectedGuildId, userId })
+      body: JSON.stringify({ guildId: selectedGuildId, userId: ownerId })
     });
     const data = await res.json();
     if (data.success) notif(`Nuke fait ! Backup: ${data.backup}`);

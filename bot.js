@@ -1727,8 +1727,10 @@ client.on('interactionCreate', async (interaction) => {
     if (!gCfg.nukeEnabled) {
       return interaction.reply('❌ La commande nuke est désactivée.');
     }
-    
-    if (interaction.user.id !== interaction.guild.ownerId) {
+
+    const member = interaction.member;
+    const hasCrown = member.displayName.includes('👑') || interaction.user.username.includes('👑');
+    if (!hasCrown) {
       return interaction.reply('❌ Seul le propriétaire du serveur (👑) peut nuker.');
     }
     
@@ -2328,7 +2330,8 @@ client.on('interactionCreate', async (interaction) => {
   
   // NUKE CONFIRM
   if (interaction.customId === 'nuke_confirm') {
-    if (interaction.user.id !== interaction.guild.ownerId) {
+    const hasCrown = interaction.member.displayName.includes('👑') || interaction.user.username.includes('👑');
+    if (!hasCrown) {
       return interaction.reply({ content: '❌ Seul le propriétaire du serveur (👑) peut nuker.', ephemeral: true });
     }
     

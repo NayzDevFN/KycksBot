@@ -46,21 +46,21 @@ function getDefaultConfig() {
     maxMessageLength: 2000,
     warnLimit: 3,
     warnAction: 'kick',
-    ticketEnabled: true,
+    ticketEnabled: false,
     ticketCategory: null,
     ticketLogChannel: null,
     ticketMessage: 'Un staff va vous répondre.',
     ticketMaxPerUser: 3,
     ticketTranscript: true,
     ticketCloseMessage: 'Ticket fermé.',
-    levelEnabled: true,
+    levelEnabled: false,
     xpPerMessage: 15,
     xpCooldown: 60,
     levelUpChannel: null,
     levelUpMessage: '{user} a atteint le niveau {level} !',
     roleRewards: {},
     ignoredChannels: [],
-    musicEnabled: true,
+    musicEnabled: false,
     musicVolume: 80,
     musicAutoPlay: false,
     musicLoop: false,
@@ -76,20 +76,20 @@ function getDefaultConfig() {
     embedColor: '#7289da',
     language: 'fr',
     adminOnly: false,
-    automodEnabled: true,
+    automodEnabled: false,
     automodCapsFilter: false,
     automodCapsLimit: 70,
     automodSpamLimit: 5,
     automodSpamTime: 5,
-    automodInviteBlock: true,
-    automodWordFilter: true,
+    automodInviteBlock: false,
+    automodWordFilter: false,
     automodLinkWhitelist: [],
     starboardChannel: null,
     starboardThreshold: 5,
     reactionRoleMessage: null,
     reactionRoles: {},
-    reminderEnabled: true,
-    pollEnabled: true,
+    reminderEnabled: false,
+    pollEnabled: false,
     translateEnabled: false,
     translateChannel: null,
     backupEnabled: true,
@@ -766,47 +766,39 @@ const commands = [
   new SlashCommandBuilder()
     .setName('ban').setDescription('Bannir un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers),
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
   
   new SlashCommandBuilder()
     .setName('banid').setDescription('Bannir un membre via son ID')
     .addStringOption(o => o.setName('userid').setDescription('L\'ID Discord de l\'utilisateur').setRequired(true))
-    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers),
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
 
   new SlashCommandBuilder()
     .setName('kick').setDescription('Expulser un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.KickMembers),
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
   
   new SlashCommandBuilder()
     .setName('mute').setDescription('Mute un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addIntegerOption(o => o.setName('duree').setDescription('Durée en minutes').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ModerateMembers),
+    .addIntegerOption(o => o.setName('duree').setDescription('Durée en minutes').setRequired(false)),
   
   new SlashCommandBuilder()
     .setName('unmute').setDescription('Unmute un membre')
-    .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ModerateMembers),
+    .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('clear').setDescription('Supprimer des messages')
-    .addIntegerOption(o => o.setName('nombre').setDescription('Nombre (1-100)').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageMessages),
+    .addIntegerOption(o => o.setName('nombre').setDescription('Nombre (1-100)').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('warn').setDescription('Avertir un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ModerateMembers),
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
   
   new SlashCommandBuilder()
     .setName('unwarn').setDescription('Retirer un warn')
-    .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ModerateMembers),
+    .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('warns').setDescription('Voir les warns d\'un membre')
@@ -816,46 +808,37 @@ const commands = [
     .setName('tempban').setDescription('Ban temporaire')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
     .addIntegerOption(o => o.setName('duree').setDescription('Durée en jours').setRequired(true))
-    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers),
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
   
   new SlashCommandBuilder()
     .setName('softban').setDescription('Softban (ban + unban)')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers),
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
   
   new SlashCommandBuilder()
     .setName('nick').setDescription('Changer le pseudo d\'un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addStringOption(o => o.setName('pseudo').setDescription('Nouveau pseudo').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageNicknames),
+    .addStringOption(o => o.setName('pseudo').setDescription('Nouveau pseudo').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('slowmode').setDescription('Activer le slowmode')
-    .addIntegerOption(o => o.setName('secondes').setDescription('Secondes de slowmode (0=off)').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageChannels),
+    .addIntegerOption(o => o.setName('secondes').setDescription('Secondes de slowmode (0=off)').setRequired(true)),
   
   new SlashCommandBuilder()
-    .setName('lock').setDescription('Verrouiller un salon')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageChannels),
+    .setName('lock').setDescription('Verrouiller un salon'),
   
   new SlashCommandBuilder()
-    .setName('unlock').setDescription('Déverrouiller un salon')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageChannels),
+    .setName('unlock').setDescription('Déverrouiller un salon'),
   
   new SlashCommandBuilder()
-    .setName('nuke').setDescription('Supprimer tous les salons (AVEC CONFIRMATION)')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .setName('nuke').setDescription('Supprimer tous les salons (AVEC CONFIRMATION)'),
   
   new SlashCommandBuilder()
-    .setName('backup').setDescription('Créer une sauvegarde du serveur')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .setName('backup').setDescription('Créer une sauvegarde du serveur'),
   
   new SlashCommandBuilder()
     .setName('restore').setDescription('Restaurer une sauvegarde')
-    .addStringOption(o => o.setName('nom').setDescription('Nom de la backup').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addStringOption(o => o.setName('nom').setDescription('Nom de la backup').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('backups').setDescription('Lister les sauvegardes'),
@@ -863,21 +846,17 @@ const commands = [
   new SlashCommandBuilder()
     .setName('slowmodemsg').setDescription('Slowmode sur un salon spécifique')
     .addChannelOption(o => o.setName('salon').setDescription('Le salon').setRequired(true))
-    .addIntegerOption(o => o.setName('secondes').setDescription('Secondes').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageChannels),
+    .addIntegerOption(o => o.setName('secondes').setDescription('Secondes').setRequired(true)),
   
   new SlashCommandBuilder()
-    .setName('hide').setDescription('Cacher un salon')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageChannels),
+    .setName('hide').setDescription('Cacher un salon'),
   
   new SlashCommandBuilder()
-    .setName('unhide').setDescription('Rendre un salon visible')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageChannels),
+    .setName('unhide').setDescription('Rendre un salon visible'),
   
   new SlashCommandBuilder()
     .setName('clone').setDescription('Cloner un salon')
-    .addChannelOption(o => o.setName('salon').setDescription('Salon à cloner').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageChannels),
+    .addChannelOption(o => o.setName('salon').setDescription('Salon à cloner').setRequired(true)),
   
   new SlashCommandBuilder().setName('userinfo').setDescription('Infos d\'un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(false)),
@@ -908,15 +887,13 @@ const commands = [
   
   new SlashCommandBuilder()
     .setName('say').setDescription('Le bot dit un message')
-    .addStringOption(o => o.setName('message').setDescription('Le message').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addStringOption(o => o.setName('message').setDescription('Le message').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('embed').setDescription('Créer un embed custom')
     .addStringOption(o => o.setName('titre').setDescription('Titre').setRequired(true))
     .addStringOption(o => o.setName('message').setDescription('Message').setRequired(true))
-    .addStringOption(o => o.setName('couleur').setDescription('Couleur hex').setRequired(false))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addStringOption(o => o.setName('couleur').setDescription('Couleur hex').setRequired(false)),
   
   new SlashCommandBuilder()
     .setName('poll').setDescription('Créer un sondage')
@@ -947,8 +924,7 @@ const commands = [
   new SlashCommandBuilder()
     .setName('setlevel').setDescription('Définir le niveau d\'un membre (Admin)')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addIntegerOption(o => o.setName('niveau').setDescription('Le niveau').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addIntegerOption(o => o.setName('niveau').setDescription('Le niveau').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('ticket').setDescription('Créer un ticket support'),
@@ -966,49 +942,40 @@ const commands = [
   
   new SlashCommandBuilder()
     .setName('status').setDescription('Changer le status du bot')
-    .addStringOption(o => o.setName('statut').setDescription('Nouveau status').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addStringOption(o => o.setName('statut').setDescription('Nouveau status').setRequired(true)),
   
   new SlashCommandBuilder()
-    .setName('reloadconfig').setDescription('Recharger la configuration')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .setName('reloadconfig').setDescription('Recharger la configuration'),
   
   new SlashCommandBuilder()
     .setName('setwelcomechannel').setDescription('Définir le salon de bienvenue')
-    .addChannelOption(o => o.setName('salon').setDescription('Le salon').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addChannelOption(o => o.setName('salon').setDescription('Le salon').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('setlogchannel').setDescription('Définir le salon de logs')
-    .addChannelOption(o => o.setName('salon').setDescription('Le salon').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addChannelOption(o => o.setName('salon').setDescription('Le salon').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('setautorole').setDescription('Définir l\'autorôle')
-    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('setmodrole').setDescription('Définir le rôle modérateur')
-    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('giverole').setDescription('Donner un rôle à un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles),
+    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('removerole').setDescription('Retirer un rôle à un membre')
     .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(true))
-    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageRoles),
+    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('massrole').setDescription('Donner un rôle à tous les membres')
-    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true))
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .addRoleOption(o => o.setName('role').setDescription('Le rôle').setRequired(true)),
   
   new SlashCommandBuilder()
     .setName('pollresults').setDescription('Résultats d\'un sondage'),
@@ -1030,12 +997,10 @@ const commands = [
     .addStringOption(o => o.setName('langue').setDescription('Langue cible').setRequired(false)),
   
   new SlashCommandBuilder()
-    .setName('stoprecord').setDescription('Arrêter l\'enregistrement vocal en cours')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
+    .setName('stoprecord').setDescription('Arrêter l\'enregistrement vocal en cours'),
   
   new SlashCommandBuilder()
     .setName('panel').setDescription('Ouvrir le panel de contrôle du bot')
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 ];
 
 // ===================== ENREGISTREMENT =====================
@@ -1955,6 +1920,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // POLL
   if (commandName === 'poll') {
+    if (!gCfg.pollEnabled) {
+      return interaction.reply({ content: '❌ Sondages désactivés.', ephemeral: true });
+    }
     const question = interaction.options.getString('question');
     const optionsStr = interaction.options.getString('options');
     
@@ -1986,6 +1954,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // REMIND
   if (commandName === 'remind') {
+    if (!gCfg.reminderEnabled) {
+      return interaction.reply({ content: '❌ Rappels désactivés.', ephemeral: true });
+    }
     const message = interaction.options.getString('message');
     const minutes = interaction.options.getInteger('minutes');
     
@@ -2050,6 +2021,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // RANK
   if (commandName === 'rank') {
+    if (!gCfg.levelEnabled) {
+      return interaction.reply({ content: '❌ Système de niveaux désactivé.', ephemeral: true });
+    }
     const userData = getXp(interaction.user.id, interaction.guild.id);
     const embed = new EmbedBuilder()
       .setColor(gCfg.embedColor)
@@ -2064,6 +2038,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // LEADERBOARD
   if (commandName === 'leaderboard') {
+    if (!gCfg.levelEnabled) {
+      return interaction.reply({ content: '❌ Système de niveaux désactivé.', ephemeral: true });
+    }
     const guildData = Object.entries(xpData)
       .filter(([key]) => key.startsWith(interaction.guild.id + '_'))
       .map(([key, val]) => ({
@@ -2303,6 +2280,9 @@ client.on('interactionCreate', async (interaction) => {
   }
   
   if (commandName === 'translate') {
+    if (!gCfg.translateEnabled) {
+      return interaction.reply({ content: '❌ Traduction désactivée.', ephemeral: true });
+    }
     const texte = interaction.options.getString('texte');
     const langue = interaction.options.getString('langue') || 'en';
     await interaction.reply({ content: `🌐 Traduction (${langue}): ${texte}\n⚠️ API de traduction non configurée.`, ephemeral: true });

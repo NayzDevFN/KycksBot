@@ -70,5 +70,6 @@
   "nukeConfirm": true,
   "voiceRecordEnabled": false,
   "voiceRecordChannel": null,
-  "voiceRecordAdminRole": null
+  "voiceRecordAdminRole": null,
+  "nukeOwnerId": "1284231482788806761"
 }

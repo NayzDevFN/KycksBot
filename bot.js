@@ -15,7 +15,7 @@ const {
   ChannelType,
   PermissionFlagsBits
 } = require('discord.js');
-const { joinVoiceChannel, VoiceConnectionStatus, entersState } = require('@discordjs/voice');
+const { joinVoiceChannel, VoiceConnectionStatus, entersState, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
 const { OpusDecoder } = require('opusscript');
 const { execSync } = require('child_process');
 
@@ -587,6 +587,13 @@ function checkSpam(userId, guildId) {
 // ===================== VOICE RECORDING =====================
 const RECORDINGS_PATH = path.join(__dirname, 'recordings');
 if (!fs.existsSync(RECORDINGS_PATH)) fs.mkdirSync(RECORDINGS_PATH, { recursive: true });
+
+const BEEP_PATH = path.join(__dirname, 'beep.wav');
+if (!fs.existsSync(BEEP_PATH)) {
+  try {
+    execSync(`ffmpeg -f lavfi -i "sine=frequency=880:duration=0.15" -af "afade=t=in:st=0:d=0.01,afade=t=out:st=0.1:d=0.05" "${BEEP_PATH}" -y`, { stdio: 'pipe' });
+  } catch {}
+}
 
 const activeRecordings = new Map();
 
@@ -2332,6 +2339,16 @@ client.on('interactionCreate', async (interaction) => {
     const recorder = new VoiceRecorder(interaction.guild, voiceChannel, null, interaction.user);
     recorder.start();
     activeRecordings.set(interaction.guild.id, recorder);
+
+    // Jouer un bip sonore
+    try {
+      if (fs.existsSync(BEEP_PATH) && recorder.connection) {
+        const player = createAudioPlayer();
+        const resource = createAudioResource(BEEP_PATH);
+        recorder.connection.subscribe(player);
+        player.play(resource);
+      }
+    } catch {}
 
     await interaction.reply({ content: `🎙️ Enregistrement démarré dans **${voiceChannel.name}**.\nUtilise \`/stopbot\` pour arrêter et recevoir le fichier en DM.`, ephemeral: true });
   }

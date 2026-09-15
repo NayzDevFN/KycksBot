@@ -524,9 +524,10 @@
           <p style="font-family:'Patrick Hand',cursive; color:#e74c3c;">Une sauvegarde est créée automatiquement.</p>
           <div class="setting-input multi">
             <input id="nukeOwnerId" class="dash-input" placeholder="ID Discord du propriétaire (👑)" style="flex:1;">
+            <button onclick="saveConfig()" class="dash-btn">💾 Sauvegarder l'ID</button>
             <button onclick="nukeServer()" class="dash-btn red">💥 Nuke</button>
           </div>
-          <p style="font-family:'Patrick Hand',cursive; color:#f39c12;">🔒 Seul le propriétaire du serveur (👑) peut nuker.</p>
+          <p style="font-family:'Patrick Hand',cursive; color:#f39c12;">🔒 Seul l'ID configuré peut nuker. Sauvegarde l'ID avant de nuker.</p>
         </div>
       </div>
       
@@ -997,7 +998,9 @@ function applyConfig() {
   setCheck('cfg_voiceRecordEnabled', currentConfig.voiceRecordEnabled);
   setSelectVal('cfg_voiceRecordChannel', currentConfig.voiceRecordChannel);
   setSelectVal('cfg_voiceRecordAdminRole', currentConfig.voiceRecordAdminRole);
-  
+
+  setVal('nukeOwnerId', currentConfig.nukeOwnerId);
+
   customCommands = currentConfig.customCommands || [];
 }
 
@@ -1096,6 +1099,7 @@ async function saveConfig() {
   currentConfig.voiceRecordEnabled = getCheck('cfg_voiceRecordEnabled');
   currentConfig.voiceRecordChannel = getVal('cfg_voiceRecordChannel') || null;
   currentConfig.voiceRecordAdminRole = getVal('cfg_voiceRecordAdminRole') || null;
+  currentConfig.nukeOwnerId = getVal('nukeOwnerId') || null;
   currentConfig.guildId = selectedGuildId;
   
   try {

@@ -240,8 +240,12 @@ app.post('/api/nuke', async (req, res) => {
     const userId = req.body.userId;
     if (!userId) return res.json({ success: false, message: 'userId requis' });
     const guild = await client.guilds.fetch(gid);
-    if (userId !== guild.ownerId) {
-      return res.json({ success: false, message: 'Seul le propriétaire du serveur peut nuker.' });
+    const gCfg = bot.getGuildCfg(gid);
+    if (!gCfg.nukeOwnerId) {
+      return res.json({ success: false, message: 'Aucun propriétaire configuré dans le panel.' });
+    }
+    if (userId !== gCfg.nukeOwnerId) {
+      return res.json({ success: false, message: 'Seul le propriétaire configuré peut nuker.' });
     }
     await guild.channels.fetch();
     await guild.members.fetch();

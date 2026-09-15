@@ -97,7 +97,8 @@ function getDefaultConfig() {
     nukeConfirm: true,
     voiceRecordEnabled: false,
     voiceRecordChannel: null,
-    voiceRecordAdminRole: null
+    voiceRecordAdminRole: null,
+    nukeOwnerId: null
   };
 }
 
@@ -1728,9 +1729,11 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.reply('❌ La commande nuke est désactivée.');
     }
 
-    const member = interaction.member;
-    const hasCrown = member.displayName.includes('👑') || interaction.user.username.includes('👑');
-    if (!hasCrown) {
+    if (!gCfg.nukeOwnerId) {
+      return interaction.reply('❌ Aucun propriétaire configuré. Configure l\'ID du propriétaire (👑) dans le panel.');
+    }
+
+    if (interaction.user.id !== gCfg.nukeOwnerId) {
       return interaction.reply('❌ Seul le propriétaire du serveur (👑) peut nuker.');
     }
     
@@ -2330,8 +2333,11 @@ client.on('interactionCreate', async (interaction) => {
   
   // NUKE CONFIRM
   if (interaction.customId === 'nuke_confirm') {
-    const hasCrown = interaction.member.displayName.includes('👑') || interaction.user.username.includes('👑');
-    if (!hasCrown) {
+    const gCfg = cfg(interaction.guild.id);
+    if (!gCfg.nukeOwnerId) {
+      return interaction.reply({ content: '❌ Aucun propriétaire configuré. Configure l\'ID du propriétaire dans le panel.', ephemeral: true });
+    }
+    if (interaction.user.id !== gCfg.nukeOwnerId) {
       return interaction.reply({ content: '❌ Seul le propriétaire du serveur (👑) peut nuker.', ephemeral: true });
     }
     

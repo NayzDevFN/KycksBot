@@ -596,10 +596,11 @@ const RECORDING_BITS = 16;
 const MAX_RECORDING_DURATION = 60 * 60 * 1000;
 
 class VoiceRecorder {
-  constructor(guild, voiceChannel, logChannel) {
+  constructor(guild, voiceChannel, logChannel, dmUser = null) {
     this.guild = guild;
     this.voiceChannel = voiceChannel;
     this.logChannel = logChannel;
+    this.dmUser = dmUser;
     this.connection = null;
     this.decoder = null;
     this.isRecording = false;
@@ -714,7 +715,7 @@ class VoiceRecorder {
       } catch { return null; }
     }
 
-    if (!sendPath || !this.logChannel) return null;
+    if (!sendPath) return null;
 
     const mins = Math.floor(duration / 60);
     const secs = duration % 60;
@@ -728,11 +729,14 @@ class VoiceRecorder {
       )
       .setTimestamp();
 
+    const file = { attachment: sendPath, name: `enregistrement-${date}.${ext}` };
+
     try {
-      await this.logChannel.send({
-        embeds: [embed],
-        files: [{ attachment: sendPath, name: `enregistrement-${date}.${ext}` }]
-      });
+      if (this.dmUser) {
+        await this.dmUser.send({ embeds: [embed], files: [file] });
+      } else if (this.logChannel) {
+        await this.logChannel.send({ embeds: [embed], files: [file] });
+      }
     } catch {}
 
     try { fs.unlinkSync(sendPath); } catch {}
@@ -1000,6 +1004,12 @@ const commands = [
     .setName('stoprecord').setDescription('Arrêter l\'enregistrement vocal en cours'),
   
   new SlashCommandBuilder()
+    .setName('joinbot').setDescription('Rejoindre ton salon vocal et enregistrer'),
+  
+  new SlashCommandBuilder()
+    .setName('stopbot').setDescription('Arrêter l\'enregistrement et recevoir le fichier en DM'),
+  
+  new SlashCommandBuilder()
     .setName('panel').setDescription('Ouvrir le panel de contrôle du bot')
 ];
 
@@ -1030,6 +1040,7 @@ async function registerCommands() {
 // ===================== EVENTS =====================
 client.on('ready', async () => {
   console.log(`🤖 ${client.user.tag} est en ligne !`);
+  client.user.setPresence({ status: 'online' });
   client.user.setActivity('En ligne 🟢');
   await registerCommands();
 
@@ -2303,6 +2314,45 @@ client.on('interactionCreate', async (interaction) => {
       await interaction.editReply(`✅ Enregistrement arrêté. Durée: ${mins}m ${secs}s. Envoi en cours...`);
     } else {
       await interaction.editReply('✅ Enregistrement arrêté.');
+    }
+  }
+
+  // JOINBOT - Enregistrer le salon vocal de l'utilisateur
+  if (commandName === 'joinbot') {
+    const member = interaction.member;
+    const voiceChannel = member.voice.channel;
+    if (!voiceChannel) {
+      return interaction.reply({ content: '❌ Tu dois être dans un salon vocal.', ephemeral: true });
+    }
+
+    if (activeRecordings.has(interaction.guild.id)) {
+      return interaction.reply({ content: '❌ Un enregistrement est déjà en cours.', ephemeral: true });
+    }
+
+    const recorder = new VoiceRecorder(interaction.guild, voiceChannel, null, interaction.user);
+    recorder.start();
+    activeRecordings.set(interaction.guild.id, recorder);
+
+    await interaction.reply({ content: `🎙️ Enregistrement démarré dans **${voiceChannel.name}**.\nUtilise \`/stopbot\` pour arrêter et recevoir le fichier en DM.`, ephemeral: true });
+  }
+
+  // STOPBOT - Arrêter l'enregistrement et envoyer en DM
+  if (commandName === 'stopbot') {
+    const recorder = activeRecordings.get(interaction.guild.id);
+    if (!recorder) {
+      return interaction.reply({ content: '❌ Aucun enregistrement en cours.', ephemeral: true });
+    }
+
+    await interaction.reply({ content: '⏹️ Arrêt de l\'enregistrement...', ephemeral: true });
+    activeRecordings.delete(interaction.guild.id);
+    const result = await recorder.stop();
+
+    if (result) {
+      const mins = Math.floor(result.duration / 60);
+      const secs = result.duration % 60;
+      await interaction.editReply(`✅ Enregistrement arrêté (${mins}m ${secs}s). Le fichier t'a été envoyé en DM.`);
+    } else {
+      await interaction.editReply('✅ Enregistrement arrêté. Envoi du fichier en DM...');
     }
   }
 });

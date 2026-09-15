@@ -70,5 +70,6 @@
   "nukeConfirm": true,
   "voiceRecordEnabled": false,
   "voiceRecordChannel": null,
-  "voiceRecordAdminRole": null
+  "voiceRecordAdminRole": null,
+  "nukeOwnerId": "ç&è_&'è&\"ç&è\"&ç\"&\""
 }

@@ -1228,13 +1228,15 @@ async function restoreBackup(name) {
 
 async function nukeServer() {
   if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
+  const userId = prompt('Entre ton Discord User ID (celui du propriétaire du serveur) :');
+  if (!userId) return notif('ID requis pour nuker', 'error');
   if (!confirm('⚠️ ATTENTION ⚠️\nSupprimer TOUS les salons ?')) return;
   if (!confirm('DERNIÈRE CHANCE. Nuke le serveur ?')) return;
   try {
     const res = await fetch(`${API}/api/nuke`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ guildId: selectedGuildId })
+      body: JSON.stringify({ guildId: selectedGuildId, userId })
     });
     const data = await res.json();
     if (data.success) notif(`Nuke fait ! Backup: ${data.backup}`);

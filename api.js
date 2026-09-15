@@ -238,8 +238,9 @@ app.post('/api/nuke', async (req, res) => {
     if (!client.isReady()) return res.json({ success: false, message: 'Bot pas encore prêt' });
     const gid = req.body.guildId || GUILD_ID;
     const userId = req.body.userId;
+    if (!userId) return res.json({ success: false, message: 'userId requis' });
     const guild = await client.guilds.fetch(gid);
-    if (userId && userId !== guild.ownerId) {
+    if (userId !== guild.ownerId) {
       return res.json({ success: false, message: 'Seul le propriétaire du serveur peut nuker.' });
     }
     await guild.channels.fetch();

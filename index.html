@@ -27,12 +27,6 @@
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot%20applications.commands&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
-    <a href="/auth/discord" class="nav-link nav-invite" id="discordLogin" style="display:none;">🔑 Connexion Discord</a>
-    <div id="discordUser" style="display:none;align-items:center;gap:8px;">
-      <img id="discordAvatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;">
-      <span id="discordName" style="color:#fff;font-family:'Patrick Hand',cursive;"></span>
-      <a href="#" onclick="logoutDiscord()" style="color:#e74c3c;font-size:0.85rem;cursor:pointer;">Déconnexion</a>
-    </div>
     <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar" onerror="this.src='assets/avatar.svg'">
   </div>
 </nav>
@@ -189,47 +183,6 @@ async function loadRealStats() {
 }
 
 loadRealStats();
-
-// ===================== DISCORD LOGIN =====================
-async function checkDiscordLogin() {
-  const params = new URLSearchParams(window.location.search);
-  const session = params.get('session');
-  if (session) {
-    localStorage.setItem('discord_session', session);
-    window.history.replaceState({}, '', '/');
-  }
-  const sid = localStorage.getItem('discord_session');
-  if (!sid) {
-    document.getElementById('discordLogin').style.display = 'inline-block';
-    return;
-  }
-  try {
-    const res = await fetch(`/auth/me?session=${sid}`);
-    const data = await res.json();
-    if (data.logged) {
-      document.getElementById('discordLogin').style.display = 'none';
-      document.getElementById('discordUser').style.display = 'flex';
-      document.getElementById('discordName').textContent = data.user.username;
-      if (data.user.avatar) document.getElementById('discordAvatar').src = data.user.avatar;
-    } else {
-      localStorage.removeItem('discord_session');
-      document.getElementById('discordLogin').style.display = 'inline-block';
-    }
-  } catch (e) {
-    document.getElementById('discordLogin').style.display = 'inline-block';
-  }
-}
-
-async function logoutDiscord() {
-  const sid = localStorage.getItem('discord_session');
-  if (sid) {
-    await fetch('/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session: sid }) });
-    localStorage.removeItem('discord_session');
-  }
-  window.location.reload();
-}
-
-checkDiscordLogin();
 </script>
 
 </body>

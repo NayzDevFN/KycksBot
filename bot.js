@@ -71,7 +71,7 @@ function getDefaultConfig() {
     logsMessages: true,
     logsMembers: true,
     logsModeration: true,
-    logsVoice: false,
+    logsVoice: true,
     logsServer: true,
     embedColor: '#7289da',
     language: 'fr',
@@ -1394,9 +1394,20 @@ client.on('messageCreate', async (message) => {
       try {
         await message.delete();
         await message.member.timeout(60000, 'Anti-spam');
-        const ch = message.guild.channels.cache.get(gCfg.logChannel);
-        if (ch) {
-          await ch.send(`🔇 **${message.author.username}** muté (anti-spam)`);
+        if (gCfg.logChannel) {
+          const ch = message.guild.channels.cache.get(gCfg.logChannel);
+          if (ch) {
+            const embed = new EmbedBuilder()
+              .setColor('#e67e22')
+              .setTitle('🔇 Anti-Spam déclenché')
+              .addFields(
+                { name: 'Membre', value: message.author.username, inline: true },
+                { name: 'Salon', value: message.channel.name, inline: true },
+                { name: 'Message', value: message.content?.substring(0, 200) || 'Vide', inline: false }
+              )
+              .setTimestamp();
+            await ch.send({ embeds: [embed] });
+          }
         }
         return;
       } catch (e) {}
@@ -1409,9 +1420,20 @@ client.on('messageCreate', async (message) => {
         if (!gCfg.automodLinkWhitelist.some(domain => message.content.includes(domain))) {
           try {
             await message.delete();
-            const ch = message.guild.channels.cache.get(gCfg.logChannel);
-            if (ch) {
-              await ch.send(`🔗 **${message.author.username}** - Lien supprimé`);
+            if (gCfg.logChannel) {
+              const ch = message.guild.channels.cache.get(gCfg.logChannel);
+              if (ch) {
+                const embed = new EmbedBuilder()
+                  .setColor('#3498db')
+                  .setTitle('🔗 Lien non autorisé')
+                  .addFields(
+                    { name: 'Membre', value: message.author.username, inline: true },
+                    { name: 'Salon', value: message.channel.name, inline: true },
+                    { name: 'Lien', value: message.content?.substring(0, 500) || 'Vide', inline: false }
+                  )
+                  .setTimestamp();
+                await ch.send({ embeds: [embed] });
+              }
             }
             return;
           } catch (e) {}
@@ -1424,10 +1446,22 @@ client.on('messageCreate', async (message) => {
       const lower = message.content.toLowerCase();
       if (gCfg.badWords.some(word => lower.includes(word.toLowerCase()))) {
         try {
+          const detectedWord = gCfg.badWords.find(word => lower.includes(word.toLowerCase()));
           await message.delete();
-          const ch = message.guild.channels.cache.get(gCfg.logChannel);
-          if (ch) {
-            await ch.send(`🤐 **${message.author.username}** - Mot interdit supprimé`);
+          if (gCfg.logChannel) {
+            const ch = message.guild.channels.cache.get(gCfg.logChannel);
+            if (ch) {
+              const embed = new EmbedBuilder()
+                .setColor('#e74c3c')
+                .setTitle('🤐 Mot interdit détecté')
+                .addFields(
+                  { name: 'Membre', value: message.author.username, inline: true },
+                  { name: 'Salon', value: message.channel.name, inline: true },
+                  { name: 'Mot détecté', value: '||' + detectedWord + '||', inline: true }
+                )
+                .setTimestamp();
+              await ch.send({ embeds: [embed] });
+            }
           }
           return;
         } catch (e) {}
@@ -1441,6 +1475,21 @@ client.on('messageCreate', async (message) => {
       if (total > 10 && (upper / total * 100) > gCfg.automodCapsLimit) {
         try {
           await message.delete();
+          if (gCfg.logChannel) {
+            const ch = message.guild.channels.cache.get(gCfg.logChannel);
+            if (ch) {
+              const embed = new EmbedBuilder()
+                .setColor('#f39c12')
+                .setTitle('🔠 Trop de majuscules')
+                .addFields(
+                  { name: 'Membre', value: message.author.username, inline: true },
+                  { name: 'Salon', value: message.channel.name, inline: true },
+                  { name: 'Pourcentage', value: `${Math.round(upper / total * 100)}%`, inline: true }
+                )
+                .setTimestamp();
+              await ch.send({ embeds: [embed] });
+            }
+          }
           return;
         } catch (e) {}
       }
@@ -1511,6 +1560,37 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
           .addFields(
             { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
             { name: 'Salon', value: oldState.channel.name, inline: true }
+          )
+          .setTimestamp();
+        await ch.send({ embeds: [embed] });
+      } else if (oldState.channel && newState.channel && oldState.channel.id !== newState.channel.id) {
+        const embed = new EmbedBuilder()
+          .setColor('#9b59b6')
+          .setTitle('🔀 Voice Move')
+          .addFields(
+            { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
+            { name: 'Avant', value: oldState.channel.name, inline: true },
+            { name: 'Après', value: newState.channel.name, inline: true }
+          )
+          .setTimestamp();
+        await ch.send({ embeds: [embed] });
+      } else if (!oldState.deaf && newState.deaf) {
+        const embed = new EmbedBuilder()
+          .setColor('#e74c3c')
+          .setTitle('🔇 Voice Deaf')
+          .addFields(
+            { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
+            { name: 'Salon', value: newState.channel.name, inline: true }
+          )
+          .setTimestamp();
+        await ch.send({ embeds: [embed] });
+      } else if (!oldState.mute && newState.mute) {
+        const embed = new EmbedBuilder()
+          .setColor('#e74c3c')
+          .setTitle('🔇 Voice Mute')
+          .addFields(
+            { name: 'Membre', value: `${oldState.member.user.username}`, inline: true },
+            { name: 'Salon', value: newState.channel.name, inline: true }
           )
           .setTimestamp();
         await ch.send({ embeds: [embed] });
@@ -1630,6 +1710,107 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
     )
     .setTimestamp();
   await ch.send({ embeds: [embed] });
+});
+
+// ROLE CREATE (logs)
+client.on('roleCreate', async (role) => {
+  const gCfg = cfg(role.guild.id);
+  if (!gCfg.logChannel || !gCfg.logsServer) return;
+  const ch = role.guild.channels.cache.get(gCfg.logChannel);
+  if (!ch) return;
+  
+  const embed = new EmbedBuilder()
+    .setColor('#2ecc71')
+    .setTitle('🏷️ Rôle créé')
+    .addFields(
+      { name: 'Rôle', value: role.name, inline: true },
+      { name: 'Couleur', value: role.hexColor || '#000000', inline: true },
+      { name: 'Position', value: role.position.toString(), inline: true }
+    )
+    .setTimestamp();
+  await ch.send({ embeds: [embed] });
+});
+
+// ROLE DELETE (logs)
+client.on('roleDelete', async (role) => {
+  const gCfg = cfg(role.guild.id);
+  if (!gCfg.logChannel || !gCfg.logsServer) return;
+  const ch = role.guild.channels.cache.get(gCfg.logChannel);
+  if (!ch) return;
+  
+  const embed = new EmbedBuilder()
+    .setColor('#e74c3c')
+    .setTitle('🏷️ Rôle supprimé')
+    .addFields(
+      { name: 'Rôle', value: role.name, inline: true },
+      { name: 'Couleur', value: role.hexColor || '#000000', inline: true },
+      { name: 'Position', value: role.position.toString(), inline: true }
+    )
+    .setTimestamp();
+  await ch.send({ embeds: [embed] });
+});
+
+// MEMBER UPDATE (logs - nickname, roles, avatar)
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+  const gCfg = cfg(newMember.guild.id);
+  if (!gCfg.logChannel) return;
+  const ch = newMember.guild.channels.cache.get(gCfg.logChannel);
+  if (!ch) return;
+
+  // Nickname change
+  if (gCfg.logsMembers && oldMember.nickname !== newMember.nickname) {
+    const embed = new EmbedBuilder()
+      .setColor('#f39c12')
+      .setTitle('📝 Surnom modifié')
+      .addFields(
+        { name: 'Membre', value: newMember.user.username, inline: true },
+        { name: 'Avant', value: oldMember.nickname || oldMember.user.username, inline: true },
+        { name: 'Après', value: newMember.nickname || newMember.user.username, inline: true }
+      )
+      .setTimestamp();
+    await ch.send({ embeds: [embed] });
+  }
+
+  // Role changes
+  if (gCfg.logsModeration) {
+    const oldRoles = [...oldMember.roles.cache.keys()];
+    const newRoles = [...newMember.roles.cache.keys()];
+    const added = newRoles.filter(r => !oldRoles.includes(r));
+    const removed = oldRoles.filter(r => !newRoles.includes(r));
+
+    if (added.length > 0 || removed.length > 0) {
+      const roleNames = (ids) => ids.map(id => {
+        const role = newMember.guild.roles.cache.get(id);
+        return role ? role.name : id;
+      }).join(', ');
+      
+      const embed = new EmbedBuilder()
+        .setColor('#9b59b6')
+        .setTitle('🎭 Rôles modifiés')
+        .addFields(
+          { name: 'Membre', value: newMember.user.username, inline: true }
+        )
+        .setTimestamp();
+      
+      if (added.length > 0) embed.addFields({ name: '✅ Rôles ajoutés', value: roleNames(added), inline: false });
+      if (removed.length > 0) embed.addFields({ name: '❌ Rôles retirés', value: roleNames(removed), inline: false });
+      
+      await ch.send({ embeds: [embed] });
+    }
+  }
+
+  // Server boost
+  if (gCfg.logsServer && !oldMember.premiumSince && newMember.premiumSince) {
+    const embed = new EmbedBuilder()
+      .setColor('#f47fff')
+      .setTitle('💎 Boost du serveur !')
+      .addFields(
+        { name: 'Membre', value: newMember.user.username, inline: true },
+        { name: 'Total boosts', value: newMember.guild.premiumSubscriptionCount?.toString() || 'Inconnu', inline: true }
+      )
+      .setTimestamp();
+    await ch.send({ embeds: [embed] });
+  }
 });
 
 // ===================== COMMANDES =====================

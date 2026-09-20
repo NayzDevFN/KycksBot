@@ -7,20 +7,12 @@
 
 body {
   font-family: 'Patrick Hand', cursive;
-  background: #f5f0e6;
+  background: #e8e8e8;
   color: #2d2d2d;
   text-align: center;
   overflow-x: hidden;
   min-height: 100vh;
   padding-top: 60px;
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 31px,
-      rgba(173, 216, 230, 0.3) 31px,
-      rgba(173, 216, 230, 0.3) 32px
-    );
 }
 
 .paper-texture {
@@ -40,7 +32,7 @@ body {
   left: 0;
   right: 0;
   height: 60px;
-  background: rgba(255, 254, 249, 0.95);
+  background: rgba(220, 220, 220, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 2px solid #2d2d2d;
   display: flex;
@@ -202,7 +194,7 @@ header {
   padding: 18px 30px;
   border: 2px solid #2d2d2d;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(180, 180, 180, 0.5);
 }
 
 .stat-number {
@@ -258,7 +250,7 @@ section {
 
 .feature-card {
   padding: 30px 20px;
-  background: #fffef9;
+  background: #d8d8d8;
   border: 2px solid #2d2d2d;
   border-radius: 10px;
   box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
@@ -299,7 +291,7 @@ section {
 
 .cmd-card {
   padding: 15px;
-  background: #fffef9;
+  background: #d8d8d8;
   border: 2px solid #2d2d2d;
   border-radius: 8px;
   text-align: left;
@@ -327,7 +319,7 @@ section {
 
 /* ===================== DASHBOARD ===================== */
 #panel {
-  background: #f5f0e6;
+  background: #e0e0e0;
 }
 
 .dashboard {
@@ -429,7 +421,7 @@ section {
 
 /* Content */
 .dash-content {
-  background: #fffef9;
+  background: #d8d8d8;
   padding: 30px;
 }
 
@@ -452,7 +444,7 @@ section {
 
 /* Settings */
 .setting-card {
-  background: #f9f6f0;
+  background: #c8c8c8;
   border: 2px solid #e0e0e0;
   border-radius: 10px;
   padding: 20px;
@@ -611,7 +603,7 @@ section {
 
 .qa-btn {
   padding: 15px;
-  background: #f9f6f0;
+  background: #c8c8c8;
   border: 2px solid #ddd;
   border-radius: 10px;
   font-family: 'Patrick Hand', cursive;
@@ -656,7 +648,7 @@ section {
   align-items: center;
   gap: 15px;
   padding: 12px 15px;
-  background: #f9f6f0;
+  background: #c8c8c8;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   margin-bottom: 8px;
@@ -697,9 +689,16 @@ section {
   padding: 30px;
   color: #999;
   font-style: italic;
-  background: #f9f6f0;
+  background: #c8c8c8;
   border-radius: 10px;
   border: 2px dashed #ddd;
+}
+
+/* Setting card separators */
+.setting-card + .setting-card {
+  border-top: 2px solid #2d2d2d;
+  margin-top: 12px;
+  padding-top: 12px;
 }
 
 /* Toggle */
@@ -791,7 +790,7 @@ section {
   max-width: 450px;
   margin: 0 auto;
   padding: 35px;
-  background: #fffef9;
+  background: #d8d8d8;
   border: 3px solid #2d2d2d;
   border-radius: 12px;
   box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
@@ -834,7 +833,7 @@ section {
 
 /* ===================== SUPPORT ===================== */
 #support {
-  background: #f9f6f0;
+  background: #d0d0d0;
 }
 
 .support-links {
@@ -850,7 +849,7 @@ section {
   align-items: center;
   gap: 10px;
   padding: 25px 35px;
-  background: #fffef9;
+  background: #d8d8d8;
   border: 2px solid #2d2d2d;
   border-radius: 12px;
   text-decoration: none;

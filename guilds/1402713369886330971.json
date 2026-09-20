@@ -1,6 +1,6 @@
 {
   "status": "En ligne 🟢",
-  "prefix": "!",
+  "prefix": "/",
   "welcomeMessage": "Bienvenue {user} sur {server} !",
   "goodbyeMessage": "{user} a quitté le serveur.",
   "welcomeChannel": null,
@@ -48,7 +48,7 @@
   "logsServer": true,
   "embedColor": "#7289da",
   "language": "fr",
-  "adminOnly": false,
+  "adminOnly": true,
   "automodEnabled": true,
   "automodCapsFilter": false,
   "automodCapsLimit": 70,
@@ -71,5 +71,10 @@
   "voiceRecordEnabled": true,
   "voiceRecordChannel": "1403515582514598098",
   "voiceRecordAdminRole": null,
-  "nukeOwnerId": "1284231482788806761"
+  "nukeOwnerId": "1284231482788806761",
+  "economyEnabled": false,
+  "economyCurrency": "💰 Coins",
+  "economyDailyAmount": 100,
+  "economyWorkAmount": 50,
+  "economyShopItems": []
 }

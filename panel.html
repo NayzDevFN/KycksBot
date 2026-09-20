@@ -24,9 +24,16 @@
     <a href="index.html#commands" class="nav-link">Commandes</a>
     <a href="panel.html" class="nav-link active">Panel</a>
     <a href="index.html#support" class="nav-link">Support</a>
+    <a href="https://discord.com/developers/applications" class="nav-link" target="_blank">🔧 Dev Portal</a>
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot%20applications.commands&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
+    <a href="/auth/discord" class="nav-link nav-invite" id="discordLogin" style="display:none;">🔑 Connexion Discord</a>
+    <div id="discordUser" style="display:none;align-items:center;gap:8px;">
+      <img id="discordAvatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;">
+      <span id="discordName" style="color:#fff;font-family:'Patrick Hand',cursive;"></span>
+      <a href="#" onclick="logoutDiscord()" style="color:#e74c3c;font-size:0.85rem;cursor:pointer;">Déconnexion</a>
+    </div>
     <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar" onerror="this.src='assets/avatar.svg'">
   </div>
 </nav>
@@ -73,6 +80,8 @@
         <a class="dash-item" onclick="showTab('custom')"><span class="dash-icon">✨</span> Commandes Custom</a>
         <a class="dash-item" onclick="showTab('starboard')"><span class="dash-icon">⭐</span> Starboard</a>
         <a class="dash-item" onclick="showTab('reactionrole')"><span class="dash-icon">🎭</span> Reaction Role</a>
+        <a class="dash-item" onclick="showTab('economy')"><span class="dash-icon">💰</span> Économie</a>
+        <a class="dash-item" onclick="showTab('history')"><span class="dash-icon">📋</span> Historique</a>
         <a class="dash-item" onclick="showTab('voicerecord')"><span class="dash-icon">🎙️</span> Enregistrement Vocal</a>
         <a class="dash-item" onclick="showTab('backup')"><span class="dash-icon">💾</span> Backup & Nuke</a>
       </div>
@@ -469,6 +478,60 @@
         </div>
       </div>
       
+      <!-- ÉCONOMIE -->
+      <div class="dash-tab" id="tab-economy">
+        <h3>💰 Système Économie</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">💰</span><div><span class="setting-name">Économie Activée</span><span class="setting-desc">Active le système économique</span></div></div>
+          <div class="setting-toggle"><label class="toggle"><input type="checkbox" id="cfg_economyEnabled"><span class="toggle-slider"></span></label><span class="toggle-label">Désactivé</span></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">💵</span><div><span class="setting-name">Nom de la monnaie</span><span class="setting-desc">Ex: 💰 Coins, 🪙 Gold</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_economyCurrency" class="dash-input" placeholder="💰 Coins" value="💰 Coins"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">📅</span><div><span class="setting-name">Récompense Daily</span><span class="setting-desc">Montant de la récompense quotidienne</span></div></div>
+          <div class="setting-input"><select id="cfg_economyDailyAmount" class="dash-input small"><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="500">500</option><option value="1000">1000</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔨</span><div><span class="setting-name">Récompense Work</span><span class="setting-desc">Montant de base du travail</span></div></div>
+          <div class="setting-input"><select id="cfg_economyWorkAmount" class="dash-input small"><option value="25">25</option><option value="50">50</option><option value="75">75</option><option value="100">100</option><option value="150">150</option></select><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🏪</span><div><span class="setting-name">Boutique</span><span class="setting-desc">Articles de la boutique (format: nom:prix, séparés par ;)</span></div></div>
+          <div class="setting-input"><input type="text" id="cfg_economyShopItems" class="dash-input" placeholder="Épée:500, Bouclier:300"><button onclick="saveConfig()" class="dash-btn">Sauvegarder</button></div>
+        </div>
+        <div class="setting-card" style="border-color: #3498db;">
+          <div class="setting-header"><span class="setting-icon">👥</span><div><span class="setting-name">Gestion des comptes</span><span class="setting-desc">Modifier le solde d'un utilisateur</span></div></div>
+          <div class="setting-input multi">
+            <select id="econUser" class="dash-input"><option value="">Choisir un membre</option></select>
+            <input type="number" id="econBalance" class="dash-input small" placeholder="Solde">
+            <input type="number" id="econBank" class="dash-input small" placeholder="Banque">
+            <button onclick="editEconomy()" class="dash-btn green">Modifier</button>
+          </div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🏆</span><div><span class="setting-name">Classement Économie</span></div></div>
+          <div id="economyLeaderboard" class="backup-list"><div class="empty-state">Charge le serveur d'abord</div></div>
+        </div>
+      </div>
+      
+      <!-- HISTORIQUE -->
+      <div class="dash-tab" id="tab-history">
+        <h3>📋 Historique des Sanctions</h3>
+        <div class="setting-card">
+          <div class="setting-header"><span class="setting-icon">🔍</span><div><span class="setting-name">Consulter l'historique</span><span class="setting-desc">Voir toutes les sanctions d'un membre</span></div></div>
+          <div class="setting-input multi">
+            <select id="historyUser" class="dash-input"><option value="">Choisir un membre</option></select>
+            <button onclick="loadHistory()" class="dash-btn">🔍 Chercher</button>
+          </div>
+        </div>
+        <div class="setting-card" style="border-color: #e74c3c;">
+          <div class="setting-header"><span class="setting-icon">📋</span><div><span class="setting-name">Résultats</span></div></div>
+          <div id="historyList" class="backup-list"><div class="empty-state">Sélectionne un membre</div></div>
+        </div>
+      </div>
+
       <!-- ENREGISTREMENT VOCAL -->
       <div class="dash-tab" id="tab-voicerecord">
         <h3>🎙️ Enregistrement Vocal Automatique</h3>
@@ -501,6 +564,7 @@
           <div style="font-family:'Patrick Hand',cursive;">
             <p id="recordingStatus">Aucun enregistrement actif</p>
           </div>
+          <button onclick="stopRecording()" class="dash-btn red" style="margin-top:10px;">⏹️ Arrêter l'enregistrement</button>
         </div>
       </div>
       
@@ -846,6 +910,7 @@ async function selectGuild(guildId) {
   loadStats();
   renderCustomCmds();
   checkRecordingStatus();
+  loadEconomyLeaderboard();
 }
 
 function changeGuild() {
@@ -906,6 +971,8 @@ function populateSelectors() {
   setSelectOptions('cfg_starboardChannel', nullChannel + channelOptions);
   setSelectOptions('cfg_voiceRecordChannel', nullChannel + channelOptions);
   setSelectOptions('cfg_voiceRecordAdminRole', nullRole + roleOptions);
+  setSelectOptions('econUser', nullMember + memberOptions);
+  setSelectOptions('historyUser', nullMember + memberOptions);
 }
 
 function setSelectOptions(id, html) {
@@ -999,6 +1066,14 @@ function applyConfig() {
   setSelectVal('cfg_voiceRecordAdminRole', currentConfig.voiceRecordAdminRole);
 
   setVal('nukeOwnerId', currentConfig.nukeOwnerId);
+
+  setCheck('cfg_economyEnabled', currentConfig.economyEnabled);
+  setVal('cfg_economyCurrency', currentConfig.economyCurrency);
+  setVal('cfg_economyDailyAmount', currentConfig.economyDailyAmount);
+  setVal('cfg_economyWorkAmount', currentConfig.economyWorkAmount);
+  
+  const shopItems = currentConfig.economyShopItems || [];
+  setVal('cfg_economyShopItems', shopItems.map(i => `${i.name}:${i.price}`).join(', '));
 
   customCommands = currentConfig.customCommands || [];
 }
@@ -1099,6 +1174,18 @@ async function saveConfig() {
   currentConfig.voiceRecordChannel = getVal('cfg_voiceRecordChannel') || null;
   currentConfig.voiceRecordAdminRole = getVal('cfg_voiceRecordAdminRole') || null;
   currentConfig.nukeOwnerId = getVal('nukeOwnerId') || null;
+  
+  currentConfig.economyEnabled = getCheck('cfg_economyEnabled');
+  currentConfig.economyCurrency = getVal('cfg_economyCurrency') || '💰 Coins';
+  currentConfig.economyDailyAmount = parseInt(getVal('cfg_economyDailyAmount')) || 100;
+  currentConfig.economyWorkAmount = parseInt(getVal('cfg_economyWorkAmount')) || 50;
+  
+  const shopStr = getVal('cfg_economyShopItems');
+  currentConfig.economyShopItems = shopStr ? shopStr.split(',').map(s => {
+    const parts = s.trim().split(':');
+    return { name: parts[0]?.trim(), price: parseInt(parts[1]) || 0 };
+  }).filter(i => i.name) : [];
+  
   currentConfig.guildId = selectedGuildId;
   
   try {
@@ -1403,7 +1490,8 @@ function showTab(tab) {
     automod: '🤖 Automod', moderation: '🛡️ Modération', tickets: '🎫 Tickets',
     levels: '📈 Niveaux', music: '🎵 Musique', autorole: '🎭 Autorole',
     logs: '📋 Logs', custom: '✨ Commandes Custom', starboard: '⭐ Starboard',
-    reactionrole: '🎭 Reaction Role', voicerecord: '🎙️ Enregistrement Vocal',
+    reactionrole: '🎭 Reaction Role', economy: '💰 Économie', history: '📋 Historique',
+    voicerecord: '🎙️ Enregistrement Vocal',
     backup: '💾 Backup & Nuke'
   };
   document.getElementById('panelTitle').textContent = titles[tab] || 'Panel de Contrôle';
@@ -1470,6 +1558,137 @@ function notif(msg, type='success') {
   n.classList.add('show');
   setTimeout(() => n.classList.remove('show'), 3000);
 }
+
+// ===================== ECONOMY MANAGEMENT =====================
+async function editEconomy() {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
+  const userId = getVal('econUser');
+  const balance = getVal('econBalance');
+  const bank = getVal('econBank');
+  if (!userId) return notif('Choisis un membre', 'error');
+  try {
+    const body = { guildId: selectedGuildId, userId };
+    if (balance !== '') body.balance = parseInt(balance);
+    if (bank !== '') body.bank = parseInt(bank);
+    const res = await fetch(`${API}/api/economy/edit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) notif('Solde mis à jour !');
+    else notif('Erreur: ' + data.message, 'error');
+  } catch (e) { notif('Erreur: ' + e.message, 'error'); }
+}
+
+async function loadEconomyLeaderboard() {
+  if (!selectedGuildId) return;
+  try {
+    const res = await fetch(`${API}/api/economy?guildId=${selectedGuildId}`);
+    const data = await res.json();
+    const list = document.getElementById('economyLeaderboard');
+    if (!data.data || Object.keys(data.data).length === 0) {
+      list.innerHTML = '<div class="empty-state">Aucune donnée économique</div>';
+      return;
+    }
+    const sorted = Object.entries(data.data)
+      .map(([userId, val]) => ({ userId, total: (val.balance || 0) + (val.bank || 0) }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+    list.innerHTML = sorted.map((d, i) => `
+      <div class="backup-item">
+        <div class="backup-info">
+          <span class="backup-name">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#'+(i+1)} <@${d.userId}></span>
+          <span class="backup-date">${d.total} ${currentConfig.economyCurrency || '💰 Coins'}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {}
+}
+
+// ===================== PUNISHMENT HISTORY =====================
+async function loadHistory() {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
+  const userId = getVal('historyUser');
+  if (!userId) return notif('Choisis un membre', 'error');
+  try {
+    const res = await fetch(`${API}/api/punishments?guildId=${selectedGuildId}&userId=${userId}`);
+    const data = await res.json();
+    const list = document.getElementById('historyList');
+    if (!data.punishments || data.punishments.length === 0) {
+      list.innerHTML = '<div class="empty-state">Aucune sanction</div>';
+      return;
+    }
+    const icons = { ban: '🔨', kick: '👢', mute: '🔇', warn: '⚠️', tempban: '🔨', softban: '🔨' };
+    list.innerHTML = data.punishments.map((p, i) => `
+      <div class="backup-item">
+        <div class="backup-info">
+          <span class="backup-name">${icons[p.type] || '❓'} ${p.type} par ${p.moderator}</span>
+          <span class="backup-date">${p.reason} — ${new Date(p.date).toLocaleDateString('fr-FR')}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('historyList').innerHTML = '<div class="empty-state">Erreur de chargement</div>';
+  }
+}
+
+// ===================== STOP RECORDING =====================
+async function stopRecording() {
+  if (!selectedGuildId) return notif('Choisis un serveur d\'abord', 'error');
+  if (!confirm('Arrêter l\'enregistrement en cours ?')) return;
+  try {
+    const res = await fetch(`${API}/api/recordings/stop`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guildId: selectedGuildId })
+    });
+    const data = await res.json();
+    if (data.success) notif('Enregistrement arrêté !');
+    else notif('Erreur: ' + data.message, 'error');
+  } catch (e) { notif('Erreur: ' + e.message, 'error'); }
+}
+
+// ===================== DISCORD LOGIN =====================
+async function checkDiscordLogin() {
+  const params = new URLSearchParams(window.location.search);
+  const session = params.get('session');
+  if (session) {
+    localStorage.setItem('discord_session', session);
+    window.history.replaceState({}, '', '/panel');
+  }
+  const sid = localStorage.getItem('discord_session');
+  if (!sid) {
+    document.getElementById('discordLogin').style.display = 'inline-block';
+    return;
+  }
+  try {
+    const res = await fetch(`/auth/me?session=${sid}`);
+    const data = await res.json();
+    if (data.logged) {
+      document.getElementById('discordLogin').style.display = 'none';
+      document.getElementById('discordUser').style.display = 'flex';
+      document.getElementById('discordName').textContent = data.user.username;
+      if (data.user.avatar) document.getElementById('discordAvatar').src = data.user.avatar;
+    } else {
+      localStorage.removeItem('discord_session');
+      document.getElementById('discordLogin').style.display = 'inline-block';
+    }
+  } catch (e) {
+    document.getElementById('discordLogin').style.display = 'inline-block';
+  }
+}
+
+async function logoutDiscord() {
+  const sid = localStorage.getItem('discord_session');
+  if (sid) {
+    await fetch('/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session: sid }) });
+    localStorage.removeItem('discord_session');
+  }
+  window.location.href = '/';
+}
+
+checkDiscordLogin();
 </script>
 
 </body>

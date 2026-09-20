@@ -23,9 +23,16 @@
     <a href="#commands" class="nav-link">Commandes</a>
     <a href="panel.html" class="nav-link">Panel</a>
     <a href="#support" class="nav-link">Support</a>
+    <a href="https://discord.com/developers/applications" class="nav-link" target="_blank">🔧 Dev Portal</a>
     <a href="https://discord.com/oauth2/authorize?client_id=1544851212187340881&scope=bot%20applications.commands&permissions=8" class="nav-link nav-invite" target="_blank">+ Inviter</a>
   </div>
   <div class="nav-right">
+    <a href="/auth/discord" class="nav-link nav-invite" id="discordLogin" style="display:none;">🔑 Connexion Discord</a>
+    <div id="discordUser" style="display:none;align-items:center;gap:8px;">
+      <img id="discordAvatar" src="" alt="" style="width:32px;height:32px;border-radius:50%;">
+      <span id="discordName" style="color:#fff;font-family:'Patrick Hand',cursive;"></span>
+      <a href="#" onclick="logoutDiscord()" style="color:#e74c3c;font-size:0.85rem;cursor:pointer;">Déconnexion</a>
+    </div>
     <img src="assets/avatar/KycksBot-pdp.png" alt="Kycks Bot" class="nav-avatar" onerror="this.src='assets/avatar.svg'">
   </div>
 </nav>
@@ -44,7 +51,7 @@
   <div class="header-stats">
     <div class="stat-box"><span class="stat-number" id="statServers">-</span><span class="stat-label">Serviteurs</span></div>
     <div class="stat-box"><span class="stat-number" id="statUsers">-</span><span class="stat-label">Utilisateurs</span></div>
-    <div class="stat-box"><span class="stat-number">70+</span><span class="stat-label">Commandes</span></div>
+    <div class="stat-box"><span class="stat-number">85+</span><span class="stat-label">Commandes</span></div>
   </div>
 </header>
 
@@ -52,14 +59,18 @@
 <section id="features">
   <h2 class="section-title">Ce qu'il fait</h2>
   <div class="features-grid">
-    <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Modération</h3><p>Ban, kick, mute, warn, tempban, slowmode...</p></div>
-    <div class="feature-card"><div class="feature-icon">🤖</div><h3>Automod</h3><p>Anti-spam, anti-liens, mots interdits, anti-raid</p></div>
-    <div class="feature-card"><div class="feature-icon">🎫</div><h3>Tickets</h3><p>Système de tickets (Ticketool)</p></div>
-    <div class="feature-card"><div class="feature-icon">🎵</div><h3>Musique</h3><p>YouTube, Spotify, SoundCloud...</p></div>
-    <div class="feature-card"><div class="feature-icon">📈</div><h3>Niveaux</h3><p>Système XP, niveaux, rôles récompenses</p></div>
-    <div class="feature-card"><div class="feature-icon">💾</div><h3>Backup & Nuke</h3><p>Sauvegarde/restore des salons, nuke serveur</p></div>
-    <div class="feature-card"><div class="feature-icon">📋</div><h3>Logs</h3><p>Messages, membres, vocaux, modération</p></div>
+    <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Modération</h3><p>Ban, kick, mute, warn, tempban, slowmode, historique des sanctions</p></div>
+    <div class="feature-card"><div class="feature-icon">🤖</div><h3>Automod</h3><p>Anti-spam, anti-liens, anti-raid, mots interdits, filtre majuscules</p></div>
+    <div class="feature-card"><div class="feature-icon">🎫</div><h3>Tickets</h3><p>Système de tickets avec transcripts et catégories</p></div>
+    <div class="feature-card"><div class="feature-icon">💰</div><h3>Économie</h3><p>Monnaie virtuelle, daily, work, banque, boutique, leaderboard</p></div>
+    <div class="feature-card"><div class="feature-icon">📈</div><h3>Niveaux</h3><p>Système XP, niveaux, rôles récompenses, classement</p></div>
     <div class="feature-card"><div class="feature-icon">⭐</div><h3>Starboard</h3><p>Messages étoilés automatiques</p></div>
+    <div class="feature-card"><div class="feature-icon">🎭</div><h3>Reaction Roles</h3><p>Rôles automatiques via réactions</p></div>
+    <div class="feature-card"><div class="feature-icon">🎙️</div><h3>Enregistrement Vocal</h3><p>Enregistrement auto des salons vocaux</p></div>
+    <div class="feature-card"><div class="feature-icon">💾</div><h3>Backup & Nuke</h3><p>Sauvegarde/restore des salons, nuke serveur</p></div>
+    <div class="feature-card"><div class="feature-icon">📋</div><h3>Logs</h3><p>Messages, membres, vocaux, modération, éditions</p></div>
+    <div class="feature-card"><div class="feature-icon">😴</div><h3>AFK</h3><p>Système AFK avec détection de mentions</p></div>
+    <div class="feature-card"><div class="feature-icon">📋</div><h3>Historique</h3><p>Historique complet des sanctions par membre</p></div>
   </div>
 </section>
 
@@ -74,6 +85,7 @@
     <div class="cmd-card"><span class="cmd-name">/warn</span><span class="cmd-desc">Avertir un membre</span></div>
     <div class="cmd-card"><span class="cmd-name">/tempban</span><span class="cmd-desc">Ban temporaire</span></div>
     <div class="cmd-card"><span class="cmd-name">/softban</span><span class="cmd-desc">Softban (nettoyer)</span></div>
+    <div class="cmd-card"><span class="cmd-name">/history</span><span class="cmd-desc">Historique sanctions</span></div>
     <div class="cmd-card"><span class="cmd-name">/nuke</span><span class="cmd-desc">Nuke le serveur</span></div>
     <div class="cmd-card"><span class="cmd-name">/backup</span><span class="cmd-desc">Sauvegarder le serveur</span></div>
     <div class="cmd-card"><span class="cmd-name">/restore</span><span class="cmd-desc">Restaurer une backup</span></div>
@@ -81,7 +93,12 @@
     <div class="cmd-card"><span class="cmd-name">/close</span><span class="cmd-desc">Fermer un ticket</span></div>
     <div class="cmd-card"><span class="cmd-name">/rank</span><span class="cmd-desc">Voir ton niveau</span></div>
     <div class="cmd-card"><span class="cmd-name">/leaderboard</span><span class="cmd-desc">Classement XP</span></div>
-    <div class="cmd-card"><span class="cmd-name">/play</span><span class="cmd-desc">Jouer de la musique</span></div>
+    <div class="cmd-card"><span class="cmd-name">/balance</span><span class="cmd-desc">Voir ton solde</span></div>
+    <div class="cmd-card"><span class="cmd-name">/daily</span><span class="cmd-desc">Récompense quotidienne</span></div>
+    <div class="cmd-card"><span class="cmd-name">/work</span><span class="cmd-desc">Travailler</span></div>
+    <div class="cmd-card"><span class="cmd-name">/pay</span><span class="cmd-desc">Payer un membre</span></div>
+    <div class="cmd-card"><span class="cmd-name">/shop</span><span class="cmd-desc">Boutique</span></div>
+    <div class="cmd-card"><span class="cmd-name">/afk</span><span class="cmd-desc">Se mettre AFK</span></div>
     <div class="cmd-card"><span class="cmd-name">/embed</span><span class="cmd-desc">Créer un embed</span></div>
     <div class="cmd-card"><span class="cmd-name">/poll</span><span class="cmd-desc">Créer un sondage</span></div>
     <div class="cmd-card"><span class="cmd-name">/userinfo</span><span class="cmd-desc">Infos membre</span></div>
@@ -94,6 +111,8 @@
     <div class="cmd-card"><span class="cmd-name">/remind</span><span class="cmd-desc">Rappel timer</span></div>
     <div class="cmd-card"><span class="cmd-name">/coinflip</span><span class="cmd-desc">Pile ou face</span></div>
     <div class="cmd-card"><span class="cmd-name">/roll</span><span class="cmd-desc">Lancer un dé</span></div>
+    <div class="cmd-card"><span class="cmd-name">/starboard</span><span class="cmd-desc">Messages étoilés</span></div>
+    <div class="cmd-card"><span class="cmd-name">/setupreactionrole</span><span class="cmd-desc">Setup reaction role</span></div>
   </div>
 </section>
 
@@ -122,9 +141,10 @@
 <section id="support">
   <h2 class="section-title">Besoin d'aide ?</h2>
   <div class="support-links">
-    <a href="#" class="support-btn"><span class="support-icon">💬</span><span>Discord Support</span></a>
-    <a href="#" class="support-btn"><span class="support-icon">🐦</span><span>Twitter</span></a>
-    <a href="#" class="support-btn"><span class="support-icon">📖</span><span>Documentation</span></a>
+    <a href="https://discord.gg/kycks" class="support-btn" target="_blank"><span class="support-icon">💬</span><span>Discord Support</span></a>
+    <a href="panel.html" class="support-btn"><span class="support-icon">📋</span><span>Panel Admin</span></a>
+    <a href="https://discord.com/developers/applications" class="support-btn" target="_blank"><span class="support-icon">🔧</span><span>Developer Portal</span></a>
+    <a href="#commands" class="support-btn"><span class="support-icon">📖</span><span>Documentation</span></a>
   </div>
 </section>
 
@@ -169,6 +189,47 @@ async function loadRealStats() {
 }
 
 loadRealStats();
+
+// ===================== DISCORD LOGIN =====================
+async function checkDiscordLogin() {
+  const params = new URLSearchParams(window.location.search);
+  const session = params.get('session');
+  if (session) {
+    localStorage.setItem('discord_session', session);
+    window.history.replaceState({}, '', '/');
+  }
+  const sid = localStorage.getItem('discord_session');
+  if (!sid) {
+    document.getElementById('discordLogin').style.display = 'inline-block';
+    return;
+  }
+  try {
+    const res = await fetch(`/auth/me?session=${sid}`);
+    const data = await res.json();
+    if (data.logged) {
+      document.getElementById('discordLogin').style.display = 'none';
+      document.getElementById('discordUser').style.display = 'flex';
+      document.getElementById('discordName').textContent = data.user.username;
+      if (data.user.avatar) document.getElementById('discordAvatar').src = data.user.avatar;
+    } else {
+      localStorage.removeItem('discord_session');
+      document.getElementById('discordLogin').style.display = 'inline-block';
+    }
+  } catch (e) {
+    document.getElementById('discordLogin').style.display = 'inline-block';
+  }
+}
+
+async function logoutDiscord() {
+  const sid = localStorage.getItem('discord_session');
+  if (sid) {
+    await fetch('/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session: sid }) });
+    localStorage.removeItem('discord_session');
+  }
+  window.location.reload();
+}
+
+checkDiscordLogin();
 </script>
 
 </body>

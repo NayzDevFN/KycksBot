@@ -63,7 +63,7 @@ function sendLiveStats(target) {
     let totalUsers = 0;
     client.guilds.cache.forEach(g => totalUsers += g.memberCount);
     const defaultCfg = bot.getDefaultConfig();
-    target.emit('botStatus', { online: true, servers: guilds, users: totalUsers, commands: 70, status: defaultCfg.status });
+    target.emit('botStatus', { online: true, servers: guilds, users: totalUsers, commands: 85, status: defaultCfg.status });
   } catch (e) {
     target.emit('botStatus', { online: false });
   }
@@ -110,7 +110,7 @@ app.get('/api/stats', async (req, res) => {
     let totalUsers = 0;
     client.guilds.cache.forEach(g => totalUsers += g.memberCount);
     const defaultCfg = bot.getDefaultConfig();
-    res.json({ servers: guilds, users: totalUsers, commands: 70, status: defaultCfg.status, online: true });
+    res.json({ servers: guilds, users: totalUsers, commands: 85, status: defaultCfg.status, online: true });
   } catch (error) {
     res.json({ servers: 0, users: 0, commands: 0, status: 'Hors ligne', online: false });
   }
@@ -145,6 +145,19 @@ app.post('/api/config', (req, res) => {
 });
 
 // ===================== MODERATION =====================
+app.post('/api/clear', async (req, res) => {
+  try {
+    const { amount, guildId, channelId } = req.body;
+    const gid = guildId || GUILD_ID;
+    const guild = await bot.client.guilds.fetch(gid);
+    const channel = channelId ? await guild.channels.fetch(channelId) : guild.channels.cache.find(c => c.type === 0 && c.name.includes('general'));
+    if (!channel) return res.json({ success: false, message: 'Salon introuvable' });
+    const deleted = await channel.bulkDelete(Math.min(amount || 10, 100), true);
+    io.emit('modAction', { action: 'clear', user: 'Panel', count: deleted.size });
+    res.json({ success: true, message: `${deleted.size} messages supprimés` });
+  } catch (error) { res.json({ success: false, message: error.message }); }
+});
+
 app.post('/api/ban', async (req, res) => {
   try {
     const { userId, reason, guildId } = req.body;
@@ -374,6 +387,42 @@ app.post('/api/send', async (req, res) => {
   } catch (error) { res.json({ success: false, message: error.message }); }
 });
 
+// ===================== ECONOMY =====================
+app.get('/api/economy', (req, res) => {
+  const guildId = req.query.guildId || GUILD_ID;
+  if (!guildId) return res.json({ data: {} });
+  const guildData = {};
+  for (const [key, val] of Object.entries(bot.economyData)) {
+    if (key.startsWith(guildId + '_')) {
+      const userId = key.split('_')[1];
+      guildData[userId] = val;
+    }
+  }
+  res.json({ data: guildData });
+});
+
+app.post('/api/economy/edit', (req, res) => {
+  try {
+    const { guildId, userId, balance, bank } = req.body;
+    if (!guildId || !userId) return res.json({ success: false, message: 'guildId et userId requis' });
+    const eco = bot.getEconomy(userId, guildId);
+    if (balance !== undefined) eco.balance = parseInt(balance) || 0;
+    if (bank !== undefined) eco.bank = parseInt(bank) || 0;
+    bot.saveEconomy();
+    io.emit('configUpdated');
+    res.json({ success: true, message: 'Solde mis à jour' });
+  } catch (error) { res.json({ success: false, message: error.message }); }
+});
+
+app.get('/api/punishments', (req, res) => {
+  const guildId = req.query.guildId || GUILD_ID;
+  const userId = req.query.userId;
+  if (!guildId || !userId) return res.json({ punishments: [] });
+  const key = `${guildId}_${userId}`;
+  const data = loadJsonFile(path.join(__dirname, 'punishments-data.json'), {});
+  res.json({ punishments: data[key] || [] });
+});
+
 // ===================== VOICE RECORDING STATUS =====================
 app.get('/api/recordings/status', (req, res) => {
   try {
@@ -425,6 +474,104 @@ app.post('/api/avatar/upload', (req, res) => {
   } catch (error) { res.json({ success: false, message: error.message }); }
 });
 
+// ===================== DISCORD OAUTH2 =====================
+const crypto = require('crypto');
+const sessions = new Map();
+
+function generateSessionId() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+// Redirect to Discord OAuth2
+app.get('/auth/discord', (req, res) => {
+  const clientId = process.env.CLIENT_ID;
+  const redirectUri = encodeURIComponent(`http://localhost:${PORT}/auth/discord/callback`);
+  const scope = encodeURIComponent('identify guilds');
+  const url = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+  res.redirect(url);
+});
+
+// OAuth2 callback
+app.get('/auth/discord/callback', async (req, res) => {
+  const { code } = req.query;
+  if (!code) return res.redirect('/?error=no_code');
+
+  try {
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+    const redirectUri = `http://localhost:${PORT}/auth/discord/callback`;
+
+    // Exchange code for token
+    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri
+      })
+    });
+    const tokenData = await tokenRes.json();
+    if (tokenData.error) return res.redirect('/?error=token_exchange_failed');
+
+    // Fetch user info
+    const userRes = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    });
+    const userData = await userRes.json();
+
+    // Fetch user's guilds
+    const guildsRes = await fetch('https://discord.com/api/users/@me/guilds', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    });
+    const guildsData = await guildsRes.json();
+
+    // Create session
+    const sessionId = generateSessionId();
+    sessions.set(sessionId, {
+      user: {
+        id: userData.id,
+        username: userData.username,
+        avatar: userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : null,
+        discriminator: userData.discriminator
+      },
+      guilds: guildsData.filter(g => g.owner || (parseInt(g.permissions) & 0x20) === 0x20),
+      accessToken: tokenData.access_token,
+      createdAt: Date.now()
+    });
+
+    res.redirect(`/panel?session=${sessionId}`);
+  } catch (error) {
+    console.error('[OAuth2] Error:', error.message);
+    res.redirect('/?error=auth_failed');
+  }
+});
+
+// Get current session
+app.get('/auth/me', (req, res) => {
+  const sessionId = req.query.session || req.headers['x-session-id'];
+  if (!sessionId || !sessions.has(sessionId)) {
+    return res.json({ logged: false });
+  }
+  const session = sessions.get(sessionId);
+  res.json({
+    logged: true,
+    user: session.user,
+    guilds: session.guilds
+  });
+});
+
+// Logout
+app.post('/auth/logout', (req, res) => {
+  const sessionId = req.body.session || req.headers['x-session-id'];
+  if (sessionId && sessions.has(sessionId)) {
+    sessions.delete(sessionId);
+  }
+  res.json({ success: true });
+});
+
 // ===================== SERVE HTML =====================
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/panel', (req, res) => res.sendFile(path.join(__dirname, 'panel.html')));
@@ -436,7 +583,7 @@ server.listen(PORT, () => {
   console.log(`🏠 Site: http://localhost:${PORT}`);
   console.log(`📋 Panel: http://localhost:${PORT}/panel`);
   console.log(`🤖 Bot Discord connecté !`);
-  console.log(`📊 ACLClouds - Kycks Bot prêt`);
+  console.log(`📊 Kycks Bot prêt`);
 });
 
 // ===================== GRACEFUL SHUTDOWN =====================

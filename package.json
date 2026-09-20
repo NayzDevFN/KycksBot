@@ -1,7 +1,7 @@
 {
   "name": "kycks-bot",
   "version": "1.0.0",
-  "description": "Kycks Discord Bot - Hébergé sur ACLClouds",
+  "description": "Kycks Discord Bot - Multi-fonctions avec panel web",
   "main": "api.js",
   "engines": {
     "node": ">=18.0.0"

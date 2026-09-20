@@ -98,7 +98,12 @@ function getDefaultConfig() {
     voiceRecordEnabled: false,
     voiceRecordChannel: null,
     voiceRecordAdminRole: null,
-    nukeOwnerId: null
+    nukeOwnerId: null,
+    economyEnabled: false,
+    economyCurrency: '💰 Coins',
+    economyDailyAmount: 100,
+    economyWorkAmount: 50,
+    economyShopItems: []
   };
 }
 
@@ -146,6 +151,77 @@ function migrateOldConfig() {
       }
     }
   } catch (e) {}
+}
+
+// ===================== ECONOMY SYSTEM =====================
+const ECONOMY_DATA_PATH = path.join(__dirname, 'economy-data.json');
+let economyData = loadJsonFile(ECONOMY_DATA_PATH, {});
+
+function getEconomy(userId, guildId) {
+  const key = `${guildId}_${userId}`;
+  if (!economyData[key]) economyData[key] = { balance: 0, bank: 0, lastDaily: 0, lastWork: 0, inventory: [] };
+  return economyData[key];
+}
+
+function saveEconomy() { saveJsonFile(ECONOMY_DATA_PATH, economyData); }
+
+// ===================== PUNISHMENT HISTORY =====================
+const PUNISHMENTS_PATH = path.join(__dirname, 'punishments-data.json');
+let punishmentsData = loadJsonFile(PUNISHMENTS_PATH, {});
+
+function addPunishment(guildId, userId, type, moderator, reason) {
+  const key = `${guildId}_${userId}`;
+  if (!punishmentsData[key]) punishmentsData[key] = [];
+  punishmentsData[key].push({ type, moderator, reason, date: new Date().toISOString() });
+  saveJsonFile(PUNISHMENTS_PATH, punishmentsData);
+}
+
+function getPunishments(guildId, userId) {
+  return punishmentsData[`${guildId}_${userId}`] || [];
+}
+
+// ===================== AFK SYSTEM =====================
+const afkUsers = new Map();
+
+// ===================== TEMPBAN PERSISTENCE =====================
+const TEMPBANS_PATH = path.join(__dirname, 'tempbans-data.json');
+let tempbansData = loadJsonFile(TEMPBANS_PATH, {});
+
+function addTempban(guildId, userId, expiresAt) {
+  tempbansData[`${guildId}_${userId}`] = { expiresAt };
+  saveJsonFile(TEMPBANS_PATH, tempbansData);
+}
+
+function removeTempban(guildId, userId) {
+  delete tempbansData[`${guildId}_${userId}`];
+  saveJsonFile(TEMPBANS_PATH, tempbansData);
+}
+
+// ===================== ANTI-RAID =====================
+const raidTracker = new Map();
+
+function checkRaid(guildId) {
+  const gCfg = loadGuildConfig(guildId);
+  if (!gCfg.antiRaid) return false;
+  const key = guildId;
+  if (!raidTracker.has(key)) raidTracker.set(key, []);
+  const now = Date.now();
+  const joins = raidTracker.get(key).filter(t => now - t < (gCfg.antiRaidTime || 10) * 1000);
+  raidTracker.set(key, joins);
+  return joins.length >= (gCfg.antiRaidThreshold || 5);
+}
+
+function addJoinToRaidTracker(guildId) {
+  const key = guildId;
+  if (!raidTracker.has(key)) raidTracker.set(key, []);
+  raidTracker.get(key).push(Date.now());
+}
+
+// ===================== HELPER: hasModPermission =====================
+function hasModPermission(member, gCfg) {
+  if (member.permissions.has(PermissionFlagsBits.Administrator)) return true;
+  if (gCfg.modRole && member.roles.cache.has(gCfg.modRole)) return true;
+  return false;
 }
 
 // Default config for legacy references
@@ -992,10 +1068,6 @@ const commands = [
     .setName('pollresults').setDescription('Résultats d\'un sondage'),
   
   new SlashCommandBuilder()
-    .setName('afk').setDescription('Se mettre AFK')
-    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
-  
-  new SlashCommandBuilder()
     .setName('covid').setDescription('Stats COVID-19'),
   
   new SlashCommandBuilder()
@@ -1017,7 +1089,51 @@ const commands = [
     .setName('stopbot').setDescription('Arrêter l\'enregistrement et recevoir le fichier en DM'),
   
   new SlashCommandBuilder()
-    .setName('panel').setDescription('Ouvrir le panel de contrôle du bot')
+    .setName('panel').setDescription('Ouvrir le panel de contrôle du bot'),
+
+  // ECONOMY
+  new SlashCommandBuilder()
+    .setName('balance').setDescription('Voir ton solde'),
+  new SlashCommandBuilder()
+    .setName('daily').setDescription('Récompense quotidienne'),
+  new SlashCommandBuilder()
+    .setName('work').setDescription('Travailler pour gagner des coins'),
+  new SlashCommandBuilder()
+    .setName('deposit').setDescription('Déposer des coins en banque')
+    .addIntegerOption(o => o.setName('montant').setDescription('Montant à déposer').setRequired(true)),
+  new SlashCommandBuilder()
+    .setName('withdraw').setDescription('Retirer des coins de la banque')
+    .addIntegerOption(o => o.setName('montant').setDescription('Montant à retirer').setRequired(true)),
+  new SlashCommandBuilder()
+    .setName('pay').setDescription('Envoyer des coins à un membre')
+    .addUserOption(o => o.setName('utilisateur').setDescription('Le destinataire').setRequired(true))
+    .addIntegerOption(o => o.setName('montant').setDescription('Montant').setRequired(true)),
+  new SlashCommandBuilder()
+    .setName('economyleaderboard').setDescription('Classement économique'),
+
+  // AFK (enhanced)
+  new SlashCommandBuilder()
+    .setName('afk').setDescription('Se mettre AFK')
+    .addStringOption(o => o.setName('raison').setDescription('Raison').setRequired(false)),
+
+  // PUNISHMENT HISTORY
+  new SlashCommandBuilder()
+    .setName('history').setDescription('Historique des sanctions d\'un membre')
+    .addUserOption(o => o.setName('utilisateur').setDescription('L\'utilisateur').setRequired(false)),
+
+  // STARBOARD (manual)
+  new SlashCommandBuilder()
+    .setName('starboard').setDescription('Voir les messages étoilés'),
+
+  // REACTION ROLE SETUP
+  new SlashCommandBuilder()
+    .setName('setupreactionrole').setDescription('Setup un reaction role')
+    .addStringOption(o => o.setName('emoji').setDescription('L\'emoji').setRequired(true))
+    .addRoleOption(o => o.setName('role').setDescription('Le rôle à donner').setRequired(true)),
+
+  // SHOP
+  new SlashCommandBuilder()
+    .setName('shop').setDescription('Voir la boutique')
 ];
 
 // ===================== ENREGISTREMENT =====================
@@ -1059,6 +1175,32 @@ client.on('ready', async () => {
       console.log(`📁 Config auto-créée pour ${g.name} (${g.id})`);
     }
   });
+  
+  // Reload persistent tempbans
+  const now = Date.now();
+  for (const [key, data] of Object.entries(tempbansData)) {
+    if (data.expiresAt && data.expiresAt > now) {
+      const [guildId, userId] = key.split('_');
+      const remaining = data.expiresAt - now;
+      setTimeout(async () => {
+        try {
+          const guild = await client.guilds.fetch(guildId);
+          await guild.members.unban(userId);
+          removeTempban(guildId, userId);
+        } catch (e) {
+          removeTempban(guildId, userId);
+        }
+      }, remaining);
+    } else if (data.expiresAt && data.expiresAt <= now) {
+      const [guildId, userId] = key.split('_');
+      try {
+        const guild = await client.guilds.fetch(guildId);
+        await guild.members.unban(userId);
+      } catch (e) {}
+      removeTempban(guildId, userId);
+    }
+  }
+  console.log(`📋 ${Object.keys(tempbansData).length} tempban(s) rechargé(s)`);
 });
 
 // ===================== GUILD CREATE (auto-config) =====================
@@ -1080,6 +1222,36 @@ client.on('guildDelete', (guild) => {
 client.on('guildMemberAdd', async (member) => {
   try {
     const gCfg = cfg(member.guild.id);
+    
+    // Anti-raid check
+    addJoinToRaidTracker(member.guild.id);
+    if (checkRaid(member.guild.id)) {
+      if (gCfg.logChannel) {
+        const logCh = member.guild.channels.cache.get(gCfg.logChannel);
+        if (logCh) {
+          const embed = new EmbedBuilder()
+            .setColor('#e74c3c')
+            .setTitle('🚨 ALERTE RAID')
+            .setDescription(`Plusieurs membres ont rejoint en peu de temps !\nSeuil: ${gCfg.antiRaidThreshold || 5} membres en ${gCfg.antiRaidTime || 10}s`)
+            .setTimestamp();
+          logCh.send({ embeds: [embed] }).catch(() => {});
+        }
+      }
+      // Try to lock down the server
+      try {
+        for (const [, ch] of member.guild.channels.cache) {
+          if (ch.type === ChannelType.GuildText) {
+            await ch.permissionOverwrites.edit(member.guild.roles.everyone, { SendMessages: false }).catch(() => {});
+          }
+        }
+        if (gCfg.logChannel) {
+          const logCh = member.guild.channels.cache.get(gCfg.logChannel);
+          if (logCh) logCh.send('🔒 **Serveur verrouillé automatiquement** — Anti-raid activé').catch(() => {});
+        }
+      } catch (e) {}
+      return;
+    }
+    
     // Welcome message
     if (gCfg.welcomeChannel) {
       const ch = member.guild.channels.cache.get(gCfg.welcomeChannel);
@@ -1189,6 +1361,27 @@ client.on('messageCreate', async (message) => {
   if (!message.guild) return;
   
   const gCfg = cfg(message.guild.id);
+  
+  // AFK detection - remove AFK when user sends a message
+  const afkKey = `${message.guild.id}_${message.author.id}`;
+  if (afkUsers.has(afkKey)) {
+    afkUsers.delete(afkKey);
+    await message.reply(`👋 **${message.author.username}** n'est plus AFK !`).then(msg => {
+      setTimeout(() => msg.delete().catch(() => {}), 5000);
+    }).catch(() => {});
+  }
+  
+  // AFK detection - notify when mentioning AFK users
+  if (message.mentions.users.size > 0) {
+    for (const [, mentionedUser] of message.mentions.users) {
+      const mentionedAfkKey = `${message.guild.id}_${mentionedUser.id}`;
+      if (afkUsers.has(mentionedAfkKey)) {
+        const afkData = afkUsers.get(mentionedAfkKey);
+        const duration = Math.floor((Date.now() - afkData.since) / 60000);
+        await message.reply(`😴 **${mentionedUser.username}** est AFK depuis ${duration} minute(s) : ${afkData.reason}`).catch(() => {});
+      }
+    }
+  }
   
   // Automod
   if (gCfg.automodEnabled) {
@@ -1416,6 +1609,29 @@ client.on('messageDelete', async (message) => {
   await ch.send({ embeds: [embed] });
 });
 
+// MESSAGE EDIT (logs)
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+  if (!oldMessage.guild) return;
+  if (oldMessage.author?.bot) return;
+  if (oldMessage.content === newMessage.content) return;
+  const gCfg = cfg(oldMessage.guild.id);
+  if (!gCfg.logChannel || !gCfg.logsMessages) return;
+  const ch = oldMessage.guild.channels.cache.get(gCfg.logChannel);
+  if (!ch) return;
+  
+  const embed = new EmbedBuilder()
+    .setColor('#f39c12')
+    .setTitle('📝 Message modifié')
+    .addFields(
+      { name: 'Auteur', value: oldMessage.author?.username || 'Inconnu', inline: true },
+      { name: 'Salon', value: oldMessage.channel.name, inline: true },
+      { name: 'Avant', value: oldMessage.content?.substring(0, 500) || 'Vide', inline: false },
+      { name: 'Après', value: newMessage.content?.substring(0, 500) || 'Vide', inline: false }
+    )
+    .setTimestamp();
+  await ch.send({ embeds: [embed] });
+});
+
 // ===================== COMMANDES =====================
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
@@ -1460,12 +1676,14 @@ client.on('interactionCreate', async (interaction) => {
       .setDescription('Voici toutes les commandes disponibles :')
       .addFields(
         { name: '🔧 Utilitaires', value: '`/help` `/ping` `/avatar` `/userinfo` `/serverinfo` `/roleinfo` `/roles` `/members` `/boosters` `/emojis` `/invites`', inline: false },
-        { name: '🛡️ Modération', value: '`/ban` `/banid` `/kick` `/mute` `/unmute` `/clear` `/warn` `/unwarn` `/warns` `/tempban` `/softban` `/nick` `/slowmode` `/lock` `/unlock` `/hide` `/unhide` `/clone` `/giverole` `/removerole` `/massrole`', inline: false },
-        { name: '⚙️ Admin', value: '`/nuke` `/backup` `/restore` `/backups` `/say` `/embed` `/status` `/reloadconfig` `/setwelcomechannel` `/setlogchannel` `/setautorole` `/setmodrole` `/setlevel` `/stoprecord`', inline: false },
+        { name: '🛡️ Modération', value: '`/ban` `/banid` `/kick` `/mute` `/unmute` `/clear` `/warn` `/unwarn` `/warns` `/tempban` `/softban` `/nick` `/slowmode` `/lock` `/unlock` `/hide` `/unhide` `/clone` `/giverole` `/removerole` `/massrole` `/history`', inline: false },
+        { name: '💰 Économie', value: '`/balance` `/daily` `/work` `/deposit` `/withdraw` `/pay` `/economyleaderboard` `/shop`', inline: false },
+        { name: '📈 Niveaux', value: '`/rank` `/leaderboard` `/setlevel`', inline: false },
         { name: '🎫 Tickets', value: '`/ticket` `/close` `/add` `/remove`', inline: false },
-        { name: '📈 Niveaux', value: '`/rank` `/leaderboard`', inline: false },
+        { name: '⭐ Social', value: '`/starboard` `/setupreactionrole` `/afk`', inline: false },
         { name: '🎮 Fun', value: '`/meme` `/8ball` `/poll` `/coinflip` `/roll`', inline: false },
-        { name: '⏰ Utilitaires', value: '`/remind` `/afk`', inline: false }
+        { name: '⏰ Utilitaires', value: '`/remind`', inline: false },
+        { name: '⚙️ Admin', value: '`/nuke` `/backup` `/restore` `/backups` `/say` `/embed` `/status` `/reloadconfig` `/setwelcomechannel` `/setlogchannel` `/setautorole` `/setmodrole` `/setlevel` `/stoprecord`', inline: false }
       )
       .setFooter({ text: 'Kycks Bot • Fait avec ❤️' })
       .setTimestamp();
@@ -1479,11 +1697,29 @@ client.on('interactionCreate', async (interaction) => {
   
   // BAN
   if (commandName === 'ban') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const reason = interaction.options.getString('raison') || 'Banni depuis Kycks';
     try {
       const member = await interaction.guild.members.fetch(user.id);
+      if (member.roles.highest.position >= interaction.member.roles.highest.position && interaction.guild.ownerId !== interaction.user.id) {
+        return interaction.reply({ content: '❌ Tu ne peux pas bannir quelqu\'un avec un rôle égal ou supérieur.', ephemeral: true });
+      }
       await member.ban({ reason });
+      addPunishment(interaction.guild.id, user.id, 'ban', interaction.user.username, reason);
+      if (gCfg.logChannel && gCfg.logsModeration) {
+        const logCh = interaction.guild.channels.cache.get(gCfg.logChannel);
+        if (logCh) {
+          const embed = new EmbedBuilder().setColor('#e74c3c').setTitle('🔨 Ban').addFields(
+            { name: 'Utilisateur', value: `${user.username} (${user.id})`, inline: true },
+            { name: 'Modérateur', value: interaction.user.username, inline: true },
+            { name: 'Raison', value: reason, inline: false }
+          ).setTimestamp();
+          logCh.send({ embeds: [embed] }).catch(() => {});
+        }
+      }
       await interaction.reply(`🔨 **${user.username}** a été banni. Raison: ${reason}`);
     } catch (error) {
       await interaction.reply(`❌ Je ne peux pas bannir cet utilisateur.`);
@@ -1492,6 +1728,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // BANID
   if (commandName === 'banid') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const userId = interaction.options.getString('userid');
     const reason = interaction.options.getString('raison') || 'Banni depuis Kycks';
     if (!/^\d{17,20}$/.test(userId)) {
@@ -1499,6 +1738,7 @@ client.on('interactionCreate', async (interaction) => {
     }
     try {
       await interaction.guild.members.ban(userId, { reason });
+      addPunishment(interaction.guild.id, userId, 'ban', interaction.user.username, reason);
       await interaction.reply(`🔨 L'utilisateur avec l'ID **${userId}** a été banni. Raison: ${reason}`);
     } catch (error) {
       await interaction.reply(`❌ Impossible de bannir cet utilisateur. Vérifie l'ID et tes permissions.`);
@@ -1507,11 +1747,29 @@ client.on('interactionCreate', async (interaction) => {
   
   // KICK
   if (commandName === 'kick') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const reason = interaction.options.getString('raison') || 'Expulsé depuis Kycks';
     try {
       const member = await interaction.guild.members.fetch(user.id);
+      if (member.roles.highest.position >= interaction.member.roles.highest.position && interaction.guild.ownerId !== interaction.user.id) {
+        return interaction.reply({ content: '❌ Tu ne peux pas expulser quelqu\'un avec un rôle égal ou supérieur.', ephemeral: true });
+      }
       await member.kick(reason);
+      addPunishment(interaction.guild.id, user.id, 'kick', interaction.user.username, reason);
+      if (gCfg.logChannel && gCfg.logsModeration) {
+        const logCh = interaction.guild.channels.cache.get(gCfg.logChannel);
+        if (logCh) {
+          const embed = new EmbedBuilder().setColor('#e67e22').setTitle('👢 Kick').addFields(
+            { name: 'Utilisateur', value: `${user.username} (${user.id})`, inline: true },
+            { name: 'Modérateur', value: interaction.user.username, inline: true },
+            { name: 'Raison', value: reason, inline: false }
+          ).setTimestamp();
+          logCh.send({ embeds: [embed] }).catch(() => {});
+        }
+      }
       await interaction.reply(`👢 **${user.username}** a été expulsé. Raison: ${reason}`);
     } catch (error) {
       await interaction.reply(`❌ Je ne peux pas expulser cet utilisateur.`);
@@ -1520,11 +1778,26 @@ client.on('interactionCreate', async (interaction) => {
   
   // MUTE
   if (commandName === 'mute') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const duration = interaction.options.getInteger('duree') || 10;
     try {
       const member = await interaction.guild.members.fetch(user.id);
-      await member.timeout(duration * 60 * 1000);
+      await member.timeout(duration * 60 * 1000, `Mute par ${interaction.user.username}`);
+      addPunishment(interaction.guild.id, user.id, 'mute', interaction.user.username, `${duration} min`);
+      if (gCfg.logChannel && gCfg.logsModeration) {
+        const logCh = interaction.guild.channels.cache.get(gCfg.logChannel);
+        if (logCh) {
+          const embed = new EmbedBuilder().setColor('#3498db').setTitle('🔇 Mute').addFields(
+            { name: 'Utilisateur', value: `${user.username} (${user.id})`, inline: true },
+            { name: 'Modérateur', value: interaction.user.username, inline: true },
+            { name: 'Durée', value: `${duration} minutes`, inline: true }
+          ).setTimestamp();
+          logCh.send({ embeds: [embed] }).catch(() => {});
+        }
+      }
       await interaction.reply(`🔇 **${user.username}** mute pendant ${duration} minutes.`);
     } catch (error) {
       await interaction.reply(`❌ Je ne peux pas mute cet utilisateur.`);
@@ -1533,6 +1806,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // UNMUTE
   if (commandName === 'unmute') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     try {
       const member = await interaction.guild.members.fetch(user.id);
@@ -1545,11 +1821,25 @@ client.on('interactionCreate', async (interaction) => {
   
   // CLEAR
   if (commandName === 'clear') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const amount = interaction.options.getInteger('nombre');
     if (amount < 1 || amount > 100) return interaction.reply('❌ Nombre invalide (1-100)');
     try {
-      await interaction.channel.bulkDelete(amount);
-      await interaction.reply(`🗑️ ${amount} messages supprimés.`);
+      const deleted = await interaction.channel.bulkDelete(amount, true);
+      if (gCfg.logChannel && gCfg.logsModeration) {
+        const logCh = interaction.guild.channels.cache.get(gCfg.logChannel);
+        if (logCh) {
+          const embed = new EmbedBuilder().setColor('#9b59b6').setTitle('🗑️ Clear').addFields(
+            { name: 'Salon', value: interaction.channel.name, inline: true },
+            { name: 'Modérateur', value: interaction.user.username, inline: true },
+            { name: 'Messages supprimés', value: deleted.size.toString(), inline: true }
+          ).setTimestamp();
+          logCh.send({ embeds: [embed] }).catch(() => {});
+        }
+      }
+      await interaction.reply(`🗑️ ${deleted.size} messages supprimés.`);
     } catch (error) {
       await interaction.reply(`❌ Impossible de supprimer les messages.`);
     }
@@ -1557,9 +1847,26 @@ client.on('interactionCreate', async (interaction) => {
   
   // WARN
   if (commandName === 'warn') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const reason = interaction.options.getString('raison') || 'Aucune raison';
     const count = addWarn(user.id, interaction.guild.id, reason, interaction.user.username);
+    addPunishment(interaction.guild.id, user.id, 'warn', interaction.user.username, reason);
+    
+    if (gCfg.logChannel && gCfg.logsModeration) {
+      const logCh = interaction.guild.channels.cache.get(gCfg.logChannel);
+      if (logCh) {
+        const embed = new EmbedBuilder().setColor('#f39c12').setTitle('⚠️ Warn').addFields(
+          { name: 'Utilisateur', value: `${user.username} (${user.id})`, inline: true },
+          { name: 'Modérateur', value: interaction.user.username, inline: true },
+          { name: 'Raison', value: reason, inline: true },
+          { name: 'Total', value: `${count}/${gCfg.warnLimit}`, inline: true }
+        ).setTimestamp();
+        logCh.send({ embeds: [embed] }).catch(() => {});
+      }
+    }
     
     await interaction.reply(`⚠️ **${user.username}** a été warn. (${count}/${gCfg.warnLimit} warns)`);
     
@@ -1568,10 +1875,16 @@ client.on('interactionCreate', async (interaction) => {
         const member = await interaction.guild.members.fetch(user.id);
         if (gCfg.warnAction === 'ban') {
           await member.ban({ reason: `${gCfg.warnLimit} warns atteints` });
+          addPunishment(interaction.guild.id, user.id, 'ban', 'Système', `${gCfg.warnLimit} warns`);
           await interaction.followUp(`🔨 **${user.username}** a été banni (${gCfg.warnLimit} warns)`);
         } else if (gCfg.warnAction === 'kick') {
           await member.kick(`${gCfg.warnLimit} warns atteints`);
+          addPunishment(interaction.guild.id, user.id, 'kick', 'Système', `${gCfg.warnLimit} warns`);
           await interaction.followUp(`👢 **${user.username}** a été expulsé (${gCfg.warnLimit} warns)`);
+        } else if (gCfg.warnAction === 'mute') {
+          await member.timeout(60 * 60 * 1000, `${gCfg.warnLimit} warns atteints`);
+          addPunishment(interaction.guild.id, user.id, 'mute', 'Système', `${gCfg.warnLimit} warns`);
+          await interaction.followUp(`🔇 **${user.username}** a été mute (${gCfg.warnLimit} warns)`);
         }
         clearWarns(user.id, interaction.guild.id);
       } catch (e) {}
@@ -1580,6 +1893,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // UNWARN
   if (commandName === 'unwarn') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     clearWarns(user.id, interaction.guild.id);
     await interaction.reply(`✅ Warns de **${user.username}** supprimés.`);
@@ -1601,15 +1917,33 @@ client.on('interactionCreate', async (interaction) => {
   
   // TEMPBAN
   if (commandName === 'tempban') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const duration = interaction.options.getInteger('duree');
     const reason = interaction.options.getString('raison') || 'Tempban';
     try {
       const member = await interaction.guild.members.fetch(user.id);
+      if (member.roles.highest.position >= interaction.member.roles.highest.position && interaction.guild.ownerId !== interaction.user.id) {
+        return interaction.reply({ content: '❌ Tu ne peux pas bannir quelqu\'un avec un rôle égal ou supérieur.', ephemeral: true });
+      }
       await member.ban({ reason });
-      setTimeout(async () => {
-        try { await interaction.guild.members.unban(user.id); } catch (e) {}
-      }, duration * 24 * 60 * 60 * 1000);
+      const expiresAt = Date.now() + (duration * 24 * 60 * 60 * 1000);
+      addTempban(interaction.guild.id, user.id, expiresAt);
+      addPunishment(interaction.guild.id, user.id, 'tempban', interaction.user.username, `${duration}j - ${reason}`);
+      if (gCfg.logChannel && gCfg.logsModeration) {
+        const logCh = interaction.guild.channels.cache.get(gCfg.logChannel);
+        if (logCh) {
+          const embed = new EmbedBuilder().setColor('#e74c3c').setTitle('🔨 Tempban').addFields(
+            { name: 'Utilisateur', value: `${user.username} (${user.id})`, inline: true },
+            { name: 'Modérateur', value: interaction.user.username, inline: true },
+            { name: 'Durée', value: `${duration} jour(s)`, inline: true },
+            { name: 'Raison', value: reason, inline: false }
+          ).setTimestamp();
+          logCh.send({ embeds: [embed] }).catch(() => {});
+        }
+      }
       await interaction.reply(`🔨 **${user.username}** banni pendant ${duration} jour(s).`);
     } catch (error) {
       await interaction.reply(`❌ Impossible de bannir.`);
@@ -1618,12 +1952,16 @@ client.on('interactionCreate', async (interaction) => {
   
   // SOFTBAN
   if (commandName === 'softban') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const reason = interaction.options.getString('raison') || 'Softban';
     try {
       const member = await interaction.guild.members.fetch(user.id);
       await member.ban({ reason, deleteMessageDays: 7 });
       await interaction.guild.members.unban(user.id);
+      addPunishment(interaction.guild.id, user.id, 'softban', interaction.user.username, reason);
       await interaction.reply(`🔨 **${user.username}** softbanni.`);
     } catch (error) {
       await interaction.reply(`❌ Impossible.`);
@@ -1632,6 +1970,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // NICK
   if (commandName === 'nick') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const nick = interaction.options.getString('pseudo');
     try {
@@ -1645,6 +1986,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // SLOWMODE
   if (commandName === 'slowmode') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const seconds = interaction.options.getInteger('secondes');
     try {
       await interaction.channel.setRateLimitPerUser(seconds);
@@ -1656,6 +2000,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // LOCK
   if (commandName === 'lock') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     try {
       await interaction.channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { SendMessages: false });
       await interaction.reply(`🔒 Salon verrouillé.`);
@@ -1666,6 +2013,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // UNLOCK
   if (commandName === 'unlock') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     try {
       await interaction.channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { SendMessages: true });
       await interaction.reply(`🔓 Salon déverrouillé.`);
@@ -1676,6 +2026,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // HIDE
   if (commandName === 'hide') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     try {
       await interaction.channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { ViewChannel: false });
       await interaction.reply(`🙈 Salon caché.`);
@@ -1686,6 +2039,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // UNHIDE
   if (commandName === 'unhide') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     try {
       await interaction.channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { ViewChannel: true });
       await interaction.reply(`👁️ Salon visible.`);
@@ -1696,6 +2052,9 @@ client.on('interactionCreate', async (interaction) => {
   
   // CLONE
   if (commandName === 'clone') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
     const channel = interaction.options.getChannel('salon');
     try {
       const cloned = await channel.clone({ reason: `Cloné par ${interaction.user.username}` });
@@ -1915,27 +2274,6 @@ client.on('interactionCreate', async (interaction) => {
     await interaction.reply({ embeds: [embed] });
   }
   
-  // SAY
-  if (commandName === 'say') {
-    const message = interaction.options.getString('message');
-    await interaction.channel.send(message);
-    await interaction.reply({ content: '✅ Message envoyé !', ephemeral: true });
-  }
-  
-  // EMBED
-  if (commandName === 'embed') {
-    const titre = interaction.options.getString('titre');
-    const message = interaction.options.getString('message');
-    const couleur = interaction.options.getString('couleur') || gCfg.embedColor;
-    
-    const embed = new EmbedBuilder()
-      .setColor(couleur)
-      .setTitle(titre)
-      .setDescription(message)
-      .setTimestamp();
-    await interaction.reply({ embeds: [embed] });
-  }
-  
   // POLL
   if (commandName === 'poll') {
     if (!gCfg.pollEnabled) {
@@ -2082,16 +2420,231 @@ client.on('interactionCreate', async (interaction) => {
   
   // SETLEVEL
   if (commandName === 'setlevel') {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: '❌ Admin uniquement.', ephemeral: true });
+    }
     const user = interaction.options.getUser('utilisateur');
     const level = interaction.options.getInteger('niveau');
     const key = `${interaction.guild.id}_${user.id}`;
     if (!xpData[key]) xpData[key] = { xp: 0, level: 0, lastXp: 0 };
     xpData[key].level = level;
     xpData[key].xp = level * level * 100;
+    saveJsonFile(XP_DATA_PATH, xpData);
     await interaction.reply(`✅ Niveau de **${user.username}** mis à jour: ${level}`);
   }
   
-  // TICKET
+  // SAY
+  if (commandName === 'say') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions.', ephemeral: true });
+    }
+    const message = interaction.options.getString('message');
+    await interaction.channel.send(message);
+    await interaction.reply({ content: '✅ Message envoyé !', ephemeral: true });
+  }
+  
+  // EMBED
+  if (commandName === 'embed') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions.', ephemeral: true });
+    }
+    const titre = interaction.options.getString('titre');
+    const message = interaction.options.getString('message');
+    const couleur = interaction.options.getString('couleur') || gCfg.embedColor;
+    
+    const embed = new EmbedBuilder()
+      .setColor(couleur)
+      .setTitle(titre)
+      .setDescription(message)
+      .setTimestamp();
+    await interaction.reply({ embeds: [embed] });
+  }
+  
+  // STATUS
+  if (commandName === 'status') {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: '❌ Admin uniquement.', ephemeral: true });
+    }
+    const newStatus = interaction.options.getString('statut');
+    gCfg.status = newStatus;
+    setGuildCfg(interaction.guild.id, gCfg);
+    client.user.setActivity(newStatus);
+    await interaction.reply(`✅ Status: **${newStatus}**`);
+  }
+  
+  // AFK (enhanced)
+  if (commandName === 'afk') {
+    const reason = interaction.options.getString('raison') || 'AFK';
+    afkUsers.set(`${interaction.guild.id}_${interaction.user.id}`, {
+      reason,
+      since: Date.now()
+    });
+    await interaction.reply(`😴 **${interaction.user.username}** est AFK: ${reason}`);
+  }
+  
+  // HISTORY
+  if (commandName === 'history') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions de modération.', ephemeral: true });
+    }
+    const user = interaction.options.getUser('utilisateur') || interaction.user;
+    const history = getPunishments(interaction.guild.id, user.id);
+    
+    const embed = new EmbedBuilder()
+      .setColor('#e74c3c')
+      .setTitle(`📋 Historique de ${user.username}`)
+      .setDescription(history.length === 0 ? 'Aucune sanction.' : history.map((p, i) => {
+        const icons = { ban: '🔨', kick: '👢', mute: '🔇', warn: '⚠️', tempban: '🔨', softban: '🔨' };
+        return `**${i+1}.** ${icons[p.type] || '❓'} ${p.type} par **${p.moderator}** — ${p.reason} (<t:${Math.floor(new Date(p.date).getTime() / 1000)}:R>)`;
+      }).join('\n'))
+      .setTimestamp();
+    
+    await interaction.reply({ embeds: [embed] });
+  }
+  
+  // ECONOMY COMMANDS
+  if (commandName === 'balance') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const eco = getEconomy(interaction.user.id, interaction.guild.id);
+    const embed = new EmbedBuilder()
+      .setColor('#f1c40f')
+      .setTitle(`💰 Solde de ${interaction.user.username}`)
+      .addFields(
+        { name: '💵 Portefeuille', value: `${eco.balance} ${gCfg.economyCurrency || '💰 Coins'}`, inline: true },
+        { name: '🏦 Banque', value: `${eco.bank} ${gCfg.economyCurrency || '💰 Coins'}`, inline: true },
+        { name: '📊 Total', value: `${eco.balance + eco.bank} ${gCfg.economyCurrency || '💰 Coins'}`, inline: true }
+      )
+      .setTimestamp();
+    await interaction.reply({ embeds: [embed] });
+  }
+  
+  if (commandName === 'daily') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const eco = getEconomy(interaction.user.id, interaction.guild.id);
+    const now = Date.now();
+    if (now - eco.lastDaily < 24 * 60 * 60 * 1000) {
+      const remaining = 24 * 60 * 60 * 1000 - (now - eco.lastDaily);
+      const hours = Math.floor(remaining / (60 * 60 * 1000));
+      const mins = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+      return interaction.reply({ content: `⏰ Tu dois attendre encore ${hours}h ${mins}min.`, ephemeral: true });
+    }
+    const amount = gCfg.economyDailyAmount || 100;
+    eco.balance += amount;
+    eco.lastDaily = now;
+    saveEconomy();
+    await interaction.reply(`💰 Tu as reçu **${amount} ${gCfg.economyCurrency || '💰 Coins'}** !`);
+  }
+  
+  if (commandName === 'work') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const eco = getEconomy(interaction.user.id, interaction.guild.id);
+    const now = Date.now();
+    if (now - eco.lastWork < 30 * 60 * 1000) {
+      const remaining = 30 * 60 * 1000 - (now - eco.lastWork);
+      const mins = Math.floor(remaining / (60 * 1000));
+      return interaction.reply({ content: `⏰ Tu dois attendre encore ${mins} minute(s).`, ephemeral: true });
+    }
+    const baseAmount = gCfg.economyWorkAmount || 50;
+    const amount = Math.floor(baseAmount * (0.5 + Math.random()));
+    eco.balance += amount;
+    eco.lastWork = now;
+    saveEconomy();
+    const jobs = ['développeur', 'boulanger', 'pompier', 'médecin', 'professeur', 'artiste', 'cuisinier', 'livreur'];
+    const job = jobs[Math.floor(Math.random() * jobs.length)];
+    await interaction.reply(`🔨 Tu as travaillé comme **${job}** et gagné **${amount} ${gCfg.economyCurrency || '💰 Coins'}** !`);
+  }
+  
+  if (commandName === 'deposit') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const eco = getEconomy(interaction.user.id, interaction.guild.id);
+    const amount = interaction.options.getInteger('montant');
+    if (amount <= 0) return interaction.reply({ content: '❌ Montant invalide.', ephemeral: true });
+    if (amount > eco.balance) return interaction.reply({ content: '❌ Tu n\'as pas assez.', ephemeral: true });
+    eco.balance -= amount;
+    eco.bank += amount;
+    saveEconomy();
+    await interaction.reply(`🏦 **${amount}** déposés en banque.`);
+  }
+  
+  if (commandName === 'withdraw') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const eco = getEconomy(interaction.user.id, interaction.guild.id);
+    const amount = interaction.options.getInteger('montant');
+    if (amount <= 0) return interaction.reply({ content: '❌ Montant invalide.', ephemeral: true });
+    if (amount > eco.bank) return interaction.reply({ content: '❌ Pas assez en banque.', ephemeral: true });
+    eco.bank -= amount;
+    eco.balance += amount;
+    saveEconomy();
+    await interaction.reply(`💵 **${amount}** retirés de la banque.`);
+  }
+  
+  if (commandName === 'pay') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const target = interaction.options.getUser('utilisateur');
+    const amount = interaction.options.getInteger('montant');
+    if (target.id === interaction.user.id) return interaction.reply({ content: '❌ Tu ne peux pas te payer à toi-même.', ephemeral: true });
+    if (target.bot) return interaction.reply({ content: '❌ Tu ne peux pas payer un bot.', ephemeral: true });
+    const eco = getEconomy(interaction.user.id, interaction.guild.id);
+    if (amount <= 0) return interaction.reply({ content: '❌ Montant invalide.', ephemeral: true });
+    if (amount > eco.balance) return interaction.reply({ content: '❌ Tu n\'as pas assez.', ephemeral: true });
+    const targetEco = getEconomy(target.id, interaction.guild.id);
+    eco.balance -= amount;
+    targetEco.balance += amount;
+    saveEconomy();
+    await interaction.reply(`💸 **${interaction.user.username}** a payé **${amount} ${gCfg.economyCurrency || '💰 Coins'}** à **${target.username}** !`);
+  }
+  
+  if (commandName === 'economyleaderboard') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const guildData = Object.entries(economyData)
+      .filter(([key]) => key.startsWith(interaction.guild.id + '_'))
+      .map(([key, val]) => ({ userId: key.split('_')[1], total: (val.balance || 0) + (val.bank || 0) }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+    
+    const description = guildData.map((d, i) =>
+      `**${i+1}.** <@${d.userId}> — ${d.total} ${gCfg.economyCurrency || '💰 Coins'}`
+    ).join('\n') || 'Aucune donnée.';
+    
+    const embed = new EmbedBuilder()
+      .setColor('#f1c40f')
+      .setTitle('🏆 Classement Économie')
+      .setDescription(description)
+      .setTimestamp();
+    await interaction.reply({ embeds: [embed] });
+  }
+  
+  if (commandName === 'shop') {
+    if (!gCfg.economyEnabled) {
+      return interaction.reply({ content: '❌ Système économique désactivé.', ephemeral: true });
+    }
+    const items = gCfg.economyShopItems || [];
+    if (items.length === 0) {
+      return interaction.reply({ content: '🏪 La boutique est vide. Configure-la dans le panel.', ephemeral: true });
+    }
+    const embed = new EmbedBuilder()
+      .setColor('#f1c40f')
+      .setTitle('🏪 Boutique')
+      .setDescription(items.map((item, i) => `**${i+1}.** ${item.name} — ${item.price} ${gCfg.economyCurrency || '💰 Coins'}`).join('\n'))
+      .setTimestamp();
+    await interaction.reply({ embeds: [embed] });
+  }
+  
+  // TICKET (enhanced version with mod role + log channel)
   if (commandName === 'ticket') {
     if (!gCfg.ticketEnabled) {
       return interaction.reply({ content: '❌ Tickets désactivés.', ephemeral: true });
@@ -2113,7 +2666,8 @@ client.on('interactionCreate', async (interaction) => {
         permissionOverwrites: [
           { id: interaction.guild.roles.everyone, deny: [PermissionFlagsBits.ViewChannel] },
           { id: interaction.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
-          { id: client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] }
+          { id: client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] },
+          ...(gCfg.modRole ? [{ id: gCfg.modRole, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages] }] : [])
         ]
       });
       
@@ -2125,6 +2679,21 @@ client.on('interactionCreate', async (interaction) => {
         createdAt: new Date().toISOString()
       });
       saveTickets();
+      
+      if (gCfg.ticketLogChannel) {
+        const logCh = interaction.guild.channels.cache.get(gCfg.ticketLogChannel);
+        if (logCh) {
+          const logEmbed = new EmbedBuilder()
+            .setColor('#2ecc71')
+            .setTitle('🎫 Ticket ouvert')
+            .addFields(
+              { name: 'Utilisateur', value: `${interaction.user.username} (${interaction.user.id})`, inline: true },
+              { name: 'Salon', value: ticketChannel.toString(), inline: true }
+            )
+            .setTimestamp();
+          logCh.send({ embeds: [logEmbed] }).catch(() => {});
+        }
+      }
       
       const closeRow = new ActionRowBuilder()
         .addComponents(
@@ -2145,6 +2714,111 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
   
+  // SETWELCOMECHANNEL
+  if (commandName === 'setwelcomechannel') {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: '❌ Admin uniquement.', ephemeral: true });
+    }
+    const channel = interaction.options.getChannel('salon');
+    gCfg.welcomeChannel = channel.id;
+    setGuildCfg(interaction.guild.id, gCfg);
+    await interaction.reply(`✅ Salon de bienvenue: ${channel}`);
+  }
+  
+  // SETLOGCHANNEL
+  if (commandName === 'setlogchannel') {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: '❌ Admin uniquement.', ephemeral: true });
+    }
+    const channel = interaction.options.getChannel('salon');
+    gCfg.logChannel = channel.id;
+    setGuildCfg(interaction.guild.id, gCfg);
+    await interaction.reply(`✅ Salon de logs: ${channel}`);
+  }
+  
+  // SETAUTOROLE
+  if (commandName === 'setautorole') {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: '❌ Admin uniquement.', ephemeral: true });
+    }
+    const role = interaction.options.getRole('role');
+    gCfg.autoRole = role.id;
+    setGuildCfg(interaction.guild.id, gCfg);
+    await interaction.reply(`✅ Auto-rôle: ${role}`);
+  }
+  
+  // SETMODROLE
+  if (commandName === 'setmodrole') {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: '❌ Admin uniquement.', ephemeral: true });
+    }
+    const role = interaction.options.getRole('role');
+    gCfg.modRole = role.id;
+    setGuildCfg(interaction.guild.id, gCfg);
+    await interaction.reply(`✅ Rôle modérateur: ${role}`);
+  }
+  
+  // GIVEROLE
+  if (commandName === 'giverole') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions.', ephemeral: true });
+    }
+    const user = interaction.options.getUser('utilisateur');
+    const role = interaction.options.getRole('role');
+    try {
+      const member = await interaction.guild.members.fetch(user.id);
+      await member.roles.add(role);
+      await interaction.reply(`✅ Rôle **${role.name}** donné à **${user.username}**.`);
+    } catch (error) {
+      await interaction.reply(`❌ Impossible.`);
+    }
+  }
+  
+  // REMOVEROLE
+  if (commandName === 'removerole') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions.', ephemeral: true });
+    }
+    const user = interaction.options.getUser('utilisateur');
+    const role = interaction.options.getRole('role');
+    try {
+      const member = await interaction.guild.members.fetch(user.id);
+      await member.roles.remove(role);
+      await interaction.reply(`✅ Rôle **${role.name}** retiré à **${user.username}**.`);
+    } catch (error) {
+      await interaction.reply(`❌ Impossible.`);
+    }
+  }
+  
+  // MASSROLE
+  if (commandName === 'massrole') {
+    if (!hasModPermission(interaction.member, gCfg)) {
+      return interaction.reply({ content: '❌ Tu n\'as pas les permissions.', ephemeral: true });
+    }
+    const role = interaction.options.getRole('role');
+    await interaction.deferReply();
+    let count = 0;
+    try {
+      let lastId = null;
+      while (true) {
+        const fetchOptions = { limit: 1000 };
+        if (lastId) fetchOptions.after = lastId;
+        const batch = await interaction.guild.members.fetch(fetchOptions);
+        for (const [, member] of batch) {
+          try {
+            if (!member.user.bot) {
+              await member.roles.add(role);
+              count++;
+            }
+          } catch (e) {}
+        }
+        if (batch.size < 1000) break;
+        lastId = batch.last()?.id;
+      }
+    } catch (e) {}
+    await interaction.editReply(`✅ Rôle **${role.name}** donné à **${count}** membres.`);
+  }
+  
   // CLOSE
   if (commandName === 'close') {
     const ticket = tickets.get(interaction.channel.id);
@@ -2155,6 +2829,21 @@ client.on('interactionCreate', async (interaction) => {
     ticket.open = false;
     saveTickets();
     await interaction.reply(`🔒 Ticket fermé par ${interaction.user.username}.`);
+    
+    if (gCfg.ticketLogChannel) {
+      const logCh = interaction.guild.channels.cache.get(gCfg.ticketLogChannel);
+      if (logCh) {
+        const embed = new EmbedBuilder()
+          .setColor('#e74c3c')
+          .setTitle('🔒 Ticket fermé')
+          .addFields(
+            { name: 'Fermé par', value: interaction.user.username, inline: true },
+            { name: 'Ticket', value: interaction.channel.name, inline: true }
+          )
+          .setTimestamp();
+        logCh.send({ embeds: [embed] }).catch(() => {});
+      }
+    }
     
     if (gCfg.ticketTranscript) {
       const messages = await interaction.channel.messages.fetch();
@@ -2188,99 +2877,45 @@ client.on('interactionCreate', async (interaction) => {
     await interaction.reply(`✅ ${user.username} retiré du ticket.`);
   }
   
-  // STATUS
-  if (commandName === 'status') {
-    const newStatus = interaction.options.getString('statut');
-    gCfg.status = newStatus;
-    setGuildCfg(interaction.guild.id, gCfg);
-    client.user.setActivity(newStatus);
-    await interaction.reply(`✅ Status: **${newStatus}**`);
-  }
-  
-  // RELOADCONFIG
-  if (commandName === 'reloadconfig') {
-    config = getDefaultConfig();
-    await interaction.reply('✅ Configuration rechargée ! Les configs serveur sont relues à chaque action.');
-  }
-  
-  // SETWELCOMECHANNEL
-  if (commandName === 'setwelcomechannel') {
-    const channel = interaction.options.getChannel('salon');
-    gCfg.welcomeChannel = channel.id;
-    setGuildCfg(interaction.guild.id, gCfg);
-    await interaction.reply(`✅ Salon de bienvenue: ${channel}`);
-  }
-  
-  // SETLOGCHANNEL
-  if (commandName === 'setlogchannel') {
-    const channel = interaction.options.getChannel('salon');
-    gCfg.logChannel = channel.id;
-    setGuildCfg(interaction.guild.id, gCfg);
-    await interaction.reply(`✅ Salon de logs: ${channel}`);
-  }
-  
-  // SETAUTOROLE
-  if (commandName === 'setautorole') {
-    const role = interaction.options.getRole('role');
-    gCfg.autoRole = role.id;
-    setGuildCfg(interaction.guild.id, gCfg);
-    await interaction.reply(`✅ Auto-rôle: ${role}`);
-  }
-  
-  // SETMODROLE
-  if (commandName === 'setmodrole') {
-    const role = interaction.options.getRole('role');
-    gCfg.modRole = role.id;
-    setGuildCfg(interaction.guild.id, gCfg);
-    await interaction.reply(`✅ Rôle modérateur: ${role}`);
-  }
-  
-  // GIVEROLE
-  if (commandName === 'giverole') {
-    const user = interaction.options.getUser('utilisateur');
-    const role = interaction.options.getRole('role');
-    try {
-      const member = await interaction.guild.members.fetch(user.id);
-      await member.roles.add(role);
-      await interaction.reply(`✅ Rôle **${role.name}** donné à **${user.username}**.`);
-    } catch (error) {
-      await interaction.reply(`❌ Impossible.`);
+  // STARBOARD
+  if (commandName === 'starboard') {
+    if (!gCfg.starboardChannel) {
+      return interaction.reply({ content: '❌ Starboard non configuré.', ephemeral: true });
     }
-  }
-  
-  // REMOVEROLE
-  if (commandName === 'removerole') {
-    const user = interaction.options.getUser('utilisateur');
-    const role = interaction.options.getRole('role');
-    try {
-      const member = await interaction.guild.members.fetch(user.id);
-      await member.roles.remove(role);
-      await interaction.reply(`✅ Rôle **${role.name}** retiré à **${user.username}**.`);
-    } catch (error) {
-      await interaction.reply(`❌ Impossible.`);
+    const starChannel = interaction.guild.channels.cache.get(gCfg.starboardChannel);
+    if (!starChannel) {
+      return interaction.reply({ content: '❌ Salon starboard introuvable.', ephemeral: true });
     }
-  }
-  
-  // MASSROLE
-  if (commandName === 'massrole') {
-    const role = interaction.options.getRole('role');
-    await interaction.deferReply();
-    let count = 0;
-    for (const [id, member] of interaction.guild.members.cache) {
-      try {
-        if (!member.user.bot) {
-          await member.roles.add(role);
-          count++;
-        }
-      } catch (e) {}
+    const messages = await starChannel.messages.fetch({ limit: 10 });
+    if (messages.size === 0) {
+      return interaction.reply({ content: '⭐ Aucun message dans le starboard.', ephemeral: true });
     }
-    await interaction.editReply(`✅ Rôle **${role.name}** donné à **${count}** membres.`);
+    const embed = new EmbedBuilder()
+      .setColor('#f1c40f')
+      .setTitle('⭐ Starboard')
+      .setDescription(messages.map(m => `> ${m.content?.substring(0, 100) || '*embed*'}\n  — ${m.author.toString()}`).join('\n\n'))
+      .setTimestamp();
+    await interaction.reply({ embeds: [embed] });
   }
   
-  // AFK
-  if (commandName === 'afk') {
-    const reason = interaction.options.getString('raison') || 'AFK';
-    await interaction.reply(`😴 **${interaction.user.username}** est AFK: ${reason}`);
+  // SETUPREACTIONROLE
+  if (commandName === 'setupreactionrole') {
+    if (!interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+      return interaction.reply({ content: '❌ Admin uniquement.', ephemeral: true });
+    }
+    const emoji = interaction.options.getString('emoji');
+    const role = interaction.options.getRole('role');
+    
+    if (!gCfg.reactionRoles) gCfg.reactionRoles = {};
+    gCfg.reactionRoles[emoji] = role.id;
+    setGuildCfg(interaction.guild.id, gCfg);
+    
+    const embed = new EmbedBuilder()
+      .setColor('#2ecc71')
+      .setTitle('🎭 Reaction Role configuré')
+      .setDescription(`Réagis avec ${emoji} pour obtenir le rôle ${role}`)
+      .setTimestamp();
+    await interaction.reply({ embeds: [embed] });
   }
   
   // REACTION ROLE SETUP (placeholder)
@@ -2374,6 +3009,75 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
+// STARBOARD REACTION HANDLER
+client.on('messageReactionAdd', async (reaction, user) => {
+  if (user.bot) return;
+  if (!reaction.message.guild) return;
+  const gCfg = cfg(reaction.message.guild.id);
+  
+  // Starboard
+  if (gCfg.starboardChannel && reaction.emoji.name === '⭐') {
+    if (reaction.count >= (gCfg.starboardThreshold || 5)) {
+      const starChannel = reaction.message.guild.channels.cache.get(gCfg.starboardChannel);
+      if (starChannel) {
+        const existing = await starChannel.messages.fetch({ limit: 100 });
+        const alreadyStarred = existing.find(m => m.embeds[0]?.footer?.text === reaction.message.id);
+        if (!alreadyStarred) {
+          const embed = new EmbedBuilder()
+            .setColor('#f1c40f')
+            .setTitle('⭐ Message Étoilé')
+            .setDescription(reaction.message.content || '*Pas de contenu*')
+            .addFields(
+              { name: 'Auteur', value: reaction.message.author.toString(), inline: true },
+              { name: 'Salon', value: reaction.message.channel.toString(), inline: true },
+              { name: '⭐', value: reaction.count.toString(), inline: true }
+            )
+            .setFooter({ text: reaction.message.id })
+            .setTimestamp();
+          if (reaction.message.content && reaction.message.content.length > 0) {
+            embed.setAuthor({ name: reaction.message.author.username, iconURL: reaction.message.author.displayAvatarURL() });
+          }
+          starChannel.send({ embeds: [embed] }).catch(() => {});
+        }
+      }
+    }
+  }
+  
+  // Reaction roles
+  if (gCfg.reactionRoles && Object.keys(gCfg.reactionRoles).length > 0) {
+    const emoji = reaction.emoji.name;
+    if (gCfg.reactionRoles[emoji]) {
+      try {
+        const member = await reaction.message.guild.members.fetch(user.id);
+        const role = reaction.message.guild.roles.cache.get(gCfg.reactionRoles[emoji]);
+        if (role) {
+          await member.roles.add(role);
+        }
+      } catch (e) {}
+    }
+  }
+});
+
+client.on('messageReactionRemove', async (reaction, user) => {
+  if (user.bot) return;
+  if (!reaction.message.guild) return;
+  const gCfg = cfg(reaction.message.guild.id);
+  
+  // Reaction roles - remove role on unreact
+  if (gCfg.reactionRoles && Object.keys(gCfg.reactionRoles).length > 0) {
+    const emoji = reaction.emoji.name;
+    if (gCfg.reactionRoles[emoji]) {
+      try {
+        const member = await reaction.message.guild.members.fetch(user.id);
+        const role = reaction.message.guild.roles.cache.get(gCfg.reactionRoles[emoji]);
+        if (role) {
+          await member.roles.remove(role);
+        }
+      } catch (e) {}
+    }
+  }
+});
+
 // ===================== BUTTON INTERACTIONS =====================
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isButton()) return;
@@ -2438,7 +3142,10 @@ module.exports = {
   restoreBackup,
   nukeGuild,
   activeRecordings,
-  VoiceRecorder
+  VoiceRecorder,
+  economyData,
+  saveEconomy,
+  getEconomy
 };
 
 // ===================== GRACEFUL SHUTDOWN =====================
@@ -2448,6 +3155,9 @@ function gracefulShutdown(signal) {
     saveJsonFile(XP_DATA_PATH, xpData);
     saveJsonFile(WARNS_DATA_PATH, warns);
     saveTickets();
+    saveEconomy();
+    saveJsonFile(PUNISHMENTS_PATH, punishmentsData);
+    saveJsonFile(TEMPBANS_PATH, tempbansData);
     console.log('💾 Données sauvegardées.');
   } catch (e) {
     console.error('❌ Erreur sauvegarde:', e);
